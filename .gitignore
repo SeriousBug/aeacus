@@ -1,0 +1,5 @@
+website/node_modules/
+website/dist/
+cli/node_modules/
+cli/*.tgz
+.pnpm-store/

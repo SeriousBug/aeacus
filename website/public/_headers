@@ -1,0 +1,4 @@
+# Cross-origin isolation lets ONNX Runtime run WebAssembly on several threads.
+/*
+  Cross-Origin-Opener-Policy: same-origin
+  Cross-Origin-Embedder-Policy: require-corp

@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Human or AI - Aeacus AI Judge</title>
+  <meta name="description" content="Paste text to see which parts of it read as written by a person and which by AI. Aeacus, the AI judge, runs entirely in your browser.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect x='1' y='3' width='6' height='10' rx='1.5' fill='%232563eb'/%3E%3Crect x='9' y='3' width='6' height='10' rx='1.5' fill='%239333ea'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="style.css">
+  <script src="/coi-serviceworker.js"></script>
+  <script type="module" src="app.js"></script>
+</head>
+<body>
+  <main>
+    <header>
+      <div>
+        <p class="eyebrow">Aeacus AI Judge</p>
+        <h1>Human or AI</h1>
+      </div>
+      <nav class="links" aria-label="Links">
+        <a href="https://huggingface.co/level20tauren/aeacus-s-1">Hugging Face</a>
+        <a href="https://github.com/SeriousBug">GitHub</a>
+        <a href="https://bgenc.com">bgenc.com</a>
+      </nav>
+    </header>
+
+    <div class="intro">
+      <p>Paste some text and press “Start check” to find out how likely each part of the text is to be
+        written by a human or by AI.</p>
+      <p>This check runs entirely on your own computer. No data is sent anywhere.</p>
+      <p>The first time you use it, Aeacus needs to download
+        <span id="model-size">%MODEL_SIZE%</span> to run in your browser. After that it stays on your
+        device.</p>
+    </div>
+
+    <div class="field">
+      <!-- The sample in the placeholder, which Start check runs when the box is empty: the opening
+           of A Tale of Two Cities, with AI writing carrying straight on from it in the same
+           paragraph, so that the check changes partway through a paragraph rather than at a break
+           (gpt-6.1-terra, writing a modern essay paragraph on the theme; a pastiche in the book's
+           own voice comes back as human or unsure, which shows the tool off badly). Neither text is
+           in the training data: the only whole books in it are Frankenstein and Pride and
+           Prejudice. The box is made tall enough to show all of it. -->
+      <div id="editor" class="editor" contenteditable="plaintext-only" role="textbox" aria-multiline="true" aria-label="Text to check" data-placeholder="It was the best of times, it was the worst of times, it was the age of wisdom, it was the age of foolishness, it was the epoch of belief, it was the epoch of incredulity, it was the season of Light, it was the season of Darkness, it was the spring of hope, it was the winter of despair, we had everything before us, we had nothing before us, we were all going direct to Heaven, we were all going direct the other way—in short, the period was so far like the present period, that some of its noisiest authorities insisted on its being received, for good or for evil, in the superlative degree of comparison only. It was a strange time to be alive: the future seemed to arrive every morning, bearing gifts we barely understand and problems we cannot agree how to name. New tools promise to heal, connect, and create, even as they unsettle the work and relationships that give our days their shape. Across widening divides, people look at the same events and see entirely different stories."></div>
+    </div>
+
+    <div id="status" class="status" hidden>
+      <div class="bar" id="bar" role="progressbar" aria-labelledby="status-label" aria-valuemin="0" aria-valuemax="100"><div class="bar-fill"></div></div>
+      <div class="status-label" id="status-label" aria-live="polite"></div>
+    </div>
+
+    <div class="actions">
+      <button id="check" type="button" disabled>Start check</button>
+      <button id="clear" type="button" hidden>Clear text</button>
+      <button id="stats-toggle" type="button" class="secondary" aria-expanded="false" aria-controls="stats" hidden>Stats for nerds</button>
+    </div>
+
+    <p class="hint" id="hint" hidden>
+      <span class="hover-only">Hover the text and move your cursor around to see what Aeacus thinks
+        about that part of the text.</span>
+      <span class="touch-only">Tap a part of the text to see what Aeacus thinks about it.</span>
+    </p>
+
+    <section id="stats" class="stats" aria-label="Run statistics" hidden>
+      <dl id="stats-list"></dl>
+      <div class="stats-thresholds">
+        <p>Aeacus's raw scores are not probabilities. They are mapped to an estimated AI rate, so
+          each rate below is how often tokens with that raw score really are AI.</p>
+        <dl id="calibration-list"></dl>
+        <p>Tokens past these cutoffs are labeled. The raw score each cutoff takes:</p>
+        <dl id="thresholds-list"></dl>
+      </div>
+    </section>
+
+    <figure class="scale">
+      <div class="scale-bar" role="img" aria-label="A scale from blue for likely human, through grey for unsure, to purple for likely AI"></div>
+      <figcaption>
+        <div class="scale-labels">
+          <span>Likely human</span>
+          <span>Unsure</span>
+          <span>Likely AI</span>
+        </div>
+        <p>Each part of the text is colored by what Aeacus thinks of it. Stronger color means it is more
+          sure, and grey means it cannot tell.</p>
+      </figcaption>
+    </figure>
+
+    <section class="explain" aria-labelledby="explain-heading">
+      <h2 id="explain-heading">How to interpret these results</h2>
+
+      <div class="caveat">
+        <h3>What do these results mean?</h3>
+        <p>All AI writing checkers, Aeacus included, are imperfect. Human writing might get flagged as
+          AI, and AI writing might pass as human. These results are not a guarantee.</p>
+        <p><strong>Do not</strong> use these results as a verdict. These are only one signal among
+          many. When trying to decide if some writing is AI, make sure you read and consider the whole
+          text. Compare it against how the author writes elsewhere, and consider the context of the
+          writing.</p>
+      </div>
+
+      <h3>Why is so much of the text unsure?</h3>
+      <p>Aeacus is calibrated to only flag text as human or AI when it is at least
+        <span data-sure>95</span>% sure. Otherwise, Aeacus will leave it as unsure. We err on the safe
+        side to avoid falsely accusing or clearing any piece of writing as much as possible, so a call
+        Aeacus does make is wrong at most about 1 time in <span data-one-in>20</span>.</p>
+      <p>If you used a short passage, try to add more text if available to give Aeacus more
+        information. If Aeacus is still unsure or if you don't have more text to add, please make sure
+        you understand what this means: it's not saying that you should or should not be suspicious. It
+        means the test is inconclusive, and shouldn't contribute to any judgement calls you make.</p>
+
+      <h3>How does Aeacus work anyway?</h3>
+      <p>Aeacus is a machine learning model, trained on pairs of human and AI writing. We started by
+        gathering text from before 2021, before any of these models existed, so it is guaranteed to be
+        human written, and then used 37 different AI models to generate matching AI texts. These AI
+        written texts cover a variety of use cases for AI: writing new text, expanding a summary,
+        continuing a human written message to make it longer, replying to messages on social media, and
+        AI-written “edits” inside human written text.</p>
+      <p>Aeacus then works by going over the text token by token (about three quarters of a word worth
+        of text), and looks at it and its surroundings. Aeacus then calculates the probability that the
+        patterns around this text are AI or human, from the AI-generated and human-written texts it has
+        seen before. If that probability is over 95%, we flag it as AI, and if it is under 5%, we flag
+        it as human.</p>
+
+      <h3>How do you know Aeacus actually works?</h3>
+      <p>We tested Aeacus on texts it was never trained on to ensure it is accurate. First, we take
+        some of our data out to check and calibrate Aeacus against. The percentages below are token by
+        token: of the tokens Aeacus flags, the share it gets right.</p>
+      <p>Next, to check if Aeacus can detect AI models it has never seen before, we have writing from
+        almost 40 models that we never train on, including large commercial “frontier” AI models.
+        Aeacus is <span data-check="heldout">98.8</span>% accurate against these texts as well.</p>
+      <p>Finally, we also check Aeacus against human and AI writing dated January 1, 2021 to November
+        30, 2022. This helps us make sure Aeacus doesn't just tell old text from new, and can
+        generalize to topics it hasn't seen before. We see Aeacus is
+        <span data-check="recent">99.3</span>% accurate for these texts.</p>
+    </section>
+  </main>
+  <footer class="credit">
+    <p>Aeacus by <a href="https://bgenc.com">Kaan C. Barmore-Genc</a>, © 2026. This page and the
+      model weights are <a href="/license.txt">MIT licensed</a>.</p>
+    <p>Made with ❤️ in Illinois.</p>
+  </footer>
+  <div id="tip" class="tip" role="tooltip" hidden></div>
+</body>
+</html>
