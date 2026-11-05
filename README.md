@@ -19,4 +19,4 @@ Production builds load `tokenizer.json`, `thresholds.json`, and `onnx/model_q4f1
 
 The `aeacus-cli` package provides the `aeacus` command. It reads from stdin or a file and emits a readable summary by default. Use `--json` for structured results or `--porcelain` for tab-separated summary fields. See [cli/README.md](cli/README.md) for details.
 
-CLI releases are published from GitHub Actions when a `cli-v<version>` tag matching `cli/package.json` is pushed. Configure npm Trusted Publishing for the `SeriousBug/aeacus` repository and `publish-cli.yml` before the first release.
+The npm package has not been bootstrapped yet. Publish its initial version once from an npm-authenticated environment, then configure npm Trusted Publishing for the `SeriousBug/aeacus` repository and `publish-cli.yml`. After that, push a `cli-v<version>` tag matching `cli/package.json` to build and publish a release from GitHub Actions.

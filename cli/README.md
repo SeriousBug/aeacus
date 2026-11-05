@@ -14,4 +14,4 @@ The document `ai_score` is the mean calibrated score across tokens. It is an AI-
 
 The CLI runs on CPU. Use `--model-dir` to point to a local model directory containing `tokenizer.json`, `thresholds.json`, and `onnx/model_q4f16.onnx`. `AEACUS_CACHE_DIR` overrides the default model cache location.
 
-This package is published to npm as `aeacus-cli`, exposing the command `aeacus`. The CLI package has no license declaration. GitHub Actions builds a package archive and publishes it when a matching `cli-v<version>` tag is pushed. npm Trusted Publishing must be configured for this repository and `.github/workflows/publish-cli.yml`.
+This package will be published to npm as `aeacus-cli`, exposing the command `aeacus`. The CLI package has no license declaration. Publish its first version once from an npm-authenticated environment, then configure npm Trusted Publishing for this repository and `.github/workflows/publish-cli.yml`. Later releases build a package archive and publish when a matching `cli-v<version>` tag is pushed.
