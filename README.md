@@ -26,4 +26,3 @@ cat draft.txt | npx aeacus-cli
 npx aeacus-cli draft.txt --json
 ```
 
-`aeacus-cli` 0.1.0 is on npm, published by hand. Later releases go out from GitHub Actions: push a `cli-v<version>` tag matching `cli/package.json` and `publish-cli.yml` builds the package and publishes it through OIDC, with no npm token in the repository. That path needs npm Trusted Publishing pointed at this repository and `publish-cli.yml` in the package's settings on npmjs.com, and it has not been run yet.
