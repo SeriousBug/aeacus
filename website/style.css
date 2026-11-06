@@ -422,7 +422,6 @@ button[hidden],
 }
 
 .explain pre {
-  max-width: 68ch;
   margin: 0 0 10px;
   padding: 12px 14px;
   border: 1px solid var(--border);
@@ -430,7 +429,7 @@ button[hidden],
   background: var(--surface);
   overflow-x: auto;
   color: var(--text);
-  font: 0.875rem/1.6 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font: 0.8125rem/1.6 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 }
 
 .explain pre code {
@@ -438,6 +437,16 @@ button[hidden],
   border: 0;
   background: none;
   font: inherit;
+}
+
+/* The examples keep their comments in an aligned column, which is wider than the text column at
+   this size. Where the window has the room, the block breaks out of the column on both sides and
+   centers on it; where it does not, it scrolls. */
+@media (min-width: 940px) {
+  .cli pre {
+    width: 880px;
+    margin-inline: calc((100% - 880px) / 2);
+  }
 }
 
 /* Sits outside main, so it keeps the column's width and padding of its own. */
@@ -458,20 +467,23 @@ button[hidden],
 }
 
 .links a,
-.credit a {
+.credit a,
+.explain a {
   color: inherit;
   text-decoration-color: var(--border);
   text-underline-offset: 2px;
 }
 
 .links a:hover,
-.credit a:hover {
+.credit a:hover,
+.explain a:hover {
   color: var(--text);
   text-decoration-color: currentColor;
 }
 
 .links a:focus-visible,
-.credit a:focus-visible {
+.credit a:focus-visible,
+.explain a:focus-visible {
   outline: 2px solid var(--focus);
   outline-offset: 2px;
 }
