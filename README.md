@@ -19,4 +19,11 @@ Production builds load `tokenizer.json`, `thresholds.json`, and `onnx/model_q4f1
 
 The `aeacus-cli` package provides the `aeacus` command. It reads from stdin or a file and emits a readable summary by default. Use `--json` for structured results or `--porcelain` for tab-separated summary fields. See [cli/README.md](cli/README.md) for details.
 
-The npm package has not been bootstrapped yet. Publish its initial version once from an npm-authenticated environment, then configure npm Trusted Publishing for the `SeriousBug/aeacus` repository and `publish-cli.yml`. After that, push a `cli-v<version>` tag matching `cli/package.json` to build and publish a release from GitHub Actions.
+Run it without installing anything:
+
+```sh
+cat draft.txt | npx aeacus-cli
+npx aeacus-cli draft.txt --json
+```
+
+`aeacus-cli` 0.1.0 is on npm, published by hand. Later releases go out from GitHub Actions: push a `cli-v<version>` tag matching `cli/package.json` and `publish-cli.yml` builds the package and publishes it through OIDC, with no npm token in the repository. That path needs npm Trusted Publishing pointed at this repository and `publish-cli.yml` in the package's settings on npmjs.com, and it has not been run yet.
