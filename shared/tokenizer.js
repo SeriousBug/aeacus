@@ -1,5 +1,6 @@
 // Byte-level BPE matching the model's tokenizer.json, returning each token's character offsets
-// (UTF-16, for slicing JS strings) so predictions can be drawn over the text.
+// (UTF-16, for slicing JS strings) so predictions can be drawn over the text. Shared by the website
+// and the browser extension; the CLI carries its own copy, since npm publishes only its src/.
 
 const PRETOKENIZE = /'s|'t|'re|'ve|'m|'ll|'d| ?\p{L}+| ?\p{N}+| ?[^\s\p{L}\p{N}]+|\s+(?!\S)|\s+/gu;
 

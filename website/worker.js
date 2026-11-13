@@ -1,5 +1,5 @@
 import { MODEL_BASE } from "./config.js";
-import { Tokenizer } from "./tokenizer.js";
+import { Tokenizer } from "../shared/tokenizer.js";
 
 // Served as separate files by the ort-files plugin in vite.config.js.
 const ORT_BASE = new URL(`${import.meta.env.BASE_URL}ort/`, location.origin);

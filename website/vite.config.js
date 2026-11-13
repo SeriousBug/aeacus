@@ -78,7 +78,8 @@ function modelSize() {
 
 export default defineConfig({
   plugins: [ortFiles(), localModel(), modelSize()],
-  server: { headers: Object.fromEntries(pagesHeaders()) },
+  // The tokenizer is in ../shared, which the dev server would otherwise refuse to serve.
+  server: { headers: Object.fromEntries(pagesHeaders()), fs: { allow: [".."] } },
   preview: { headers: Object.fromEntries(pagesHeaders()) },
   worker: { format: "es" },
 });
