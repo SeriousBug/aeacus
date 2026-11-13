@@ -7,6 +7,7 @@
     body { max-width: 40rem; margin: 40px auto; font: 17px/1.6 Georgia, serif; }
     nav { font: 14px/1.4 system-ui, sans-serif; margin-bottom: 2rem; }
     .short, .links { color: #666; }
+    .dot { vertical-align: middle; }
     footer { margin-top: 3rem; font: 14px/1.4 system-ui, sans-serif; }
   </style>
 </head>
@@ -30,9 +31,13 @@
       stories.</p>
 
     <h2>Inline markup</h2>
-    <!-- Links and emphasis inside a paragraph: the offsets have to survive them. -->
+    <!-- Links, emphasis and an image inside a paragraph: the offsets have to survive them, and a
+         marker must not be drawn over the picture. -->
     <p id="inline">Making <a href="https://example.com/one">a decision under uncertainty</a> is the
-      ordinary condition of work, not an exception to it. When the evidence is thin, the useful move is
+      ordinary condition of work, not an exception to it.
+      <img class="dot" alt="" width="12" height="12"
+        src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12'%3E%3Crect width='12' height='12' fill='%23c33'/%3E%3C/svg%3E">
+      When the evidence is thin, the useful move is
       to <em>shrink the size of the bet</em>, learn from what happens, and keep enough room to change
       course. Teams that treat every choice as reversible until it turns out otherwise tend to move
       faster than teams that wait for certainty, and they are usually

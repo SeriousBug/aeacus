@@ -220,6 +220,25 @@ async function main() {
     return out;
   })()`, { contextId: contentContext.id });
 
+  // What the markers landed on: no range may cover a picture, and none may sit in the nav or the
+  // footer of the test page.
+  const drawn = await evaluate(pageSession, `(() => {
+    const counts = { ranges: 0, overPicture: 0, inChrome: 0 };
+    for (const [name, highlight] of CSS.highlights) {
+      if (!name.startsWith("aeacus-")) continue;
+      for (const range of highlight) {
+        counts.ranges++;
+        if (range.cloneContents().querySelector("img, picture, video, svg, button, pre, code")) {
+          counts.overPicture++;
+        }
+        const start = range.startContainer;
+        const element = start.nodeType === Node.TEXT_NODE ? start.parentElement : start;
+        if (element.closest("nav, footer")) counts.inChrome++;
+      }
+    }
+    return counts;
+  })()`, { contextId: contentContext.id });
+
   const offscreen = (await targets()).find((target) => target.url.endsWith("/offscreen.html"));
   const stored = await evaluate(sw, "chrome.storage.local.get(null)");
 
@@ -228,6 +247,7 @@ async function main() {
     provider: state.provider,
     milliseconds: state.milliseconds,
     highlights,
+    drawn,
     offscreenDocument: Boolean(offscreen),
     modelReady: stored.modelReady,
     consoleErrors: logs,
@@ -247,6 +267,9 @@ async function main() {
   if (!Object.keys(highlights).some((name) => name.startsWith("aeacus-human"))) {
     problems.push("nothing was marked on the page as human");
   }
+  if (!(drawn.ranges > 0)) problems.push("no range was drawn");
+  if (drawn.overPicture) problems.push(`${drawn.overPicture} markers were drawn over a picture`);
+  if (drawn.inChrome) problems.push(`${drawn.inChrome} markers were drawn in the nav or the footer`);
   if (!offscreen) problems.push("the model never got its offscreen document");
   if (!stored.modelReady) problems.push("the model was not marked as downloaded");
   if (logs.length) problems.push(`${logs.length} console errors`);
