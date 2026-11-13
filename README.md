@@ -28,7 +28,8 @@ npx aeacus-cli draft.txt --json
 
 ## Extension
 
-The extension marks up the parts of a page that read as written by AI, and checks them on the
-computer it is installed on. From `extension/`, `pnpm install && pnpm build` writes `dist/chrome`,
-`dist/firefox` and `dist/safari`. See [extension/README.md](extension/README.md).
+The extension detects which parts of text on a page are likely to be AI generated, and which parts
+are likely to be human written. It runs entirely locally, on the computer it is installed on. From
+`extension/`, `pnpm install && pnpm build` writes `dist/chrome`, `dist/firefox` and `dist/safari`.
+See [extension/README.md](extension/README.md).
 

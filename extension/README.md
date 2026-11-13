@@ -1,8 +1,8 @@
 # Aeacus browser extension
 
-Marks the parts of a page that read as written by AI. Aeacus runs on the computer it is installed
-on: the model is downloaded once from Hugging Face, kept in the browser's cache, and read there, so
-no page text leaves the machine.
+Detects which parts of text on a page are likely to be AI generated, and which parts are likely to
+be human written. It runs entirely locally: the model is downloaded once from Hugging Face, kept in
+the browser's cache, and read there, so no page text leaves the machine.
 
 ## Build
 
@@ -29,7 +29,7 @@ pnpm check
 
 `pnpm types` runs `tsc` over the sources with `--checkJs` and over the scripts with Node's types;
 `pnpm lint` runs ESLint. The sources stay plain JavaScript and carry their types in JSDoc, with what
-crosses a boundary (the model's messages, the settings, the page's state) declared once in
+crosses a boundary (the model's messages, the page's state) declared once in
 `src/types.d.ts`. `tsconfig.json` covers `src/`, and `tsconfig.tools.json` covers `build.mjs`, the
 tools and the tests, which run on Node instead of in a browser.
 
@@ -68,7 +68,7 @@ worker runs the model itself over WebAssembly.
 | `src/background.js` | Connects each page to the document that holds the worker |
 | `src/scoring.js` | Thresholds, calibration and the page-level numbers, the same as the website and the CLI |
 | `src/api.js` | The browser's API under one name, since Firefox calls it `browser` and Chrome `chrome` |
-| `src/types.d.ts` | The shapes that cross a boundary: the model's messages, the page's state, the settings |
+| `src/types.d.ts` | The shapes that cross a boundary: the model's messages and the page's state |
 
 `src/` is shared by all three browsers; only `manifests/` differs. `build.mjs` merges
 `manifests/base.json` with the browser's own file, bundles each entry point with esbuild, and copies
@@ -83,6 +83,6 @@ AEACUS_MODEL_BASE=http://localhost:8799/ pnpm build
 
 ## Permissions
 
-`storage` holds the settings and whether the model is downloaded; `unlimitedStorage` lets the 87 MB
+`storage` holds whether the model is downloaded; `unlimitedStorage` lets the 87 MB
 weights sit in the cache. The host permissions are for the Hugging Face addresses the model comes
 from. Nothing is sent anywhere.

@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Aeacus",
-  "description": "Marks the parts of a page that read as written by AI, and checks them on your own computer.",
+  "description": "Detects which parts of text are likely to be AI generated, and which parts are likely to be human written. Runs entirely locally.",
   "permissions": ["storage", "unlimitedStorage"],
   "host_permissions": [
     "https://huggingface.co/*",

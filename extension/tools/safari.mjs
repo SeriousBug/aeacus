@@ -44,8 +44,8 @@ const html = path.join(resources, "Base.lproj", "Main.html");
 const page = await readFile(html, "utf8");
 const after = 'alt="Aeacus Icon">';
 if (!page.includes(after)) throw new Error(`${html} is not what the converter used to write`);
-const lede = "\n    <p class=\"lede\">Aeacus marks the parts of a page that read as written by AI. "
-  + "Everything it reads stays on this Mac.</p>";
+const lede = "\n    <p class=\"lede\">Aeacus detects which parts of text on a page are likely AI generated, "
+  + "and which are likely human written. Everything it reads stays on this Mac.</p>";
 if (!page.includes(lede)) {
   await writeFile(html, page.replace(after, after + lede));
 }
