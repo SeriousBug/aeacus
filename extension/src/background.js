@@ -71,12 +71,26 @@ function deliver(message) {
   }
   const owner = message.id ? owners.get(message.id) : null;
   if (owner) {
-    owner.postMessage(message);
+    try {
+      owner.postMessage(message);
+    } catch {
+      // The page went away first, which its disconnect listener has already handled.
+    }
     if (message.type === "done" || message.type === "error") owners.delete(message.id);
     return;
   }
   if (message.type === "model") {
     for (const port of ports) port.postMessage(message);
+  }
+}
+
+// A page that is gone has no use for its scores, and the model is one runner for every tab, so
+// leaving a page mid-check stops the work rather than leaving it to finish behind the next page.
+function stopOwned(port) {
+  for (const [id, owner] of owners) {
+    if (owner !== port) continue;
+    owners.delete(id);
+    hosting?.send({ type: "cancel", id });
   }
 }
 
@@ -86,9 +100,18 @@ async function receive(port, message) {
     port.postMessage({ type: "model", ...lastModel });
     return;
   }
+  if (message.type === "cancel") {
+    // Nothing to cancel on this side if the model was never opened, and opening it to say so would
+    // cost a document and a download.
+    hosting?.send(message);
+    return;
+  }
   if (message.type === "check" && message.id) owners.set(message.id, port);
   try {
-    (await host()).send(message);
+    const target = await host();
+    // The page can go away while the offscreen document is still opening.
+    if (message.type === "check" && owners.get(message.id) !== port) return;
+    target.send(message);
   } catch (error) {
     port.postMessage({ type: "error", id: message.id, message: String(error?.message ?? error) });
   }
@@ -97,7 +120,10 @@ async function receive(port, message) {
 api.runtime.onConnect.addListener((port) => {
   if (port.name !== "aeacus") return;
   ports.add(port);
-  port.onDisconnect.addListener(() => ports.delete(port));
+  port.onDisconnect.addListener(() => {
+    ports.delete(port);
+    stopOwned(port);
+  });
   port.onMessage.addListener((message) => {
     receive(port, message).catch(() => {});
   });

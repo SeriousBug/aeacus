@@ -1,6 +1,7 @@
 import { MIN_WORDS } from "./config.js";
 
-export const DEFAULTS = { auto: true, minWords: MIN_WORDS, tooltips: true };
+// Checks are asked for, not assumed: a page is read when the button or the shortcut says so.
+export const DEFAULTS = { auto: false, minWords: MIN_WORDS, tooltips: true };
 
 const api = globalThis.browser ?? globalThis.chrome;
 

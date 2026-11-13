@@ -32,6 +32,7 @@ export function createRunner(post) {
   let state = { state: "idle" };
   let reading = null;
   let latest = null;
+  const stopped = new Set();
   let queue = Promise.resolve();
 
   function announce(next) {
@@ -222,7 +223,8 @@ export function createRunner(post) {
     handle(message) {
       if (!message || typeof message !== "object") return;
       if (message.type === "cancel") {
-        latest = message.id;
+        stopped.add(message.id);
+        if (latest === message.id) latest = null;
         return;
       }
       if (message.type === "state") {
@@ -234,14 +236,18 @@ export function createRunner(post) {
         return;
       }
       if (message.type !== "check") return;
-      latest = message.id;
+      stopped.delete(message.id);
+      // One runner for every tab, so a check that arrives while another is running waits its turn
+      // rather than cutting it short. Only a page that was left stops part way.
       queue = queue.then(async () => {
-        if (latest !== message.id) return;
+        if (stopped.delete(message.id)) return;
+        latest = message.id;
         try {
           await check(message);
         } catch (error) {
           post({ type: "error", id: message.id, message: String(error?.message ?? error) });
         }
+        if (latest === message.id) latest = null;
       });
     },
   };

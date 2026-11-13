@@ -7,6 +7,10 @@ import { findBlocks, splitBlock } from "./page-text.js";
 
 const api = globalThis.browser ?? globalThis.chrome;
 
+// Aeacus's own site describes the thing instead of being a page to judge, so nothing is read there.
+const OWN_HOST = "aeacus.bgenc.dev";
+const ownSite = () => location.hostname === OWN_HOST;
+
 let settings = { auto: true, minWords: MIN_WORDS, tooltips: true };
 const painter = Painter.supported() ? new Painter() : null;
 const tooltip = new Tooltip();
@@ -160,6 +164,10 @@ function finish(message) {
 }
 
 async function begin() {
+  if (ownSite()) {
+    publish({ phase: "home" });
+    return;
+  }
   if (running) return;
   if (!painter) {
     publish({ phase: "unsupported" });
@@ -231,15 +239,42 @@ addEventListener("pointermove", (event) => {
 addEventListener("scroll", () => tooltip.hide(), { passive: true });
 document.addEventListener("pointerleave", () => tooltip.hide(), { capture: true });
 
+// Leaving the page stops its check, so a page you have moved on from is not still being read behind
+// the next one.
+addEventListener("pagehide", () => {
+  if (runId) port?.postMessage({ type: "cancel", id: runId });
+  tooltip.hide();
+}, { capture: true });
+
 function showTooltip() {
   if (!pointer || !thresholds) return;
   const caret = caretAt(pointer.x, pointer.y);
-  const p = caret ? painter.at(caret.node, caret.offset) ?? painter.at(caret.node, caret.offset - 1) : null;
+  if (!caret || !onGlyph(caret.node, caret.offset, pointer.x, pointer.y)) {
+    tooltip.hide();
+    return;
+  }
+  const p = painter.at(caret.node, caret.offset) ?? painter.at(caret.node, caret.offset - 1);
   if (p === null || p === undefined) {
     tooltip.hide();
     return;
   }
   tooltip.show(label(p, thresholds), pointer.x, pointer.y);
+}
+
+// A browser will name a caret position in the empty space beside a line as readily as on its words,
+// and a tooltip there hangs over nothing. Only a character the pointer is actually on counts.
+function onGlyph(node, offset, x, y) {
+  if (!node || node.nodeType !== Node.TEXT_NODE || !node.data) return false;
+  const last = node.data.length - 1;
+  for (let from = Math.max(0, offset - 1); from <= Math.min(offset, last); from++) {
+    const range = document.createRange();
+    range.setStart(node, from);
+    range.setEnd(node, from + 1);
+    for (const rect of range.getClientRects()) {
+      if (x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom) return true;
+    }
+  }
+  return false;
 }
 
 function caretAt(x, y) {
@@ -261,6 +296,10 @@ function randomId() {
 async function init() {
   const stored = await api.storage.local.get(["settings", "modelReady"]);
   settings = { ...settings, ...(stored.settings ?? {}) };
+  if (ownSite()) {
+    publish({ phase: "home" });
+    return;
+  }
   if (!settings.auto || !stored.modelReady) return;
   setTimeout(() => {
     if (!running && state.phase === "idle") begin();

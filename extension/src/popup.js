@@ -106,6 +106,13 @@ function draw(next) {
     note(state.message || "Aeacus checks paragraphs of prose, and this page has none long enough.");
   }
 
+  if (phase === "home") {
+    elements.lede.textContent = "This is Aeacus's own site.";
+    note("The extension stays out of the way here. Try any other page.");
+    elements.check.hidden = true;
+    elements.clear.hidden = true;
+  }
+
   if (phase === "unsupported") {
     elements.lede.textContent = "Aeacus can't check this page.";
     note("Browsers keep extensions out of their own pages and of most PDFs. Try a regular web page.", false);

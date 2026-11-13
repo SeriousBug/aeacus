@@ -228,11 +228,27 @@ test("a check walks every block through the model", async (t) => {
     assert.equal(messages.filter((message) => message.type === "block").length, last.blocks);
   });
 
+  await t.test("a second check waits its turn instead of cutting the first short", async () => {
+    const posts = [];
+    const runner = createRunner((message) => posts.push(message));
+    runner.handle({ type: "check", id: "a", blocks: [{ index: 0, text: UNIT.repeat(4) }] });
+    runner.handle({ type: "check", id: "b", blocks: [{ index: 0, text: UNIT.repeat(4) }] });
+    for (let tries = 0; tries < 600; tries++) {
+      if (posts.some((message) => message.type === "done" && message.id === "b")) break;
+      await new Promise((resolve) => setTimeout(resolve, 25));
+    }
+    const done = posts.filter((message) => message.type === "done").map((message) => message.id);
+    assert.deepEqual(done, ["a", "b"], "both checks finish, in the order they were asked for");
+    const lastOfA = posts.findLastIndex((message) => message.id === "a");
+    const firstOfB = posts.findIndex((message) => message.id === "b");
+    assert.ok(lastOfA < firstOfB, "the second check starts after the first is done");
+  });
+
   await t.test("a cancelled check posts nothing", async () => {
     const posts = [];
     const other = createRunner((message) => posts.push(message));
     other.handle({ type: "check", id: "a", blocks: [{ index: 0, text: UNIT.repeat(4) }] });
-    other.handle({ type: "cancel", id: "b" });
+    other.handle({ type: "cancel", id: "a" });
     await new Promise((resolve) => setTimeout(resolve, 50));
     assert.deepEqual(posts, []);
   });
