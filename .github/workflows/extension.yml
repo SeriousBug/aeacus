@@ -25,7 +25,10 @@ jobs:
           cache: pnpm
           cache-dependency-path: extension/pnpm-lock.yaml
       - run: pnpm install --frozen-lockfile
-      # The build comes first: the tests read what it wrote, and check that every file each manifest
+      # Types and lint before the build: they are the quickest way to hear about a name used before
+      # its own line, or a message field that only one side spells that way.
+      - run: pnpm check
+      # The build comes next: the tests read what it wrote, and check that every file each manifest
       # names is there. The model tests need the weights beside the repo, so they skip here.
       - run: pnpm build
       - run: pnpm test

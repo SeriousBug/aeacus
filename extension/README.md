@@ -21,6 +21,22 @@ when the weights are not at `../../publish/aeacus-s-1`, or wherever `AEACUS_WEIG
 `test/fixtures/`, and reports what the popup and the page ended up showing. Chrome loads no unpacked
 extension in headless mode, so it opens a window.
 
+## Checks
+
+```sh
+pnpm check
+```
+
+`pnpm types` runs `tsc` over the sources with `--checkJs` and over the scripts with Node's types;
+`pnpm lint` runs ESLint. The sources stay plain JavaScript and carry their types in JSDoc, with what
+crosses a boundary (the model's messages, the settings, the page's state) declared once in
+`src/types.d.ts`. `tsconfig.json` covers `src/`, and `tsconfig.tools.json` covers `build.mjs`, the
+tools and the tests, which run on Node instead of in a browser.
+
+The two read different things. `tsc` checks the shape of what one part hands another, and catches a
+`const` read before its own line. ESLint catches a local that shadows the name it calls, globals the
+extension has no business reaching for, and `let` where `const` would do.
+
 ## Load it in a browser
 
 Chrome: open `chrome://extensions`, turn on Developer mode, choose "Load unpacked", and pick
@@ -51,6 +67,8 @@ worker runs the model itself over WebAssembly.
 | `src/host.js` | Runs `infer.js` in a worker, or in place when the browser has none |
 | `src/background.js` | Connects each page to the document that holds the worker |
 | `src/scoring.js` | Thresholds, calibration and the page-level numbers, the same as the website and the CLI |
+| `src/api.js` | The browser's API under one name, since Firefox calls it `browser` and Chrome `chrome` |
+| `src/types.d.ts` | The shapes that cross a boundary: the model's messages, the page's state, the settings |
 
 `src/` is shared by all three browsers; only `manifests/` differs. `build.mjs` merges
 `manifests/base.json` with the browser's own file, bundles each entry point with esbuild, and copies

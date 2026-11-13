@@ -53,14 +53,15 @@ export function windowsFor(tokens) {
 /**
  * @param {number[]} probabilities
  * @param {number} words
- * @param {Thresholds} thresholds
  * @returns {ModelVerdict}
  */
-export function summary(probabilities, words, thresholds) {
+export function summary(probabilities, words) {
   const aiScore = probabilities.length
     ? probabilities.reduce((sum, p) => sum + p, 0) / probabilities.length
     : null;
   const leaning = aiScore !== null && aiScore >= 0.5 ? "ai_leaning" : "human_leaning";
-  const verdict = words < MIN_WORDS ? "insufficient_text" : leaning;
-  return { verdict, ai_score: aiScore === null ? null : Number(aiScore.toFixed(4)) };
+  return {
+    verdict: words < MIN_WORDS ? "insufficient_text" : leaning,
+    ai_score: aiScore === null ? null : Number(aiScore.toFixed(4)),
+  };
 }

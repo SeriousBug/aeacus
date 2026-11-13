@@ -91,11 +91,11 @@ function readBlock(element, skip = null) {
         allChars += data.replace(/\s+/g, "").length;
         if (inLink) linkChars += data.replace(/\s+/g, "").length;
       } else if (child.nodeType === Node.ELEMENT_NODE) {
-        const element = /** @type {Element} */ (child);
-        if (SKIP_TAGS.has(element.tagName)) continue;
-        if (skip?.has(element)) continue;
-        if (element.hasAttribute("hidden") || element.getAttribute("aria-hidden") === "true") continue;
-        walk(element, inLink || element.tagName === "A");
+        const inside = /** @type {Element} */ (child);
+        if (SKIP_TAGS.has(inside.tagName)) continue;
+        if (skip?.has(inside)) continue;
+        if (inside.hasAttribute("hidden") || inside.getAttribute("aria-hidden") === "true") continue;
+        walk(inside, inLink || inside.tagName === "A");
       }
     }
   }

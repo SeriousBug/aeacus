@@ -82,10 +82,10 @@ export function createRunner(post) {
   /** @returns {Promise<Loaded>} */
   function model() {
     if (!reading) {
-      reading = load().then((model) => {
-        announce({ state: "ready", provider: model.provider, low: model.thresholds.low,
-          high: model.thresholds.high, calibration: model.thresholds.calibration });
-        return model;
+      reading = load().then((opened) => {
+        announce({ state: "ready", provider: opened.provider, low: opened.thresholds.low,
+          high: opened.thresholds.high, calibration: opened.thresholds.calibration });
+        return opened;
       }).catch((error) => {
         reading = null;
         announce({ state: "error", message: reason(error) });
@@ -161,17 +161,14 @@ export function createRunner(post) {
    */
   async function fetchCached(file, onProgress) {
     const url = modelURL(file);
-    let cache = null;
-    try {
-      cache = await caches.open(CACHE);
-      const hit = await cache.match(url);
-      if (hit) {
-        announce({ state: "starting", cached: true });
-        return hit.arrayBuffer();
-      }
-    } catch (error) {
+    const cache = await caches.open(CACHE).catch((error) => {
       console.warn("Couldn't read the model cache", error);
-      cache = null;
+      return null;
+    });
+    const hit = cache ? await cache.match(url).catch(() => null) : null;
+    if (hit) {
+      announce({ state: "starting", cached: true });
+      return hit.arrayBuffer();
     }
     const response = await fetch(url);
     if (!response.ok) throw new Error(`couldn't download the model (HTTP ${response.status})`);
@@ -269,7 +266,7 @@ export function createRunner(post) {
       for (let i = 0; i < probs.length; i++) probs[i] = calibrate(sums[i] / counts[i], loaded.thresholds.calibration);
       const scores = plain(probs);
       post({ type: "block", id, block: block.index, probs: scores, words: plan.words,
-        ...summary(scores, plan.words, loaded.thresholds) });
+        ...summary(scores, plan.words) });
     }
     post({
       type: "done", id, blocks: plans.length, tokens,

@@ -35,10 +35,10 @@ test("windowsFor covers a token sequence with the training stride", () => {
 });
 
 test("summary refuses to lean either way on text shorter than training used", () => {
-  const short = summary([0.9, 0.9], 12, thresholds);
+  const short = summary([0.9, 0.9], 12);
   assert.equal(short.verdict, "insufficient_text");
   assert.equal(short.ai_score, 0.9);
-  assert.equal(summary([0.9, 0.9], 40, thresholds).verdict, "ai_leaning");
-  assert.equal(summary([0.1, 0.1], 40, thresholds).verdict, "human_leaning");
-  assert.deepEqual(summary([], 40, thresholds), { verdict: "human_leaning", ai_score: null });
+  assert.equal(summary([0.9, 0.9], 40).verdict, "ai_leaning");
+  assert.equal(summary([0.1, 0.1], 40).verdict, "human_leaning");
+  assert.deepEqual(summary([], 40), { verdict: "human_leaning", ai_score: null });
 });

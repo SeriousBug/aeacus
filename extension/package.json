@@ -8,16 +8,20 @@
     "build": "node build.mjs",
     "icons": "node tools/icons.mjs",
     "safari": "node tools/safari.mjs",
-    "test": "node --test test/*.test.mjs"
+    "test": "node --test test/*.test.mjs",
+    "types": "tsc -p tsconfig.json && tsc -p tsconfig.tools.json",
+    "lint": "eslint .",
+    "check": "pnpm types && pnpm lint"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "@types/chrome": "^0.3.7",
     "@types/firefox-webext-browser": "^143.0.1",
     "@types/node": "^26.6.6",
     "esbuild": "^0.25.12",
     "eslint": "^10.14.0",
+    "globals": "^17.14.0",
     "onnxruntime-web": "1.30.0",
-    "typescript": "^7.0.2",
-    "typescript-eslint": "^8.72.2"
+    "typescript": "^7.0.2"
   }
 }
