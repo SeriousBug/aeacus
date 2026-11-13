@@ -1,6 +1,21 @@
-const api = globalThis.browser ?? globalThis.chrome;
 
-const $ = (id) => document.getElementById(id);
+
+import api from "./api.js";
+
+/**
+ * @template {HTMLElement} T
+ * @param {string} id
+ * @returns {T}
+ */
+const $ = (id) => /** @type {any} */ (document.getElementById(id));
+
+/** @type {{
+ *   lede: HTMLElement, shares: HTMLElement, shareHuman: HTMLElement, shareUnsure: HTMLElement,
+ *   shareAi: HTMLElement, legend: HTMLElement, valueHuman: HTMLElement, valueUnsure: HTMLElement,
+ *   valueAi: HTMLElement, progress: HTMLElement, bar: HTMLElement, fill: HTMLElement,
+ *   progressLabel: HTMLElement, check: HTMLButtonElement, clear: HTMLButtonElement,
+ *   note: HTMLElement, settings: HTMLAnchorElement
+ * }} */
 const elements = {
   lede: $("lede"),
   shares: $("shares"),
@@ -21,26 +36,33 @@ const elements = {
   settings: $("settings"),
 };
 
+/** @type {chrome.runtime.Port | null} */
 let port = null;
-let state = { phase: "idle" };
+/** @type {PageState} */
+let state = { phase: "idle", message: "", progress: null, summary: null };
 let modelReady = false;
 let answered = false;
 
+/** @param {number} share @returns {string} */
 const percent = (share) => `${Math.round(share * 100)}%`;
+/** @param {number} bytes @returns {string} */
 const megabytes = (bytes) => `${Math.round(bytes / 1e6)} MB`;
 
+/** @param {string} text @param {boolean} [error] */
 function note(text, error = false) {
   elements.note.textContent = text;
   elements.note.classList.toggle("error", error);
   elements.note.hidden = !text;
 }
 
+/** @param {Partial<PageState>} next */
 function draw(next) {
   state = { ...state, ...next };
   if (state.model?.state === "ready") modelReady = true;
   const phase = state.phase ?? "idle";
   const summary = state.summary;
-  const model = state.model ?? {};
+  /** @type {ModelState} */
+  const model = state.model ?? { state: "idle" };
 
   elements.shares.hidden = !summary;
   elements.legend.hidden = !summary;
@@ -73,10 +95,11 @@ function draw(next) {
   if (phase === "checking") {
     const progress = state.progress ?? { done: 0, total: 0 };
     if (model.state === "downloading") {
-      const loaded = megabytes(model.loaded ?? 0);
+      const loadedBytes = model.loaded ?? 0;
+      const loaded = megabytes(loadedBytes);
       const total = model.total ? ` of ${megabytes(model.total)}` : "";
       elements.progressLabel.textContent = `Downloading Aeacus (${loaded}${total}). This only happens once.`;
-      elements.fill.style.setProperty("--fraction", model.total ? String(model.loaded / model.total) : "0");
+      elements.fill.style.setProperty("--fraction", model.total ? String(loadedBytes / model.total) : "0");
       elements.bar.classList.toggle("indeterminate", !model.total);
     } else if (model.state === "starting") {
       elements.progressLabel.textContent = "Starting Aeacus…";
@@ -93,7 +116,7 @@ function draw(next) {
     note("");
   }
 
-  if (phase === "idle" || phase === "unknown") {
+  if (phase === "idle") {
     elements.lede.textContent = "See which parts of this page read as written by a person and which"
       + " by AI.";
     note(modelReady

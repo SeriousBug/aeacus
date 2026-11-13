@@ -1,16 +1,28 @@
 import { readSettings, writeSettings } from "./settings.js";
+import api from "./api.js";
 
-const api = globalThis.browser ?? globalThis.chrome;
-const $ = (id) => document.getElementById(id);
+/**
+ * @template {HTMLElement} T
+ * @param {string} id
+ * @returns {T}
+ */
+const $ = (id) => /** @type {any} */ (document.getElementById(id));
 
+/** @type {HTMLInputElement} */
 const auto = $("auto");
+/** @type {HTMLInputElement} */
 const tooltips = $("tooltips");
+/** @type {HTMLInputElement} */
 const minWords = $("minWords");
+/** @type {HTMLElement} */
 const status = $("model-status");
+/** @type {HTMLButtonElement} */
 const download = $("download");
 
+/** @param {number} bytes @returns {string} */
 const megabytes = (bytes) => `${Math.round(bytes / 1e6)} MB`;
 
+/** @type {chrome.runtime.Port | null} */
 let port = null;
 
 async function start() {

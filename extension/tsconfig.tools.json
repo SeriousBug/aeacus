@@ -1,0 +1,18 @@
+{
+  // The scripts around the extension run on Node and import the extension's own modules, so they
+  // need Node's globals and the browser ones the modules are written against.
+  "compilerOptions": {
+    "target": "ES2023",
+    "lib": ["ES2023", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "allowJs": true,
+    "checkJs": true,
+    "noEmit": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true,
+    "types": ["node", "chrome", "firefox-webext-browser"]
+  },
+  "include": ["build.mjs", "tools/**/*.mjs", "src/**/*.d.ts"]
+}

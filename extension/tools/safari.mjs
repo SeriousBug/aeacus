@@ -7,7 +7,10 @@ import { readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { promisify } from "node:util";
 
-const run = promisify(execFile);
+// execFile's promisified overload drops stdio, which is how the converter's output reaches the
+// terminal.
+const run = /** @type {(file: string, args: string[], options: { stdio: "inherit" }) =>
+  Promise<unknown>} */ (promisify(execFile));
 
 const root = path.resolve(import.meta.dirname, "..");
 const project = path.join(root, "safari");

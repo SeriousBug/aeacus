@@ -2,21 +2,28 @@
 // hold it. On Chrome that place is an offscreen document, since a service worker has no page to run a
 // worker in; on Firefox and Safari the background page itself is that document.
 
+import { reason } from "./errors.js";
 import { startHost } from "./host.js";
+import api from "./api.js";
 
-const api = globalThis.browser ?? globalThis.chrome;
 const OFFSCREEN = "offscreen.html";
 
+/** @type {Set<chrome.runtime.Port>} */
 const ports = new Set();
+/** @type {Map<string, chrome.runtime.Port>} */
 const owners = new Map();
+/** @type {ModelState} */
 let lastModel = { state: "idle" };
+/** @type {Host | null} */
 let hosting = null;
+/** @type {Promise<chrome.runtime.Port> | null} */
 let starting = null;
 
 function offscreenAvailable() {
   return Boolean(api.offscreen?.createDocument);
 }
 
+/** @returns {Promise<Host>} */
 async function host() {
   if (hosting) return hosting;
   if (!offscreenAvailable()) {
@@ -32,6 +39,7 @@ async function host() {
   return hosting;
 }
 
+/** @returns {Promise<chrome.runtime.Port>} */
 async function openOffscreen() {
   if (!(await hasOffscreen())) {
     try {
@@ -54,6 +62,7 @@ async function openOffscreen() {
   return port;
 }
 
+/** @returns {Promise<boolean>} */
 async function hasOffscreen() {
   try {
     return await api.offscreen.hasDocument();
@@ -62,30 +71,30 @@ async function hasOffscreen() {
   }
 }
 
+/** @param {ModelReply} message */
 function deliver(message) {
-  if (!message) return;
   if (message.type === "model") {
     lastModel = message;
     if (message.state === "ready") api.storage.local.set({ modelReady: true }).catch(() => {});
     if (message.state === "error") api.storage.local.remove("modelReady").catch(() => {});
-  }
-  const owner = message.id ? owners.get(message.id) : null;
-  if (owner) {
-    try {
-      owner.postMessage(message);
-    } catch {
-      // The page went away first, which its disconnect listener has already handled.
-    }
-    if (message.type === "done" || message.type === "error") owners.delete(message.id);
+    for (const port of ports) port.postMessage(message);
     return;
   }
-  if (message.type === "model") {
-    for (const port of ports) port.postMessage(message);
+  if (!("id" in message) || !message.id) return;
+  const id = message.id;
+  const owner = owners.get(id);
+  if (!owner) return;
+  try {
+    owner.postMessage(message);
+  } catch {
+    // The page went away first, which its disconnect listener has already handled.
   }
+  if (message.type === "done" || message.type === "error") owners.delete(id);
 }
 
 // A page that is gone has no use for its scores, and the model is one runner for every tab, so
 // leaving a page mid-check stops the work rather than leaving it to finish behind the next page.
+/** @param {chrome.runtime.Port} port */
 function stopOwned(port) {
   for (const [id, owner] of owners) {
     if (owner !== port) continue;
@@ -94,6 +103,10 @@ function stopOwned(port) {
   }
 }
 
+/**
+ * @param {chrome.runtime.Port} port
+ * @param {ModelRequest} message
+ */
 async function receive(port, message) {
   if (!message || typeof message !== "object") return;
   if (message.type === "state") {
@@ -113,7 +126,8 @@ async function receive(port, message) {
     if (message.type === "check" && owners.get(message.id) !== port) return;
     target.send(message);
   } catch (error) {
-    port.postMessage({ type: "error", id: message.id, message: String(error?.message ?? error) });
+    const id = "id" in message ? message.id : undefined;
+    port.postMessage({ type: "error", id, message: reason(error) });
   }
 }
 

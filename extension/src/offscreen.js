@@ -1,12 +1,12 @@
 import { startHost } from "./host.js";
-
-const api = globalThis.browser ?? globalThis.chrome;
+import api from "./api.js";
 
 // Long enough to be worth keeping the model in memory across checks, short enough that a page read
 // once does not hold a few hundred megabytes for the rest of the session.
 const IDLE_CLOSE = 120000;
 
-let idle = null;
+/** @type {ReturnType<typeof setTimeout> | undefined} */
+let idle;
 
 function touch() {
   clearTimeout(idle);

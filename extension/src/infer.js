@@ -2,6 +2,7 @@
 // module runs in the inference worker, or in the service worker when there is no worker to be had.
 
 import { Tokenizer } from "../../shared/tokenizer.js";
+import { reason } from "./errors.js";
 import { MAX_TOKENS, MAX_TOKENS_WASM, MODEL_BASE, MODEL_FILE, WINDOW } from "./config.js";
 import { calibrate, summary, windowsFor } from "./scoring.js";
 
@@ -10,17 +11,46 @@ const ORT_BUNDLE = "ort/ort.webgpu.bundle.min.mjs";
 const ORT_WASM = "ort/ort-wasm-simd-threaded.asyncify.wasm";
 const CACHE = "aeacus-model";
 
+// One block of a page as the model intends to read it: the tokens, and where each window starts.
+/**
+ * @typedef {object} Plan
+ * @property {BlockTask} block
+ * @property {number} words
+ * @property {number[]} ids
+ * @property {number[]} starts
+ * @property {number[]} ends
+ * @property {number[]} windows
+ */
+
+/**
+ * @typedef {object} Loaded
+ * @property {any} ort
+ * @property {any} session
+ * @property {Provider} provider
+ * @property {number | null} threads
+ * @property {Thresholds} thresholds
+ * @property {Tokenizer} tokenizer
+ */
+
 const base = self.location.href;
 
 // Extension message channels serialize with JSON in Chrome, where a typed array arrives as an object
 // of indices and nothing downstream can read it. Scores are rounded on the way out, which is finer
 // than a color band can show.
+/**
+ * @param {Float32Array} probs
+ * @returns {number[]}
+ */
 function plain(probs) {
   const out = new Array(probs.length);
   for (let i = 0; i < probs.length; i++) out[i] = Math.round(probs[i] * 1000) / 1000;
   return out;
 }
 
+/**
+ * @param {string} file
+ * @returns {string}
+ */
 function modelURL(file) {
   return new URL(file, MODEL_BASE).href;
 }
@@ -28,18 +58,28 @@ function modelURL(file) {
 // Returns { handle }, where handle(message) takes the messages the host forwards: check, cancel and
 // state. Replies go through `post`, which the caller points at a worker's postMessage or at the
 // extension's message channel.
+/**
+ * @param {Post} post
+ * @returns {{ handle(message: ModelRequest): void }}
+ */
 export function createRunner(post) {
+  /** @type {ModelState} */
   let state = { state: "idle" };
+  /** @type {Promise<Loaded> | null} */
   let reading = null;
+  /** @type {string | null} */
   let latest = null;
+  /** @type {Set<string>} */
   const stopped = new Set();
   let queue = Promise.resolve();
 
+  /** @param {ModelState} next */
   function announce(next) {
     state = next;
     post({ type: "model", ...next });
   }
 
+  /** @returns {Promise<Loaded>} */
   function model() {
     if (!reading) {
       reading = load().then((model) => {
@@ -48,13 +88,14 @@ export function createRunner(post) {
         return model;
       }).catch((error) => {
         reading = null;
-        announce({ state: "error", message: String(error?.message ?? error) });
+        announce({ state: "error", message: reason(error) });
         throw error;
       });
     }
     return reading;
   }
 
+  /** @returns {Promise<Loaded>} */
   async function load() {
     const [tokenizerJson, thresholds, weights] = await Promise.all([
       fetchJson("tokenizer.json", "the tokenizer"),
@@ -69,12 +110,22 @@ export function createRunner(post) {
     return { ort, session, provider, threads, thresholds, tokenizer: new Tokenizer(tokenizerJson) };
   }
 
+  /**
+   * @param {string} file
+   * @param {string} what
+   * @returns {Promise<any>}
+   */
   async function fetchJson(file, what) {
     const response = await fetch(modelURL(file));
     if (!response.ok) throw new Error(`couldn't load ${what} (HTTP ${response.status})`);
     return response.json();
   }
 
+  /**
+   * @param {any} ort
+   * @param {ArrayBuffer} weights
+   * @returns {Promise<{ session: any, provider: Provider, threads: number | null }>}
+   */
   async function openSession(ort, weights) {
     ort.env.logLevel = "error";
     ort.env.wasm.wasmPaths = new URL("ort/", base).href;
@@ -103,6 +154,11 @@ export function createRunner(post) {
   }
 
   // The model is 80+ MB, so it is kept in the Cache API between visits.
+  /**
+   * @param {string} file
+   * @param {(loaded: number, total: number) => void} onProgress
+   * @returns {Promise<ArrayBuffer>}
+   */
   async function fetchCached(file, onProgress) {
     const url = modelURL(file);
     let cache = null;
@@ -120,6 +176,7 @@ export function createRunner(post) {
     const response = await fetch(url);
     if (!response.ok) throw new Error(`couldn't download the model (HTTP ${response.status})`);
     const total = Number(response.headers.get("Content-Length")) || 0;
+    if (!response.body) throw new Error("the model downloaded without a body");
     const reader = response.body.getReader();
     const chunks = [];
     let loaded = 0;
@@ -141,11 +198,13 @@ export function createRunner(post) {
     return blob.arrayBuffer();
   }
 
+  /** @param {{ id: string, blocks: BlockTask[] }} task */
   async function check({ id, blocks }) {
     const loaded = await model();
     // A window takes a fraction of a second on a GPU and several seconds without one, so a page that
     // would take an hour to read gets the top of it only.
     const budget = loaded.provider === "webgpu" ? MAX_TOKENS : MAX_TOKENS_WASM;
+    /** @type {Plan[]} */
     const plans = [];
     let windows = 0;
     let tokens = 0;
@@ -220,6 +279,7 @@ export function createRunner(post) {
   }
 
   return {
+    /** @param {ModelRequest} message */
     handle(message) {
       if (!message || typeof message !== "object") return;
       if (message.type === "cancel") {
@@ -245,7 +305,7 @@ export function createRunner(post) {
         try {
           await check(message);
         } catch (error) {
-          post({ type: "error", id: message.id, message: String(error?.message ?? error) });
+          post({ type: "error", id: message.id, message: reason(error) });
         }
         if (latest === message.id) latest = null;
       });

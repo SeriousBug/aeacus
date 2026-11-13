@@ -7,13 +7,25 @@ import { verdict } from "./scoring.js";
 // How many steps of color strength each side has; content.css has a rule for every one of them.
 const LEVELS = 4;
 
+/**
+ * @param {Band} band
+ * @param {number} level
+ * @returns {string}
+ */
 const nameFor = (band, level) => (band === "unsure" ? "aeacus-unsure" : `aeacus-${band}-${level}`);
+
+/** @typedef {{ text: string, nodes: TextNodeSpan[], starts: number[], ends: number[] }} TokenLayout */
 
 export class Painter {
   constructor() {
+    /** @type {Map<number, TokenLayout & { nodeStarts: Map<Text, number>,
+      probs: number[] | null, words: number }>} */
     this.blocks = new Map();
+    /** @type {Map<number, { name: string, range: Range }[]>} */
     this.drawn = new Map();
+    /** @type {Map<Text, number>} */
     this.owned = new Map();
+    /** @type {Map<string, Highlight>} */
     this.highlights = new Map();
   }
 
@@ -21,6 +33,7 @@ export class Painter {
     return Boolean(globalThis.CSS?.highlights && globalThis.Highlight && globalThis.Range);
   }
 
+  /** @param {string} name @returns {Highlight} */
   #highlight(name) {
     let highlight = this.highlights.get(name);
     if (!highlight) {
@@ -32,6 +45,10 @@ export class Painter {
   }
 
   // Registers where a block's tokens are, so ranges can be made from them as scores arrive.
+  /**
+   * @param {number} index
+   * @param {TokenLayout} layout
+   */
   setTokens(index, { text, nodes, starts, ends }) {
     const nodeStarts = new Map();
     for (const entry of nodes) {
@@ -41,6 +58,7 @@ export class Painter {
     this.blocks.set(index, { text, nodes, starts, ends, nodeStarts, probs: null, words: 0 });
   }
 
+  /** @param {number} index @param {string} text */
   setText(index, text) {
     const block = this.blocks.get(index);
     if (block) block.text = text;
@@ -48,6 +66,11 @@ export class Painter {
 
   // Repaints one block: consecutive tokens of the same band and strength become one range, which
   // keeps a long article to a few hundred ranges instead of thousands.
+  /**
+   * @param {number} index
+   * @param {number[]} probs
+   * @param {Bands} thresholds
+   */
   paint(index, probs, thresholds) {
     const block = this.blocks.get(index);
     if (!block) return;
@@ -83,6 +106,7 @@ export class Painter {
     this.drawn.set(index, drawn);
   }
 
+  /** @param {number} index */
   #forget(index) {
     const previous = this.drawn.get(index);
     if (!previous) return;
@@ -91,13 +115,20 @@ export class Painter {
   }
 
   // What Aeacus thinks of the character the pointer is on, as a calibrated probability.
+  /**
+   * @param {Node | null} node
+   * @param {number} offset
+   * @returns {number | null}
+   */
   at(node, offset) {
     if (!node || node.nodeType !== Node.TEXT_NODE) return null;
-    const index = this.owned.get(node);
+    const text = /** @type {Text} */ (node);
+    const index = this.owned.get(text);
     if (index === undefined) return null;
     const block = this.blocks.get(index);
-    if (!block?.probs) return null;
-    const position = block.nodeStarts.get(node) + offset;
+    const start = block?.nodeStarts.get(text);
+    if (!block?.probs || start === undefined) return null;
+    const position = start + offset;
     let low = 0;
     let high = block.starts.length - 1;
     while (low <= high) {
@@ -134,6 +165,11 @@ export class Painter {
 
 // "92% likely AI", and never a percentage inside the unsure band, which exists to say the model
 // cannot tell.
+/**
+ * @param {number} p
+ * @param {Bands} thresholds
+ * @returns {string}
+ */
 export function label(p, thresholds) {
   if (p > thresholds.low && p < thresholds.high) return "Unsure";
   const aiSide = p >= 0.5;
@@ -144,7 +180,9 @@ export function label(p, thresholds) {
 
 // A tooltip of its own, in a shadow root, so no page's styles reach it and it reaches no page.
 export class Tooltip {
+  /** @type {HTMLDivElement | null} */
   #host = null;
+  /** @type {HTMLDivElement | null} */
   #tip = null;
 
   #build() {
@@ -171,20 +209,27 @@ export class Tooltip {
     this.#tip = tip;
   }
 
+  /**
+   * @param {string} text
+   * @param {number} x
+   * @param {number} y
+   */
   show(text, x, y) {
     if (!this.#host?.isConnected) this.#build();
-    this.#tip.textContent = text;
-    this.#tip.hidden = false;
+    const tip = this.#tip;
+    if (!tip) return;
+    tip.textContent = text;
+    tip.hidden = false;
     // Measured at the corner first, then moved above the pointer, or below it when there is no room,
     // and never off the side.
-    this.#tip.style.left = "0px";
-    this.#tip.style.top = "0px";
-    const box = this.#tip.getBoundingClientRect();
+    tip.style.left = "0px";
+    tip.style.top = "0px";
+    const box = tip.getBoundingClientRect();
     const margin = 10;
     const left = Math.min(Math.max(margin, x - box.width / 2), innerWidth - box.width - margin);
     const top = y - box.height - margin < margin ? y + 18 : y - box.height - margin;
-    this.#tip.style.left = `${left}px`;
-    this.#tip.style.top = `${top}px`;
+    tip.style.left = `${left}px`;
+    tip.style.top = `${top}px`;
   }
 
   hide() {

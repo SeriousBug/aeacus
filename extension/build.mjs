@@ -34,6 +34,7 @@ async function version() {
   return JSON.parse(await fs.readFile(path.join(HERE, "package.json"), "utf8")).version;
 }
 
+/** @param {string} browser @param {string} number */
 async function manifest(browser, number) {
   const base = JSON.parse(await fs.readFile(path.join(HERE, "manifests", "base.json"), "utf8"));
   const extra = JSON.parse(await fs.readFile(path.join(HERE, "manifests", `${browser}.json`), "utf8"));
@@ -45,6 +46,7 @@ async function manifest(browser, number) {
   return merged;
 }
 
+/** @param {string} browser */
 async function buildOne(browser) {
   const out = path.join(DIST, browser);
   await fs.rm(out, { recursive: true, force: true });

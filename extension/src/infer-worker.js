@@ -1,5 +1,10 @@
 import { createRunner } from "./infer.js";
 
-const runner = createRunner((message) => postMessage(message));
+// The global scope here is a worker's, which the DOM types call a window.
+/** @type {{ postMessage(message: unknown): void,
+  addEventListener(type: "message", listener: (event: MessageEvent) => void): void }} */
+const scope = /** @type {any} */ (self);
 
-addEventListener("message", ({ data }) => runner.handle(data));
+const runner = createRunner((/** @type {ModelReply} */ message) => scope.postMessage(message));
+
+scope.addEventListener("message", (event) => runner.handle(event.data));

@@ -25,39 +25,40 @@ function port(name) {
 }
 
 // Every import of background.js is its own module instance, so each test starts with no ports, no
-// owners and no open document.
+// owners and no open document. The API itself is loaded once by the modules and held on to, so the
+// cases fill this one object in turn instead of replacing it.
+const fake = { runtime: {}, offscreen: {}, storage: {}, tabs: {} };
+globalThis.browser = fake;
+
 async function load(caseName, { slow = 0 } = {}) {
   const stored = [];
   const connects = [];
-  const api = {
-    runtime: {
-      onConnect: event(),
-      connect({ name }) {
-        const opened = port(name);
-        connects.push(opened);
-        return opened;
-      },
+  fake.runtime = {
+    onConnect: event(),
+    connect({ name }) {
+      const opened = port(name);
+      connects.push(opened);
+      return opened;
     },
-    offscreen: {
-      createDocument: async () => {},
-      hasDocument: async () => {
-        if (slow) await new Promise((resolve) => setTimeout(resolve, slow));
-        return true;
-      },
-    },
-    storage: {
-      local: {
-        get: async () => ({}),
-        set: async (values) => stored.push(values),
-        remove: async () => {},
-      },
-    },
-    tabs: { query: async () => [], sendMessage: async () => {} },
   };
-  globalThis.browser = api;
+  fake.offscreen = {
+    createDocument: async () => {},
+    hasDocument: async () => {
+      if (slow) await new Promise((resolve) => setTimeout(resolve, slow));
+      return true;
+    },
+  };
+  fake.storage = {
+    local: {
+      get: async () => ({}),
+      set: async (values) => stored.push(values),
+      remove: async () => {},
+    },
+  };
+  fake.tabs = { query: async () => [], sendMessage: async () => {} };
   globalThis.self = { location: { href: `file:///tmp/aeacus-bg-${caseName}/infer-worker.js` } };
   await import(`../src/background.js?case=${caseName}`);
-  return { api, connects, stored };
+  return { api: fake, connects, stored };
 }
 
 const tick = () => new Promise((resolve) => setTimeout(resolve, 0));

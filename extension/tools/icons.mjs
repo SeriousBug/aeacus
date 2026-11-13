@@ -9,10 +9,14 @@ import zlib from "node:zlib";
 const HERE = path.dirname(new URL(import.meta.url).pathname);
 const OUT = path.join(HERE, "..", "src", "icons");
 
+/** @type {[number, number, number]} */
 const HUMAN = [37, 99, 235];
+/** @type {[number, number, number]} */
 const AI = [147, 51, 234];
 const SAMPLES = 4;
 
+/** @param {number} x @param {number} y @param {number} x0 @param {number} y0 @param {number} x1
+ *  @param {number} y1 @param {number} radius @returns {boolean} */
 const inside = (x, y, x0, y0, x1, y1, radius) => {
   if (x < x0 || x > x1 || y < y0 || y > y1) return false;
   const cx = Math.min(Math.max(x, x0 + radius), x1 - radius);
@@ -24,6 +28,7 @@ const inside = (x, y, x0, y0, x1, y1, radius) => {
     || (y >= y0 + radius && y <= y1 - radius);
 };
 
+/** @param {number} size @returns {Buffer} */
 function draw(size) {
   const scale = size * SAMPLES;
   const margin = Math.round(scale * 0.12);
@@ -75,6 +80,7 @@ const CRC = (() => {
     for (let k = 0; k < 8; k++) c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1;
     table[n] = c;
   }
+  /** @param {Buffer} buffer @returns {number} */
   return (buffer) => {
     let c = -1;
     for (const byte of buffer) c = table[(c ^ byte) & 0xff] ^ (c >>> 8);
@@ -82,6 +88,7 @@ const CRC = (() => {
   };
 })();
 
+/** @param {string} type @param {Buffer} data @returns {Buffer} */
 function chunk(type, data) {
   const length = Buffer.alloc(4);
   length.writeUInt32BE(data.length);
@@ -91,6 +98,7 @@ function chunk(type, data) {
   return Buffer.concat([length, body, crc]);
 }
 
+/** @param {Buffer} pixels @param {number} size @returns {Buffer} */
 function png(pixels, size) {
   const header = Buffer.alloc(13);
   header.writeUInt32BE(size, 0);

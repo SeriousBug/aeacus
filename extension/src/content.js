@@ -4,25 +4,33 @@
 import { MIN_WORDS } from "./config.js";
 import { Painter, Tooltip, label } from "./highlight.js";
 import { findBlocks, splitBlock } from "./page-text.js";
-
-const api = globalThis.browser ?? globalThis.chrome;
+import api from "./api.js";
+import { reason } from "./errors.js";
 
 // Aeacus's own site describes the thing instead of being a page to judge, so nothing is read there.
 const OWN_HOST = "aeacus.bgenc.dev";
 const ownSite = () => location.hostname === OWN_HOST;
 
-let settings = { auto: true, minWords: MIN_WORDS, tooltips: true };
+/** @type {Settings} */
+let settings = { auto: false, minWords: MIN_WORDS, tooltips: true };
 const painter = Painter.supported() ? new Painter() : null;
 const tooltip = new Tooltip();
 
+/** @type {Bands | null} */
 let thresholds = null;
+/** @type {Block[]} */
 let blocks = [];
 let running = false;
+/** @type {string | null} */
 let runId = null;
+/** @type {chrome.runtime.Port | null} */
 let port = null;
-let state = { phase: "idle" };
+/** @type {PageState} */
+let state = { phase: "idle", message: "", progress: null, summary: null };
+/** @type {Set<chrome.runtime.Port>} */
 const popups = new Set();
 
+/** @param {Partial<PageState>} next */
 function publish(next) {
   state = { ...state, ...next };
   for (const popup of popups) {
@@ -34,6 +42,7 @@ function publish(next) {
   }
 }
 
+/** @param {string} message */
 function fail(message) {
   running = false;
   disconnect();
@@ -42,6 +51,7 @@ function fail(message) {
 
 // The model lives behind the background's port: one connection per check, so nothing stays running
 // on a page that was only read.
+/** @returns {chrome.runtime.Port} */
 function connect() {
   const opened = api.runtime.connect({ name: "aeacus" });
   opened.onMessage.addListener(receive);
@@ -58,19 +68,20 @@ function disconnect() {
   port = null;
 }
 
+/** @param {ModelReply} message */
 function receive(message) {
-  if (!message || message.id !== runId) {
-    if (message?.type === "model") publish({ model: message });
-    return;
-  }
+  if (!message) return;
+  if (message.type === "model") publish({ model: message });
+  if (!("id" in message) || message.id !== runId) return;
   try {
     handle(message);
   } catch (error) {
     console.error("Aeacus couldn't draw a result", error);
-    fail(String(error?.message ?? error));
+    fail(reason(error));
   }
 }
 
+/** @param {ModelReply} message */
 function handle(message) {
   switch (message.type) {
     case "total":
@@ -108,7 +119,9 @@ function resetTotals() {
   Object.assign(totals, { tokens: 0, ai: 0, human: 0, unsure: 0, blocks: 0, aiBlocks: 0, words: 0, sum: 0 });
 }
 
+/** @param {{ probs: number[], words: number }} message */
 function collect({ probs, words }) {
+  if (!thresholds) return;
   let ai = 0;
   let human = 0;
   let unsure = 0;
@@ -132,6 +145,7 @@ function collect({ probs, words }) {
   publish({ summary: summary() });
 }
 
+/** @returns {PageSummary | null} */
 function summary() {
   if (!totals.tokens) return null;
   return {
@@ -145,6 +159,7 @@ function summary() {
   };
 }
 
+/** @param {Extract<ModelReply, { type: "done" }>} message */
 function finish(message) {
   running = false;
   disconnect();
@@ -221,6 +236,7 @@ api.runtime.onMessage.addListener((message) => {
 });
 
 // Pointing at the text says what Aeacus thinks of that word, the way the website's tooltip does.
+/** @type {{ x: number, y: number } | null} */
 let pointer = null;
 let waiting = false;
 
@@ -247,7 +263,7 @@ addEventListener("pagehide", () => {
 }, { capture: true });
 
 function showTooltip() {
-  if (!pointer || !thresholds) return;
+  if (!pointer || !thresholds || !painter) return;
   const caret = caretAt(pointer.x, pointer.y);
   if (!caret || !onGlyph(caret.node, caret.offset, pointer.x, pointer.y)) {
     tooltip.hide();
@@ -263,13 +279,21 @@ function showTooltip() {
 
 // A browser will name a caret position in the empty space beside a line as readily as on its words,
 // and a tooltip there hangs over nothing. Only a character the pointer is actually on counts.
+/**
+ * @param {Node | null} node
+ * @param {number} offset
+ * @param {number} x
+ * @param {number} y
+ * @returns {boolean}
+ */
 function onGlyph(node, offset, x, y) {
-  if (!node || node.nodeType !== Node.TEXT_NODE || !node.data) return false;
-  const last = node.data.length - 1;
+  if (!node || node.nodeType !== Node.TEXT_NODE) return false;
+  const text = /** @type {Text} */ (node);
+  const last = text.data.length - 1;
   for (let from = Math.max(0, offset - 1); from <= Math.min(offset, last); from++) {
     const range = document.createRange();
-    range.setStart(node, from);
-    range.setEnd(node, from + 1);
+    range.setStart(text, from);
+    range.setEnd(text, from + 1);
     for (const rect of range.getClientRects()) {
       if (x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom) return true;
     }
@@ -277,6 +301,11 @@ function onGlyph(node, offset, x, y) {
   return false;
 }
 
+/**
+ * @param {number} x
+ * @param {number} y
+ * @returns {{ node: Node, offset: number } | null}
+ */
 function caretAt(x, y) {
   if (document.caretPositionFromPoint) {
     const position = document.caretPositionFromPoint(x, y);

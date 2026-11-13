@@ -23,17 +23,25 @@ const IGNORED = "nav, header, footer, aside, form, dialog, [role='navigation'], 
 // swallowing them, which matters for the pages that put an article in one div with line breaks and
 // the odd heading: the headings and the loose sentences still belong to the writing around them, and
 // a wrapper whose own text is short is dropped for saying nothing of its own.
+/**
+ * @param {{ root?: Element | null, minWords?: number, maxBlocks?: number }} [options]
+ * @returns {PageBlock[]}
+ */
 export function findBlocks({ root = document.body, minWords = MIN_WORDS, maxBlocks = MAX_BLOCKS } = {}) {
   if (!root) return [];
   const candidates = [...root.querySelectorAll(CANDIDATES)];
+  /** @type {Set<Element>} */
   const containers = new Set();
   for (const element of candidates) {
     if (element.querySelector(CANDIDATES)) containers.add(element);
   }
 
+  /** @type {PageBlock[]} */
   const blocks = [];
+  /** @type {Set<Element>} */
   const accepted = new Set();
 
+  /** @param {Element} element @returns {boolean} */
   const usable = (element) => !SKIP_TAGS.has(element.tagName) && element.isConnected
     && !element.closest(IGNORED) && element.getClientRects().length > 0;
 
@@ -55,27 +63,39 @@ export function findBlocks({ root = document.body, minWords = MIN_WORDS, maxBloc
 
 // The text of one container, plus where each text node starts in it. Adjacent inline elements are
 // joined with a space, which keeps the offsets exact and the tokenizer on prose.
+/**
+ * @param {Element} element
+ * @param {Set<Element> | null} [skip]
+ * @returns {PageBlock | null}
+ */
 function readBlock(element, skip = null) {
+  /** @type {TextNodeSpan[]} */
   const nodes = [];
   let text = "";
   let linkChars = 0;
   let allChars = 0;
 
+  /**
+   * @param {Node} parent
+   * @param {boolean} inLink
+   */
   function walk(parent, inLink) {
     for (let child = parent.firstChild; child; child = child.nextSibling) {
       if (child.nodeType === Node.TEXT_NODE) {
-        const data = child.data;
+        const node = /** @type {Text} */ (child);
+        const data = node.data;
         if (!data) continue;
         if (text && /\S$/.test(text) && /^\S/.test(data)) text += " ";
-        nodes.push({ node: child, start: text.length, end: text.length + data.length });
+        nodes.push({ node, start: text.length, end: text.length + data.length });
         text += data;
         allChars += data.replace(/\s+/g, "").length;
         if (inLink) linkChars += data.replace(/\s+/g, "").length;
       } else if (child.nodeType === Node.ELEMENT_NODE) {
-        if (SKIP_TAGS.has(child.tagName)) continue;
-        if (skip?.has(child)) continue;
-        if (child.hasAttribute("hidden") || child.getAttribute("aria-hidden") === "true") continue;
-        walk(child, inLink || child.tagName === "A");
+        const element = /** @type {Element} */ (child);
+        if (SKIP_TAGS.has(element.tagName)) continue;
+        if (skip?.has(element)) continue;
+        if (element.hasAttribute("hidden") || element.getAttribute("aria-hidden") === "true") continue;
+        walk(element, inLink || element.tagName === "A");
       }
     }
   }
@@ -106,10 +126,16 @@ function readBlock(element, skip = null) {
 // Windows are 510 tokens, so a block is cut where a sentence ends, well before it gets that long.
 const CHUNK_CHARS = 4500;
 
+/**
+ * @param {PageBlock} block
+ * @param {number} [maxChars]
+ * @returns {Block[]}
+ */
 export function splitBlock(block, maxChars = CHUNK_CHARS) {
   if (block.text.length <= maxChars) {
     return [{ ...block, base: 0, nodes: localNodes(block.nodes, 0, block.text.length) }];
   }
+  /** @type {Block[]} */
   const chunks = [];
   let from = 0;
   while (from < block.text.length) {
@@ -143,6 +169,12 @@ export function splitBlock(block, maxChars = CHUNK_CHARS) {
 }
 
 // The text nodes of [from, to), with the offsets counted from `from` instead of from the block.
+/**
+ * @param {TextNodeSpan[]} nodes
+ * @param {number} from
+ * @param {number} to
+ * @returns {TextNodeSpan[]}
+ */
 function localNodes(nodes, from, to) {
   const out = [];
   for (const entry of nodes) {
@@ -155,6 +187,12 @@ function localNodes(nodes, from, to) {
 }
 
 // The range covering [start, end) of a block's text, or null when it falls outside it.
+/**
+ * @param {{ nodes: TextNodeSpan[] }} block
+ * @param {number} start
+ * @param {number} end
+ * @returns {Range | null}
+ */
 export function rangeFor(block, start, end) {
   const from = locateStart(block.nodes, start);
   const to = locateEnd(block.nodes, end);
@@ -165,6 +203,11 @@ export function rangeFor(block, start, end) {
   return range;
 }
 
+/**
+ * @param {TextNodeSpan[]} nodes
+ * @param {number} offset
+ * @returns {{ node: Text, offset: number } | null}
+ */
 function locateStart(nodes, offset) {
   let low = 0;
   let high = nodes.length - 1;
@@ -180,6 +223,11 @@ function locateStart(nodes, offset) {
 
 // The caret position at `offset`, which is the boundary after the character before it, so it can sit
 // on the end of a node.
+/**
+ * @param {TextNodeSpan[]} nodes
+ * @param {number} offset
+ * @returns {{ node: Text, offset: number } | null}
+ */
 function locateEnd(nodes, offset) {
   let low = 0;
   let high = nodes.length - 1;
