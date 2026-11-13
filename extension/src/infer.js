@@ -266,7 +266,7 @@ export function createRunner(post) {
       for (let i = 0; i < probs.length; i++) probs[i] = calibrate(sums[i] / counts[i], loaded.thresholds.calibration);
       const scores = plain(probs);
       post({ type: "block", id, block: block.index, probs: scores, words: plan.words,
-        ...summary(scores, plan.words) });
+        ...summary(scores) });
     }
     post({
       type: "done", id, blocks: plans.length, tokens,

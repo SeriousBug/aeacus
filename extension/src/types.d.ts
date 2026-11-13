@@ -65,7 +65,7 @@ interface ModelState {
 }
 
 interface ModelVerdict {
-  verdict: "ai_leaning" | "human_leaning" | "insufficient_text";
+  verdict: "ai_leaning" | "human_leaning";
   ai_score: number | null;
 }
 

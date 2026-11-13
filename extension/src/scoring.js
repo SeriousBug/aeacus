@@ -1,7 +1,7 @@
 // Turning raw token scores into what a person reads: a calibrated AI rate, a band, and how sure the
 // label is within that band. The website does the same thing in app.js.
 
-import { MIN_WORDS, STRIDE, WINDOW } from "./config.js";
+import { STRIDE, WINDOW } from "./config.js";
 
 // Below `low` a token counts as likely human, above `high` as likely AI, in between as unsure.
 /**
@@ -48,20 +48,18 @@ export function windowsFor(tokens) {
   return starts;
 }
 
-// The page-level numbers the CLI reports: a mean calibrated score over the block's tokens, and a
-// verdict that refuses to lean either way on text the model was not trained for.
+// The page-level numbers the CLI reports: a mean calibrated score over the block's tokens, and which
+// way it leans.
 /**
  * @param {number[]} probabilities
- * @param {number} words
  * @returns {ModelVerdict}
  */
-export function summary(probabilities, words) {
+export function summary(probabilities) {
   const aiScore = probabilities.length
     ? probabilities.reduce((sum, p) => sum + p, 0) / probabilities.length
     : null;
-  const leaning = aiScore !== null && aiScore >= 0.5 ? "ai_leaning" : "human_leaning";
   return {
-    verdict: words < MIN_WORDS ? "insufficient_text" : leaning,
+    verdict: aiScore !== null && aiScore >= 0.5 ? "ai_leaning" : "human_leaning",
     ai_score: aiScore === null ? null : Number(aiScore.toFixed(4)),
   };
 }

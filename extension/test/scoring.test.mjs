@@ -34,11 +34,9 @@ test("windowsFor covers a token sequence with the training stride", () => {
   for (let i = 1; i < starts.length; i++) assert.equal(starts[i] - starts[i - 1], WINDOW - STRIDE);
 });
 
-test("summary refuses to lean either way on text shorter than training used", () => {
-  const short = summary([0.9, 0.9], 12);
-  assert.equal(short.verdict, "insufficient_text");
-  assert.equal(short.ai_score, 0.9);
-  assert.equal(summary([0.9, 0.9], 40).verdict, "ai_leaning");
-  assert.equal(summary([0.1, 0.1], 40).verdict, "human_leaning");
-  assert.deepEqual(summary([], 40), { verdict: "human_leaning", ai_score: null });
+test("summary leans the way the mean of the block's tokens leans", () => {
+  assert.deepEqual(summary([0.9, 0.9]), { verdict: "ai_leaning", ai_score: 0.9 });
+  assert.equal(summary([0.7, 0.6, 0.5]).verdict, "ai_leaning");
+  assert.equal(summary([0.1, 0.1]).verdict, "human_leaning");
+  assert.deepEqual(summary([]), { verdict: "human_leaning", ai_score: null });
 });

@@ -136,16 +136,16 @@ function draw(next) {
   }
 
   if (phase === "idle") {
-    elements.lede.textContent = "See which parts of this page read as written by a person and which"
-      + " by AI.";
+    elements.lede.textContent = "Check which parts are likely to be AI-generated, and which parts are"
+      + " likely to be written by a human.";
     note(modelReady
       ? "The check runs on this computer. Nothing is sent anywhere."
       : "The first check downloads Aeacus, about 87 MB, and keeps it on this computer.");
   }
 
   if (phase === "empty") {
-    elements.lede.textContent = "Aeacus can't say on this page.";
-    note(state.message || "There's too little prose here for a verdict.");
+    elements.lede.textContent = "Aeacus found nothing to read here.";
+    note(state.message || "This page has no paragraphs of prose for it to check.");
   }
 
   if (phase === "home") {

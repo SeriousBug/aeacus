@@ -2,7 +2,7 @@
 // DOM, so a score can be drawn back over the text. No extension APIs here, so it can be tested in
 // a plain page.
 
-import { MAX_BLOCKS, MIN_WORDS } from "./config.js";
+import { MAX_BLOCKS } from "./config.js";
 
 const SKIP_TAGS = new Set([
   "SCRIPT", "STYLE", "NOSCRIPT", "TEMPLATE", "TEXTAREA", "INPUT", "SELECT", "OPTION", "BUTTON",
@@ -22,7 +22,7 @@ const IGNORED = "nav, header, footer, aside, form, dialog, [role='navigation'], 
 // Much of the web writes in divs. A container is read around the paragraphs inside it rather than
 // swallowing them, which matters for the pages that put an article in one div with line breaks and
 // the odd heading: the headings and the loose sentences still belong to the writing around them, and
-// a wrapper whose own text is short is dropped for saying nothing of its own.
+// a wrapper with nothing left of its own is dropped.
 /**
  * @param {{ root?: Element | null, maxBlocks?: number }} [options]
  * @returns {PageBlock[]}
@@ -52,7 +52,6 @@ export function findBlocks({ root = document.body, maxBlocks = MAX_BLOCKS } = {}
     if (!usable(element)) continue;
     const block = readBlock(element, accepted);
     if (!block) continue;
-    if (block.words < MIN_WORDS) continue;
     if (block.linkShare > 0.5) continue;
     accepted.add(element);
     blocks.push(block);

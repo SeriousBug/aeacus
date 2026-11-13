@@ -66,7 +66,7 @@ worker runs the model itself over WebAssembly.
 | `src/infer.js` | The model: download and cache, session on WebGPU or WebAssembly, windows and scores |
 | `src/host.js` | Runs `infer.js` in a worker, or in place when the browser has none |
 | `src/background.js` | Connects each page to the document that holds the worker |
-| `src/scoring.js` | Thresholds, calibration and the page-level numbers, the same as the website and the CLI |
+| `src/scoring.js` | Thresholds, calibration and the page-level numbers, on the bands the website and the CLI use |
 | `src/api.js` | The browser's API under one name, since Firefox calls it `browser` and Chrome `chrome` |
 | `src/types.d.ts` | The shapes that cross a boundary: the model's messages and the page's state |
 
