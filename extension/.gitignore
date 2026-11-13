@@ -2,3 +2,4 @@ node_modules/
 dist/
 safari/*.xcodeproj/xcuserdata/
 safari/*.xcodeproj/project.xcworkspace/xcuserdata/
+artifacts/

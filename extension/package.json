@@ -8,6 +8,7 @@
     "build": "node build.mjs",
     "icons": "node tools/icons.mjs",
     "safari": "node tools/safari.mjs",
+    "zip": "node tools/pack.mjs",
     "test": "node --test test/*.test.mjs",
     "types": "tsc -p tsconfig.json && tsc -p tsconfig.tools.json",
     "lint": "eslint .",
