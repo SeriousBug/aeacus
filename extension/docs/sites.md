@@ -123,6 +123,28 @@ that mark chrome: they are only read inside the region, because a card on Amazon
   but also the "Select your rating", "Overall rating" and "5 stars" rows of the review form, and the
   photo captions inside reviews. With the `comment__` rule, ten reviews and no noise.
 
+## bsky.app
+
+- Keep: `[data-word-wrap="1"]`, the body of a post. It is the only stable hook in the markup: the
+  classes are React Native Web's (`css-g5y9jx`, `r-8akbws`, new names on each deploy) and the
+  `data-testid` differs per view. The feed wraps the body in `data-testid="postText"`, a thread puts
+  no test id on the body at all (its items are `data-testid="postThreadItem-by-<handle>"`), and a
+  profile has neither. `data-word-wrap` is on the body in all three, and on nothing else: on a feed,
+  all 70 of them were inside a post.
+- Drop: `[aria-label^="Post "]`, the `3/7` counter of a post that belongs to a thread. It sits inside
+  the body, so without the rule the block ends in `3/7`. The `^` matters: `aria-label="Post by
+  <handle>"` is on the card around a quoted post, and that card holds the quoted body.
+- A feed of 48 posts: 47 blocks, because one post is a GIF with no writing, and 66 without the
+  counter rule, one block per counter (`1/2`, `2/3`). A post that quotes another one gives its own
+  body and the quoted body, so that feed came to 69 blocks, and two posts the feed showed twice did
+  as well.
+- A thread view: 16 blocks, the post and 15 replies, without their authors.
+- A profile: 58 blocks, its posts. Where the app lays out the profile's own description, that is
+  among them.
+- Without a rule, the same feed gives 309 blocks of `ALT` badges (one per image), `GIF`, author names,
+  handles, `· 6h`, `115`, `1K`, `9` and `Write your reply`; the thread gives 57 and the profile 320,
+  nearly all of them `ALT`.
+
 ## Pages no rule covers, measured on a WordPress blog
 
 ma.tt is the test case: a `[role=main]`, an `article` per post, `.entry-content` around the writing,
@@ -153,5 +175,4 @@ What the same pass does on two other sites with no rule:
 
 ## Not done yet
 
-- Amazon reviews, Bluesky threads and X put a sign-in in the way, so they need a session in the
-  browser before their markup can be checked.
+- X puts a sign-in in the way, so it needs a session in the browser before its markup can be checked.
