@@ -1,8 +1,7 @@
 {
   "background": {
     "scripts": ["background.js"],
-    "service_worker": "background.js",
-    "preferred_environment": ["document", "service_worker"]
+    "service_worker": "background.js"
   },
   "browser_specific_settings": {
     "safari": {

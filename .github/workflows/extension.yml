@@ -1,0 +1,54 @@
+name: Extension
+
+on:
+  push:
+    branches: [main]
+    paths: ["extension/**", "shared/**"]
+  pull_request:
+    paths: ["extension/**", "shared/**"]
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: extension
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 12
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+          cache-dependency-path: extension/pnpm-lock.yaml
+      - run: pnpm install --frozen-lockfile
+      # The model tests need the weights beside the repo, so they skip here; the rest of the
+      # pipeline runs on the tokenizer alone.
+      - run: pnpm test
+      - run: pnpm build
+      # WebGPU and the highlight API are what the extension leans on, so a build that no browser can
+      # load is caught by keeping each manifest parseable and its files present.
+      - name: Check the built extensions
+        run: node -e '
+          const fs = require("node:fs");
+          for (const browser of ["chrome", "firefox", "safari"]) {
+            const dir = `dist/${browser}`;
+            const manifest = JSON.parse(fs.readFileSync(`${dir}/manifest.json`, "utf8"));
+            if (manifest.manifest_version !== 3) throw new Error(`${browser}: not MV3`);
+            if (!manifest.version) throw new Error(`${browser}: no version`);
+            for (const file of ["content.js", "background.js", "popup.html", "options.html",
+              "infer-worker.js", "ort/ort.webgpu.bundle.min.mjs"]) {
+              if (!fs.existsSync(`${dir}/${file}`)) throw new Error(`${browser}: ${file} missing`);
+            }
+            console.log(`${browser}: ${manifest.version}`);
+          }'
+      - uses: actions/upload-artifact@v4
+        with:
+          name: extension
+          path: |
+            extension/dist/chrome
+            extension/dist/firefox
+            extension/dist/safari

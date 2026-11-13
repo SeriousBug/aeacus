@@ -2,7 +2,7 @@
 
 Aeacus estimates how AI-like a passage of writing is. The website is at [aeacus.bgenc.dev](https://aeacus.bgenc.dev).
 
-This repository is a monorepo containing the website source in `website/` and the npm CLI package in `cli/`. GitHub Actions builds and deploys the website to GitHub Pages and publishes versioned CLI releases to npm.
+This repository is a monorepo containing the website source in `website/`, the npm CLI package in `cli/`, and the browser extension for Chrome, Firefox and Safari in `extension/`. GitHub Actions builds and deploys the website to GitHub Pages and publishes versioned CLI releases to npm.
 
 ## Website
 
@@ -25,4 +25,10 @@ Run it without installing anything:
 cat draft.txt | npx aeacus-cli
 npx aeacus-cli draft.txt --json
 ```
+
+## Extension
+
+The extension marks up the parts of a page that read as written by AI, and checks them on the
+computer it is installed on. From `extension/`, `pnpm install && pnpm build` writes `dist/chrome`,
+`dist/firefox` and `dist/safari`. See [extension/README.md](extension/README.md).
 

@@ -111,7 +111,7 @@ function png(pixels, size) {
 }
 
 await fs.mkdir(OUT, { recursive: true });
-for (const size of [16, 32, 48, 128, 256, 512, 1024]) {
+for (const size of [16, 32, 48, 64, 128, 256, 512, 1024]) {
   const file = path.join(OUT, `icon-${size}.png`);
   await fs.writeFile(file, png(draw(size), size));
   console.log(`${file} ${size}×${size}`);
