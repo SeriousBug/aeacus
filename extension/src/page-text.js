@@ -2,7 +2,7 @@
 // DOM, so a score can be drawn back over the text. No extension APIs here, so it can be tested in
 // a plain page.
 
-import { MIN_WORDS } from "./config.js";
+import { MAX_BLOCKS, MIN_WORDS } from "./config.js";
 
 const SKIP_TAGS = new Set([
   "SCRIPT", "STYLE", "NOSCRIPT", "TEMPLATE", "TEXTAREA", "INPUT", "SELECT", "OPTION", "BUTTON",
@@ -23,7 +23,7 @@ const IGNORED = "nav, header, footer, aside, form, dialog, [role='navigation'], 
 // swallowing them, which matters for the pages that put an article in one div with line breaks and
 // the odd heading: the headings and the loose sentences still belong to the writing around them, and
 // a wrapper whose own text is short is dropped for saying nothing of its own.
-export function findBlocks({ root = document.body, minWords = MIN_WORDS, maxBlocks = 400 } = {}) {
+export function findBlocks({ root = document.body, minWords = MIN_WORDS, maxBlocks = MAX_BLOCKS } = {}) {
   if (!root) return [];
   const candidates = [...root.querySelectorAll(CANDIDATES)];
   const containers = new Set();

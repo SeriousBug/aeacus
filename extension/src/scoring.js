@@ -1,7 +1,7 @@
 // Turning raw token scores into what a person reads: a calibrated AI rate, a band, and how sure the
 // label is within that band. The website does the same thing in app.js.
 
-import { STRIDE, WINDOW } from "./config.js";
+import { MIN_WORDS, STRIDE, WINDOW } from "./config.js";
 
 // Below `low` a token counts as likely human, above `high` as likely AI, in between as unsure.
 export function verdict(p, thresholds) {
@@ -40,7 +40,7 @@ export function summary(probabilities, words, thresholds) {
   const aiScore = probabilities.length
     ? probabilities.reduce((sum, p) => sum + p, 0) / probabilities.length
     : null;
-  const verdict = words < 30 ? "insufficient_text"
+  const verdict = words < MIN_WORDS ? "insufficient_text"
     : aiScore >= 0.5 ? "ai_leaning" : "human_leaning";
   return { verdict, ai_score: aiScore === null ? null : Number(aiScore.toFixed(4)) };
 }
