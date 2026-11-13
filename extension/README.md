@@ -61,6 +61,7 @@ worker runs the model itself over WebAssembly.
 | File | What it does |
 | --- | --- |
 | `src/page-text.js` | Finds the prose on a page, and cuts a container that holds a whole article into pieces a 510-token window can read |
+| `src/sites.js` | Where a known site keeps its writing, since a nav or a byline is not something a site labels as such |
 | `src/highlight.js` | Paints the scores back over the text with the CSS Custom Highlight API, so the page is never changed |
 | `src/content.js` | Runs a check: gather the text, ask the background, paint and report to the popup |
 | `src/infer.js` | The model: download and cache, session on WebGPU or WebAssembly, windows and scores |
@@ -74,6 +75,9 @@ worker runs the model itself over WebAssembly.
 `src/` is shared by all three browsers; only `manifests/` differs. `build.mjs` merges
 `manifests/base.json` with the browser's own file, bundles each entry point with esbuild, and copies
 the ONNX Runtime files the model needs.
+
+`docs/sites.md` says which containers each site's rule names, and how many blocks that gave on the
+pages the rules were checked against.
 
 Set `AEACUS_MODEL_BASE` when building to load the model from somewhere else, which is how a local
 copy of the weights is tested:
