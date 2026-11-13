@@ -1,0 +1,12 @@
+{
+  "background": {
+    "scripts": ["background.js"],
+    "service_worker": "background.js",
+    "preferred_environment": ["document", "service_worker"]
+  },
+  "browser_specific_settings": {
+    "safari": {
+      "strict_min_version": "17.4"
+    }
+  }
+}

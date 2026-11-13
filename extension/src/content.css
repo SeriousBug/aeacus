@@ -1,0 +1,28 @@
+/* The colors the website uses: blue for likely human, purple for likely AI, grey for unsure, with
+   four steps of strength on each side. */
+
+::highlight(aeacus-human-0) { background-color: rgb(37 99 235 / 0.16); }
+::highlight(aeacus-human-1) { background-color: rgb(37 99 235 / 0.3); }
+::highlight(aeacus-human-2) { background-color: rgb(37 99 235 / 0.46); }
+::highlight(aeacus-human-3) { background-color: rgb(37 99 235 / 0.62); }
+
+::highlight(aeacus-ai-0) { background-color: rgb(147 51 234 / 0.16); }
+::highlight(aeacus-ai-1) { background-color: rgb(147 51 234 / 0.3); }
+::highlight(aeacus-ai-2) { background-color: rgb(147 51 234 / 0.46); }
+::highlight(aeacus-ai-3) { background-color: rgb(147 51 234 / 0.62); }
+
+::highlight(aeacus-unsure) { background-color: rgb(120 120 128 / 0.22); }
+
+@media (prefers-color-scheme: dark) {
+  ::highlight(aeacus-human-0) { background-color: rgb(88 145 255 / 0.18); }
+  ::highlight(aeacus-human-1) { background-color: rgb(88 145 255 / 0.32); }
+  ::highlight(aeacus-human-2) { background-color: rgb(88 145 255 / 0.48); }
+  ::highlight(aeacus-human-3) { background-color: rgb(88 145 255 / 0.64); }
+
+  ::highlight(aeacus-ai-0) { background-color: rgb(180 110 255 / 0.18); }
+  ::highlight(aeacus-ai-1) { background-color: rgb(180 110 255 / 0.32); }
+  ::highlight(aeacus-ai-2) { background-color: rgb(180 110 255 / 0.48); }
+  ::highlight(aeacus-ai-3) { background-color: rgb(180 110 255 / 0.64); }
+
+  ::highlight(aeacus-unsure) { background-color: rgb(150 150 160 / 0.22); }
+}

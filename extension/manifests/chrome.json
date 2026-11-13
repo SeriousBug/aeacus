@@ -1,0 +1,9 @@
+{
+  "permissions": ["storage", "unlimitedStorage", "offscreen"],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "minimum_chrome_version": "116",
+  "cross_origin_embedder_policy": { "value": "require-corp" },
+  "cross_origin_opener_policy": { "value": "same-origin" }
+}

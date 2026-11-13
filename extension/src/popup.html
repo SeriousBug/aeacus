@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Aeacus</title>
+  <link rel="stylesheet" href="theme.css">
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <header>
+    <span class="mark" aria-hidden="true"><i></i><i></i></span>
+    <h1>Aeacus</h1>
+  </header>
+
+  <main>
+    <p id="lede"></p>
+
+    <div id="shares" class="shares" hidden>
+      <span class="share human" id="share-human"></span>
+      <span class="share unsure" id="share-unsure"></span>
+      <span class="share ai" id="share-ai"></span>
+    </div>
+
+    <dl id="legend" class="legend" hidden>
+      <div><dt><span class="swatch human"></span>Likely human</dt><dd id="value-human"></dd></div>
+      <div><dt><span class="swatch unsure"></span>Unsure</dt><dd id="value-unsure"></dd></div>
+      <div><dt><span class="swatch ai"></span>Likely AI</dt><dd id="value-ai"></dd></div>
+    </dl>
+
+    <div id="progress" class="progress" hidden>
+      <div class="bar" id="bar" role="progressbar" aria-valuemin="0" aria-valuemax="100"><div class="fill" id="fill"></div></div>
+      <p class="progress-label" id="progress-label" aria-live="polite"></p>
+    </div>
+
+    <div class="actions">
+      <button id="check" type="button">Check this page</button>
+      <button id="clear" type="button" class="secondary" hidden>Clear highlights</button>
+    </div>
+
+    <p id="note" class="note"></p>
+  </main>
+
+  <footer>
+    <a href="#" id="settings">Settings</a>
+    <a href="https://aeacus.bgenc.dev" target="_blank" rel="noreferrer">About Aeacus</a>
+  </footer>
+
+  <script src="popup.js"></script>
+</body>
+</html>

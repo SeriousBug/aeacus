@@ -1,0 +1,16 @@
+{
+  "name": "aeacus-extension",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Marks up the parts of a page that read as AI-written, on your own computer",
+  "scripts": {
+    "build": "node build.mjs",
+    "icons": "node tools/icons.mjs",
+    "test": "node --test test/*.test.mjs"
+  },
+  "devDependencies": {
+    "esbuild": "^0.25.12",
+    "onnxruntime-web": "1.30.0"
+  }
+}

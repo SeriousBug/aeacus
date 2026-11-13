@@ -1,0 +1,99 @@
+:root {
+  --bg: #f7f6f3;
+  --surface: #ffffff;
+  --text: #1c1c1f;
+  --muted: #66666e;
+  --border: #d9d7d1;
+  --focus: #1c1c1f;
+  --button: #1c1c1f;
+  --button-text: #ffffff;
+  --error: #b42318;
+  --human: #2563eb;
+  --ai: #9333ea;
+  --unsure: #787880;
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #141416;
+    --surface: #1d1d20;
+    --text: #ececef;
+    --muted: #9d9da6;
+    --border: #34343a;
+    --focus: #ececef;
+    --button: #ececef;
+    --button-text: #141416;
+    --error: #f97066;
+    --human: #5891ff;
+    --ai: #b46eff;
+    --unsure: #9696a0;
+    color-scheme: dark;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font: 14px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+h1 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+p {
+  margin: 0 0 10px;
+  color: var(--muted);
+}
+
+p:last-child {
+  margin-bottom: 0;
+}
+
+button {
+  padding: 8px 14px;
+  border: 0;
+  border-radius: 8px;
+  background: var(--button);
+  color: var(--button-text);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+button:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+button.secondary {
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text);
+}
+
+button:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+a {
+  color: inherit;
+}
+
+.note {
+  font-size: 12px;
+}
+
+.note.error {
+  color: var(--error);
+}

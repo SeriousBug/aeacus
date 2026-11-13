@@ -1,0 +1,173 @@
+body {
+  width: 320px;
+}
+
+header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 16px 10px;
+}
+
+/* The same two bars as the icon: blue for a person's writing, purple for AI's. */
+.mark {
+  display: inline-flex;
+  gap: 3px;
+}
+
+.mark i {
+  width: 7px;
+  height: 14px;
+  border-radius: 2px;
+  background: var(--human);
+}
+
+.mark i + i {
+  background: var(--ai);
+}
+
+main {
+  padding: 0 16px 12px;
+}
+
+#lede {
+  font-size: 14px;
+  color: var(--text);
+}
+
+.shares {
+  display: flex;
+  height: 8px;
+  margin: 12px 0;
+  border-radius: 4px;
+  overflow: hidden;
+  background: var(--border);
+}
+
+.share {
+  display: block;
+  height: 100%;
+}
+
+.share.human {
+  background: var(--human);
+}
+
+.share.unsure {
+  background: var(--unsure);
+  opacity: 0.5;
+}
+
+.share.ai {
+  background: var(--ai);
+}
+
+.legend {
+  display: grid;
+  gap: 4px;
+  margin: 0 0 12px;
+  font-size: 12px;
+}
+
+.legend > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.legend dt {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--muted);
+}
+
+.legend dd {
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+
+.swatch {
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+}
+
+.swatch.human {
+  background: var(--human);
+}
+
+.swatch.unsure {
+  background: var(--unsure);
+  opacity: 0.5;
+}
+
+.swatch.ai {
+  background: var(--ai);
+}
+
+.progress {
+  margin: 12px 0;
+}
+
+.bar {
+  height: 4px;
+  border-radius: 2px;
+  background: var(--border);
+  overflow: hidden;
+}
+
+.fill {
+  height: 100%;
+  width: calc(var(--fraction, 0) * 100%);
+  background: var(--text);
+  transition: width 200ms;
+}
+
+.bar.indeterminate .fill {
+  width: 40%;
+  animation: slide 1.4s ease-in-out infinite;
+}
+
+@keyframes slide {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(250%); }
+}
+
+.progress-label {
+  margin: 6px 0 0;
+  font-size: 12px;
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+  margin: 12px 0 0;
+}
+
+.actions button {
+  flex: 1;
+}
+
+.actions button[hidden] {
+  display: none;
+}
+
+footer {
+  display: flex;
+  gap: 14px;
+  padding: 10px 16px 14px;
+  border-top: 1px solid var(--border);
+  font-size: 12px;
+  color: var(--muted);
+}
+
+footer a {
+  text-decoration: none;
+}
+
+footer a:hover {
+  text-decoration: underline;
+}
