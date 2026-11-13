@@ -15,6 +15,8 @@ const run = /** @type {(file: string, args: string[], options: { stdio: "inherit
 const root = path.resolve(import.meta.dirname, "..");
 const project = path.join(root, "safari");
 const app = path.join(project, "Aeacus", "Aeacus");
+const settingsFile = path.join(project, "Aeacus", "Aeacus.xcodeproj", "project.pbxproj");
+const bundleId = "dev.bgenc.aeacus";
 const icons = path.join(app, "Assets.xcassets", "AppIcon.appiconset");
 const resources = path.join(app, "Resources");
 
@@ -23,9 +25,21 @@ await run("xcrun", [
   "safari-web-extension-converter", path.join(root, "dist", "safari"),
   "--project-location", project,
   "--app-name", "Aeacus",
-  "--bundle-identifier", "dev.bgenc.aeacus",
+  "--bundle-identifier", bundleId,
   "--swift", "--macos-only", "--no-open", "--no-prompt", "--force",
 ], { stdio: "inherit" });
+
+// The converter writes the app's identifier in the app name's case, so the extension's
+// `dev.bgenc.aeacus.Extension` sits in an app called `dev.bgenc.Aeacus` and Xcode refuses to
+// validate the embedded binary, which fails the build.
+const converted = "PRODUCT_BUNDLE_IDENTIFIER = dev.bgenc.Aeacus;";
+const wanted = `PRODUCT_BUNDLE_IDENTIFIER = ${bundleId};`;
+const settings = await readFile(settingsFile, "utf8");
+if (settings.includes(converted)) {
+  await writeFile(settingsFile, settings.replaceAll(converted, wanted));
+} else if (!settings.includes(wanted)) {
+  throw new Error(`${settingsFile} has neither ${converted} nor ${wanted}`);
+}
 
 // The converter fills the app icon set with placeholders; ours carries the same mark as the browser
 // action, at every size the set asks for.

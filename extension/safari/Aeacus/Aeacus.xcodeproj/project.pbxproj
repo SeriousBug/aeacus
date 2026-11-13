@@ -7,95 +7,95 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		8C57F41930A6ADDC00A029D6 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C57F41830A6ADDC00A029D6 /* AppDelegate.swift */; };
-		8C57F41D30A6ADDC00A029D6 /* Main.html in Resources */ = {isa = PBXBuildFile; fileRef = 8C57F41B30A6ADDC00A029D6 /* Main.html */; };
-		8C57F41F30A6ADDC00A029D6 /* Icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 8C57F41E30A6ADDC00A029D6 /* Icon.png */; };
-		8C57F42130A6ADDC00A029D6 /* Style.css in Resources */ = {isa = PBXBuildFile; fileRef = 8C57F42030A6ADDC00A029D6 /* Style.css */; };
-		8C57F42330A6ADDC00A029D6 /* Script.js in Resources */ = {isa = PBXBuildFile; fileRef = 8C57F42230A6ADDC00A029D6 /* Script.js */; };
-		8C57F42530A6ADDC00A029D6 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C57F42430A6ADDC00A029D6 /* ViewController.swift */; };
-		8C57F42830A6ADDC00A029D6 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 8C57F42630A6ADDC00A029D6 /* Main.storyboard */; };
-		8C57F42A30A6ADDC00A029D6 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8C57F42930A6ADDC00A029D6 /* Assets.xcassets */; };
-		8C57F43130A6ADDD00A029D6 /* Aeacus Extension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 8C57F43030A6ADDD00A029D6 /* Aeacus Extension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-		8C57F43630A6ADDD00A029D6 /* SafariWebExtensionHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C57F43530A6ADDD00A029D6 /* SafariWebExtensionHandler.swift */; };
-		8C57F45230A6ADDD00A029D6 /* theme.css in Resources */ = {isa = PBXBuildFile; fileRef = 8C57F44230A6ADDD00A029D6 /* theme.css */; };
-		8C57F45330A6ADDD00A029D6 /* popup.js in Resources */ = {isa = PBXBuildFile; fileRef = 8C57F44330A6ADDD00A029D6 /* popup.js */; };
-		8C57F45430A6ADDD00A029D6 /* content.css in Resources */ = {isa = PBXBuildFile; fileRef = 8C57F44430A6ADDD00A029D6 /* content.css */; };
-		8C57F45530A6ADDD00A029D6 /* offscreen.html in Resources */ = {isa = PBXBuildFile; fileRef = 8C57F44530A6ADDD00A029D6 /* offscreen.html */; };
-		8C57F45630A6ADDD00A029D6 /* background.js in Resources */ = {isa = PBXBuildFile; fileRef = 8C57F44630A6ADDD00A029D6 /* background.js */; };
-		8C57F45730A6ADDD00A029D6 /* popup.html in Resources */ = {isa = PBXBuildFile; fileRef = 8C57F44730A6ADDD00A029D6 /* popup.html */; };
-		8C57F45830A6ADDD00A029D6 /* options.js in Resources */ = {isa = PBXBuildFile; fileRef = 8C57F44830A6ADDD00A029D6 /* options.js */; };
-		8C57F45930A6ADDD00A029D6 /* ort in Resources */ = {isa = PBXBuildFile; fileRef = 8C57F44930A6ADDD00A029D6 /* ort */; };
-		8C57F45A30A6ADDD00A029D6 /* icons in Resources */ = {isa = PBXBuildFile; fileRef = 8C57F44A30A6ADDD00A029D6 /* icons */; };
-		8C57F45B30A6ADDD00A029D6 /* manifest.json in Resources */ = {isa = PBXBuildFile; fileRef = 8C57F44B30A6ADDD00A029D6 /* manifest.json */; };
-		8C57F45C30A6ADDD00A029D6 /* offscreen.js in Resources */ = {isa = PBXBuildFile; fileRef = 8C57F44C30A6ADDD00A029D6 /* offscreen.js */; };
-		8C57F45D30A6ADDD00A029D6 /* infer-worker.js in Resources */ = {isa = PBXBuildFile; fileRef = 8C57F44D30A6ADDD00A029D6 /* infer-worker.js */; };
-		8C57F45E30A6ADDD00A029D6 /* options.html in Resources */ = {isa = PBXBuildFile; fileRef = 8C57F44E30A6ADDD00A029D6 /* options.html */; };
-		8C57F45F30A6ADDD00A029D6 /* popup.css in Resources */ = {isa = PBXBuildFile; fileRef = 8C57F44F30A6ADDD00A029D6 /* popup.css */; };
-		8C57F46030A6ADDD00A029D6 /* content.js in Resources */ = {isa = PBXBuildFile; fileRef = 8C57F45030A6ADDD00A029D6 /* content.js */; };
-		8C57F46130A6ADDD00A029D6 /* options.css in Resources */ = {isa = PBXBuildFile; fileRef = 8C57F45130A6ADDD00A029D6 /* options.css */; };
+		8C9AACC230A7ADC500E1BC5D /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C9AACC130A7ADC500E1BC5D /* AppDelegate.swift */; };
+		8C9AACC630A7ADC500E1BC5D /* Main.html in Resources */ = {isa = PBXBuildFile; fileRef = 8C9AACC430A7ADC500E1BC5D /* Main.html */; };
+		8C9AACC830A7ADC500E1BC5D /* Icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 8C9AACC730A7ADC500E1BC5D /* Icon.png */; };
+		8C9AACCA30A7ADC500E1BC5D /* Style.css in Resources */ = {isa = PBXBuildFile; fileRef = 8C9AACC930A7ADC500E1BC5D /* Style.css */; };
+		8C9AACCC30A7ADC500E1BC5D /* Script.js in Resources */ = {isa = PBXBuildFile; fileRef = 8C9AACCB30A7ADC500E1BC5D /* Script.js */; };
+		8C9AACCE30A7ADC500E1BC5D /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C9AACCD30A7ADC500E1BC5D /* ViewController.swift */; };
+		8C9AACD130A7ADC500E1BC5D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 8C9AACCF30A7ADC500E1BC5D /* Main.storyboard */; };
+		8C9AACD330A7ADC600E1BC5D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8C9AACD230A7ADC600E1BC5D /* Assets.xcassets */; };
+		8C9AACDA30A7ADC600E1BC5D /* Aeacus Extension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 8C9AACD930A7ADC600E1BC5D /* Aeacus Extension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		8C9AACDF30A7ADC600E1BC5D /* SafariWebExtensionHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C9AACDE30A7ADC600E1BC5D /* SafariWebExtensionHandler.swift */; };
+		8C9AACFB30A7ADC600E1BC5D /* theme.css in Resources */ = {isa = PBXBuildFile; fileRef = 8C9AACEB30A7ADC600E1BC5D /* theme.css */; };
+		8C9AACFC30A7ADC600E1BC5D /* popup.js in Resources */ = {isa = PBXBuildFile; fileRef = 8C9AACEC30A7ADC600E1BC5D /* popup.js */; };
+		8C9AACFD30A7ADC600E1BC5D /* content.css in Resources */ = {isa = PBXBuildFile; fileRef = 8C9AACED30A7ADC600E1BC5D /* content.css */; };
+		8C9AACFE30A7ADC600E1BC5D /* offscreen.html in Resources */ = {isa = PBXBuildFile; fileRef = 8C9AACEE30A7ADC600E1BC5D /* offscreen.html */; };
+		8C9AACFF30A7ADC600E1BC5D /* background.js in Resources */ = {isa = PBXBuildFile; fileRef = 8C9AACEF30A7ADC600E1BC5D /* background.js */; };
+		8C9AAD0030A7ADC600E1BC5D /* popup.html in Resources */ = {isa = PBXBuildFile; fileRef = 8C9AACF030A7ADC600E1BC5D /* popup.html */; };
+		8C9AAD0130A7ADC600E1BC5D /* options.js in Resources */ = {isa = PBXBuildFile; fileRef = 8C9AACF130A7ADC600E1BC5D /* options.js */; };
+		8C9AAD0230A7ADC600E1BC5D /* ort in Resources */ = {isa = PBXBuildFile; fileRef = 8C9AACF230A7ADC600E1BC5D /* ort */; };
+		8C9AAD0330A7ADC600E1BC5D /* icons in Resources */ = {isa = PBXBuildFile; fileRef = 8C9AACF330A7ADC600E1BC5D /* icons */; };
+		8C9AAD0430A7ADC600E1BC5D /* manifest.json in Resources */ = {isa = PBXBuildFile; fileRef = 8C9AACF430A7ADC600E1BC5D /* manifest.json */; };
+		8C9AAD0530A7ADC600E1BC5D /* offscreen.js in Resources */ = {isa = PBXBuildFile; fileRef = 8C9AACF530A7ADC600E1BC5D /* offscreen.js */; };
+		8C9AAD0630A7ADC600E1BC5D /* infer-worker.js in Resources */ = {isa = PBXBuildFile; fileRef = 8C9AACF630A7ADC600E1BC5D /* infer-worker.js */; };
+		8C9AAD0730A7ADC600E1BC5D /* options.html in Resources */ = {isa = PBXBuildFile; fileRef = 8C9AACF730A7ADC600E1BC5D /* options.html */; };
+		8C9AAD0830A7ADC600E1BC5D /* popup.css in Resources */ = {isa = PBXBuildFile; fileRef = 8C9AACF830A7ADC600E1BC5D /* popup.css */; };
+		8C9AAD0930A7ADC600E1BC5D /* content.js in Resources */ = {isa = PBXBuildFile; fileRef = 8C9AACF930A7ADC600E1BC5D /* content.js */; };
+		8C9AAD0A30A7ADC600E1BC5D /* options.css in Resources */ = {isa = PBXBuildFile; fileRef = 8C9AACFA30A7ADC600E1BC5D /* options.css */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		8C57F43230A6ADDD00A029D6 /* PBXContainerItemProxy */ = {
+		8C9AACDB30A7ADC600E1BC5D /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 8C57F40D30A6ADDC00A029D6 /* Project object */;
+			containerPortal = 8C9AACB630A7ADC500E1BC5D /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 8C57F42F30A6ADDD00A029D6;
+			remoteGlobalIDString = 8C9AACD830A7ADC600E1BC5D;
 			remoteInfo = "Aeacus Extension";
 		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		8C57F43D30A6ADDD00A029D6 /* Embed Foundation Extensions */ = {
+		8C9AACE630A7ADC600E1BC5D /* Embed Foundation Extensions */ = {
 			isa = PBXCopyFilesBuildPhase;
 			dstPath = "";
 			dstSubfolder = PlugIns;
 			files = (
-				8C57F43130A6ADDD00A029D6 /* Aeacus Extension.appex in Embed Foundation Extensions */,
+				8C9AACDA30A7ADC600E1BC5D /* Aeacus Extension.appex in Embed Foundation Extensions */,
 			);
 			name = "Embed Foundation Extensions";
 		};
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		8C57F41530A6ADDC00A029D6 /* Aeacus.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Aeacus.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		8C57F41830A6ADDC00A029D6 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		8C57F41C30A6ADDC00A029D6 /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = Base; path = Base.lproj/Main.html; sourceTree = "<group>"; };
-		8C57F41E30A6ADDC00A029D6 /* Icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Icon.png; sourceTree = "<group>"; };
-		8C57F42030A6ADDC00A029D6 /* Style.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; path = Style.css; sourceTree = "<group>"; };
-		8C57F42230A6ADDC00A029D6 /* Script.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = Script.js; sourceTree = "<group>"; };
-		8C57F42430A6ADDC00A029D6 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
-		8C57F42730A6ADDC00A029D6 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
-		8C57F42930A6ADDC00A029D6 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		8C57F42B30A6ADDC00A029D6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		8C57F43030A6ADDD00A029D6 /* Aeacus Extension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "Aeacus Extension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
-		8C57F43530A6ADDD00A029D6 /* SafariWebExtensionHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SafariWebExtensionHandler.swift; sourceTree = "<group>"; };
-		8C57F43730A6ADDD00A029D6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		8C57F44230A6ADDD00A029D6 /* theme.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; name = theme.css; path = ../../../dist/safari/theme.css; sourceTree = "<group>"; };
-		8C57F44330A6ADDD00A029D6 /* popup.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = popup.js; path = ../../../dist/safari/popup.js; sourceTree = "<group>"; };
-		8C57F44430A6ADDD00A029D6 /* content.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; name = content.css; path = ../../../dist/safari/content.css; sourceTree = "<group>"; };
-		8C57F44530A6ADDD00A029D6 /* offscreen.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = offscreen.html; path = ../../../dist/safari/offscreen.html; sourceTree = "<group>"; };
-		8C57F44630A6ADDD00A029D6 /* background.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = background.js; path = ../../../dist/safari/background.js; sourceTree = "<group>"; };
-		8C57F44730A6ADDD00A029D6 /* popup.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = popup.html; path = ../../../dist/safari/popup.html; sourceTree = "<group>"; };
-		8C57F44830A6ADDD00A029D6 /* options.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = options.js; path = ../../../dist/safari/options.js; sourceTree = "<group>"; };
-		8C57F44930A6ADDD00A029D6 /* ort */ = {isa = PBXFileReference; lastKnownFileType = folder; name = ort; path = ../../../dist/safari/ort; sourceTree = "<group>"; };
-		8C57F44A30A6ADDD00A029D6 /* icons */ = {isa = PBXFileReference; lastKnownFileType = folder; name = icons; path = ../../../dist/safari/icons; sourceTree = "<group>"; };
-		8C57F44B30A6ADDD00A029D6 /* manifest.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = manifest.json; path = ../../../dist/safari/manifest.json; sourceTree = "<group>"; };
-		8C57F44C30A6ADDD00A029D6 /* offscreen.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = offscreen.js; path = ../../../dist/safari/offscreen.js; sourceTree = "<group>"; };
-		8C57F44D30A6ADDD00A029D6 /* infer-worker.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = "infer-worker.js"; path = "../../../dist/safari/infer-worker.js"; sourceTree = "<group>"; };
-		8C57F44E30A6ADDD00A029D6 /* options.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = options.html; path = ../../../dist/safari/options.html; sourceTree = "<group>"; };
-		8C57F44F30A6ADDD00A029D6 /* popup.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; name = popup.css; path = ../../../dist/safari/popup.css; sourceTree = "<group>"; };
-		8C57F45030A6ADDD00A029D6 /* content.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = content.js; path = ../../../dist/safari/content.js; sourceTree = "<group>"; };
-		8C57F45130A6ADDD00A029D6 /* options.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; name = options.css; path = ../../../dist/safari/options.css; sourceTree = "<group>"; };
+		8C9AACBE30A7ADC500E1BC5D /* Aeacus.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Aeacus.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		8C9AACC130A7ADC500E1BC5D /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		8C9AACC530A7ADC500E1BC5D /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = Base; path = Base.lproj/Main.html; sourceTree = "<group>"; };
+		8C9AACC730A7ADC500E1BC5D /* Icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Icon.png; sourceTree = "<group>"; };
+		8C9AACC930A7ADC500E1BC5D /* Style.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; path = Style.css; sourceTree = "<group>"; };
+		8C9AACCB30A7ADC500E1BC5D /* Script.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = Script.js; sourceTree = "<group>"; };
+		8C9AACCD30A7ADC500E1BC5D /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		8C9AACD030A7ADC500E1BC5D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		8C9AACD230A7ADC600E1BC5D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		8C9AACD430A7ADC600E1BC5D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		8C9AACD930A7ADC600E1BC5D /* Aeacus Extension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "Aeacus Extension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
+		8C9AACDE30A7ADC600E1BC5D /* SafariWebExtensionHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SafariWebExtensionHandler.swift; sourceTree = "<group>"; };
+		8C9AACE030A7ADC600E1BC5D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		8C9AACEB30A7ADC600E1BC5D /* theme.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; name = theme.css; path = ../../../dist/safari/theme.css; sourceTree = "<group>"; };
+		8C9AACEC30A7ADC600E1BC5D /* popup.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = popup.js; path = ../../../dist/safari/popup.js; sourceTree = "<group>"; };
+		8C9AACED30A7ADC600E1BC5D /* content.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; name = content.css; path = ../../../dist/safari/content.css; sourceTree = "<group>"; };
+		8C9AACEE30A7ADC600E1BC5D /* offscreen.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = offscreen.html; path = ../../../dist/safari/offscreen.html; sourceTree = "<group>"; };
+		8C9AACEF30A7ADC600E1BC5D /* background.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = background.js; path = ../../../dist/safari/background.js; sourceTree = "<group>"; };
+		8C9AACF030A7ADC600E1BC5D /* popup.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = popup.html; path = ../../../dist/safari/popup.html; sourceTree = "<group>"; };
+		8C9AACF130A7ADC600E1BC5D /* options.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = options.js; path = ../../../dist/safari/options.js; sourceTree = "<group>"; };
+		8C9AACF230A7ADC600E1BC5D /* ort */ = {isa = PBXFileReference; lastKnownFileType = folder; name = ort; path = ../../../dist/safari/ort; sourceTree = "<group>"; };
+		8C9AACF330A7ADC600E1BC5D /* icons */ = {isa = PBXFileReference; lastKnownFileType = folder; name = icons; path = ../../../dist/safari/icons; sourceTree = "<group>"; };
+		8C9AACF430A7ADC600E1BC5D /* manifest.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = manifest.json; path = ../../../dist/safari/manifest.json; sourceTree = "<group>"; };
+		8C9AACF530A7ADC600E1BC5D /* offscreen.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = offscreen.js; path = ../../../dist/safari/offscreen.js; sourceTree = "<group>"; };
+		8C9AACF630A7ADC600E1BC5D /* infer-worker.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = "infer-worker.js"; path = "../../../dist/safari/infer-worker.js"; sourceTree = "<group>"; };
+		8C9AACF730A7ADC600E1BC5D /* options.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = options.html; path = ../../../dist/safari/options.html; sourceTree = "<group>"; };
+		8C9AACF830A7ADC600E1BC5D /* popup.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; name = popup.css; path = ../../../dist/safari/popup.css; sourceTree = "<group>"; };
+		8C9AACF930A7ADC600E1BC5D /* content.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = content.js; path = ../../../dist/safari/content.js; sourceTree = "<group>"; };
+		8C9AACFA30A7ADC600E1BC5D /* options.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; name = options.css; path = ../../../dist/safari/options.css; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		8C57F41230A6ADDC00A029D6 /* Frameworks */ = {
+		8C9AACBB30A7ADC500E1BC5D /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			files = (
 			);
 		};
-		8C57F42D30A6ADDD00A029D6 /* Frameworks */ = {
+		8C9AACD630A7ADC600E1BC5D /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			files = (
 			);
@@ -103,77 +103,77 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		8C57F40C30A6ADDC00A029D6 = {
+		8C9AACB530A7ADC500E1BC5D = {
 			isa = PBXGroup;
 			children = (
-				8C57F41730A6ADDC00A029D6 /* Aeacus */,
-				8C57F43430A6ADDD00A029D6 /* Aeacus Extension */,
-				8C57F41630A6ADDC00A029D6 /* Products */,
+				8C9AACC030A7ADC500E1BC5D /* Aeacus */,
+				8C9AACDD30A7ADC600E1BC5D /* Aeacus Extension */,
+				8C9AACBF30A7ADC500E1BC5D /* Products */,
 			);
 			sourceTree = "<group>";
 		};
-		8C57F41630A6ADDC00A029D6 /* Products */ = {
+		8C9AACBF30A7ADC500E1BC5D /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				8C57F41530A6ADDC00A029D6 /* Aeacus.app */,
-				8C57F43030A6ADDD00A029D6 /* Aeacus Extension.appex */,
+				8C9AACBE30A7ADC500E1BC5D /* Aeacus.app */,
+				8C9AACD930A7ADC600E1BC5D /* Aeacus Extension.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		8C57F41730A6ADDC00A029D6 /* Aeacus */ = {
+		8C9AACC030A7ADC500E1BC5D /* Aeacus */ = {
 			isa = PBXGroup;
 			children = (
-				8C57F41830A6ADDC00A029D6 /* AppDelegate.swift */,
-				8C57F42430A6ADDC00A029D6 /* ViewController.swift */,
-				8C57F42630A6ADDC00A029D6 /* Main.storyboard */,
-				8C57F42930A6ADDC00A029D6 /* Assets.xcassets */,
-				8C57F42B30A6ADDC00A029D6 /* Info.plist */,
-				8C57F41A30A6ADDC00A029D6 /* Resources */,
+				8C9AACC130A7ADC500E1BC5D /* AppDelegate.swift */,
+				8C9AACCD30A7ADC500E1BC5D /* ViewController.swift */,
+				8C9AACCF30A7ADC500E1BC5D /* Main.storyboard */,
+				8C9AACD230A7ADC600E1BC5D /* Assets.xcassets */,
+				8C9AACD430A7ADC600E1BC5D /* Info.plist */,
+				8C9AACC330A7ADC500E1BC5D /* Resources */,
 			);
 			path = Aeacus;
 			sourceTree = "<group>";
 		};
-		8C57F41A30A6ADDC00A029D6 /* Resources */ = {
+		8C9AACC330A7ADC500E1BC5D /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				8C57F41B30A6ADDC00A029D6 /* Main.html */,
-				8C57F41E30A6ADDC00A029D6 /* Icon.png */,
-				8C57F42030A6ADDC00A029D6 /* Style.css */,
-				8C57F42230A6ADDC00A029D6 /* Script.js */,
+				8C9AACC430A7ADC500E1BC5D /* Main.html */,
+				8C9AACC730A7ADC500E1BC5D /* Icon.png */,
+				8C9AACC930A7ADC500E1BC5D /* Style.css */,
+				8C9AACCB30A7ADC500E1BC5D /* Script.js */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
 		};
-		8C57F43430A6ADDD00A029D6 /* Aeacus Extension */ = {
+		8C9AACDD30A7ADC600E1BC5D /* Aeacus Extension */ = {
 			isa = PBXGroup;
 			children = (
-				8C57F44130A6ADDD00A029D6 /* Resources */,
-				8C57F43530A6ADDD00A029D6 /* SafariWebExtensionHandler.swift */,
-				8C57F43730A6ADDD00A029D6 /* Info.plist */,
+				8C9AACEA30A7ADC600E1BC5D /* Resources */,
+				8C9AACDE30A7ADC600E1BC5D /* SafariWebExtensionHandler.swift */,
+				8C9AACE030A7ADC600E1BC5D /* Info.plist */,
 			);
 			path = "Aeacus Extension";
 			sourceTree = "<group>";
 		};
-		8C57F44130A6ADDD00A029D6 /* Resources */ = {
+		8C9AACEA30A7ADC600E1BC5D /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				8C57F44230A6ADDD00A029D6 /* theme.css */,
-				8C57F44330A6ADDD00A029D6 /* popup.js */,
-				8C57F44430A6ADDD00A029D6 /* content.css */,
-				8C57F44530A6ADDD00A029D6 /* offscreen.html */,
-				8C57F44630A6ADDD00A029D6 /* background.js */,
-				8C57F44730A6ADDD00A029D6 /* popup.html */,
-				8C57F44830A6ADDD00A029D6 /* options.js */,
-				8C57F44930A6ADDD00A029D6 /* ort */,
-				8C57F44A30A6ADDD00A029D6 /* icons */,
-				8C57F44B30A6ADDD00A029D6 /* manifest.json */,
-				8C57F44C30A6ADDD00A029D6 /* offscreen.js */,
-				8C57F44D30A6ADDD00A029D6 /* infer-worker.js */,
-				8C57F44E30A6ADDD00A029D6 /* options.html */,
-				8C57F44F30A6ADDD00A029D6 /* popup.css */,
-				8C57F45030A6ADDD00A029D6 /* content.js */,
-				8C57F45130A6ADDD00A029D6 /* options.css */,
+				8C9AACEB30A7ADC600E1BC5D /* theme.css */,
+				8C9AACEC30A7ADC600E1BC5D /* popup.js */,
+				8C9AACED30A7ADC600E1BC5D /* content.css */,
+				8C9AACEE30A7ADC600E1BC5D /* offscreen.html */,
+				8C9AACEF30A7ADC600E1BC5D /* background.js */,
+				8C9AACF030A7ADC600E1BC5D /* popup.html */,
+				8C9AACF130A7ADC600E1BC5D /* options.js */,
+				8C9AACF230A7ADC600E1BC5D /* ort */,
+				8C9AACF330A7ADC600E1BC5D /* icons */,
+				8C9AACF430A7ADC600E1BC5D /* manifest.json */,
+				8C9AACF530A7ADC600E1BC5D /* offscreen.js */,
+				8C9AACF630A7ADC600E1BC5D /* infer-worker.js */,
+				8C9AACF730A7ADC600E1BC5D /* options.html */,
+				8C9AACF830A7ADC600E1BC5D /* popup.css */,
+				8C9AACF930A7ADC600E1BC5D /* content.js */,
+				8C9AACFA30A7ADC600E1BC5D /* options.css */,
 			);
 			name = Resources;
 			path = "Aeacus Extension";
@@ -182,150 +182,150 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		8C57F41430A6ADDC00A029D6 /* Aeacus */ = {
+		8C9AACBD30A7ADC500E1BC5D /* Aeacus */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 8C57F43E30A6ADDD00A029D6 /* Build configuration list for PBXNativeTarget "Aeacus" */;
+			buildConfigurationList = 8C9AACE730A7ADC600E1BC5D /* Build configuration list for PBXNativeTarget "Aeacus" */;
 			buildPhases = (
-				8C57F41130A6ADDC00A029D6 /* Sources */,
-				8C57F41230A6ADDC00A029D6 /* Frameworks */,
-				8C57F41330A6ADDC00A029D6 /* Resources */,
-				8C57F43D30A6ADDD00A029D6 /* Embed Foundation Extensions */,
+				8C9AACBA30A7ADC500E1BC5D /* Sources */,
+				8C9AACBB30A7ADC500E1BC5D /* Frameworks */,
+				8C9AACBC30A7ADC500E1BC5D /* Resources */,
+				8C9AACE630A7ADC600E1BC5D /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
-				8C57F43330A6ADDD00A029D6 /* PBXTargetDependency */,
+				8C9AACDC30A7ADC600E1BC5D /* PBXTargetDependency */,
 			);
 			name = Aeacus;
 			productName = Aeacus;
-			productReference = 8C57F41530A6ADDC00A029D6 /* Aeacus.app */;
+			productReference = 8C9AACBE30A7ADC500E1BC5D /* Aeacus.app */;
 			productType = "com.apple.product-type.application";
 		};
-		8C57F42F30A6ADDD00A029D6 /* Aeacus Extension */ = {
+		8C9AACD830A7ADC600E1BC5D /* Aeacus Extension */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 8C57F43A30A6ADDD00A029D6 /* Build configuration list for PBXNativeTarget "Aeacus Extension" */;
+			buildConfigurationList = 8C9AACE330A7ADC600E1BC5D /* Build configuration list for PBXNativeTarget "Aeacus Extension" */;
 			buildPhases = (
-				8C57F42C30A6ADDD00A029D6 /* Sources */,
-				8C57F42D30A6ADDD00A029D6 /* Frameworks */,
-				8C57F42E30A6ADDD00A029D6 /* Resources */,
+				8C9AACD530A7ADC600E1BC5D /* Sources */,
+				8C9AACD630A7ADC600E1BC5D /* Frameworks */,
+				8C9AACD730A7ADC600E1BC5D /* Resources */,
 			);
 			buildRules = (
 			);
 			name = "Aeacus Extension";
 			productName = "Aeacus Extension";
-			productReference = 8C57F43030A6ADDD00A029D6 /* Aeacus Extension.appex */;
+			productReference = 8C9AACD930A7ADC600E1BC5D /* Aeacus Extension.appex */;
 			productType = "com.apple.product-type.app-extension";
 		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
-		8C57F40D30A6ADDC00A029D6 /* Project object */ = {
+		8C9AACB630A7ADC500E1BC5D /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 2700;
 				LastUpgradeCheck = 2700;
 				TargetAttributes = {
-					8C57F41430A6ADDC00A029D6 = {
+					8C9AACBD30A7ADC500E1BC5D = {
 						CreatedOnToolsVersion = 27.0;
 					};
-					8C57F42F30A6ADDD00A029D6 = {
+					8C9AACD830A7ADC600E1BC5D = {
 						CreatedOnToolsVersion = 27.0;
 					};
 				};
 			};
-			buildConfigurationList = 8C57F41030A6ADDC00A029D6 /* Build configuration list for PBXProject "Aeacus" */;
+			buildConfigurationList = 8C9AACB930A7ADC500E1BC5D /* Build configuration list for PBXProject "Aeacus" */;
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
 				Base,
 			);
-			mainGroup = 8C57F40C30A6ADDC00A029D6;
+			mainGroup = 8C9AACB530A7ADC500E1BC5D;
 			minimizedProjectReferenceProxies = 1;
 			preferredProjectObjectVersion = 77;
-			productRefGroup = 8C57F41630A6ADDC00A029D6 /* Products */;
+			productRefGroup = 8C9AACBF30A7ADC500E1BC5D /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				8C57F41430A6ADDC00A029D6 /* Aeacus */,
-				8C57F42F30A6ADDD00A029D6 /* Aeacus Extension */,
+				8C9AACBD30A7ADC500E1BC5D /* Aeacus */,
+				8C9AACD830A7ADC600E1BC5D /* Aeacus Extension */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		8C57F41330A6ADDC00A029D6 /* Resources */ = {
+		8C9AACBC30A7ADC500E1BC5D /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			files = (
-				8C57F41F30A6ADDC00A029D6 /* Icon.png in Resources */,
-				8C57F42830A6ADDC00A029D6 /* Main.storyboard in Resources */,
-				8C57F42330A6ADDC00A029D6 /* Script.js in Resources */,
-				8C57F41D30A6ADDC00A029D6 /* Main.html in Resources */,
-				8C57F42A30A6ADDC00A029D6 /* Assets.xcassets in Resources */,
-				8C57F42130A6ADDC00A029D6 /* Style.css in Resources */,
+				8C9AACC830A7ADC500E1BC5D /* Icon.png in Resources */,
+				8C9AACD130A7ADC500E1BC5D /* Main.storyboard in Resources */,
+				8C9AACCC30A7ADC500E1BC5D /* Script.js in Resources */,
+				8C9AACC630A7ADC500E1BC5D /* Main.html in Resources */,
+				8C9AACD330A7ADC600E1BC5D /* Assets.xcassets in Resources */,
+				8C9AACCA30A7ADC500E1BC5D /* Style.css in Resources */,
 			);
 		};
-		8C57F42E30A6ADDD00A029D6 /* Resources */ = {
+		8C9AACD730A7ADC600E1BC5D /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			files = (
-				8C57F45930A6ADDD00A029D6 /* ort in Resources */,
-				8C57F45D30A6ADDD00A029D6 /* infer-worker.js in Resources */,
-				8C57F45E30A6ADDD00A029D6 /* options.html in Resources */,
-				8C57F45530A6ADDD00A029D6 /* offscreen.html in Resources */,
-				8C57F45C30A6ADDD00A029D6 /* offscreen.js in Resources */,
-				8C57F45B30A6ADDD00A029D6 /* manifest.json in Resources */,
-				8C57F45730A6ADDD00A029D6 /* popup.html in Resources */,
-				8C57F45A30A6ADDD00A029D6 /* icons in Resources */,
-				8C57F45F30A6ADDD00A029D6 /* popup.css in Resources */,
-				8C57F46030A6ADDD00A029D6 /* content.js in Resources */,
-				8C57F45430A6ADDD00A029D6 /* content.css in Resources */,
-				8C57F45830A6ADDD00A029D6 /* options.js in Resources */,
-				8C57F45230A6ADDD00A029D6 /* theme.css in Resources */,
-				8C57F45330A6ADDD00A029D6 /* popup.js in Resources */,
-				8C57F46130A6ADDD00A029D6 /* options.css in Resources */,
-				8C57F45630A6ADDD00A029D6 /* background.js in Resources */,
+				8C9AAD0230A7ADC600E1BC5D /* ort in Resources */,
+				8C9AAD0630A7ADC600E1BC5D /* infer-worker.js in Resources */,
+				8C9AAD0730A7ADC600E1BC5D /* options.html in Resources */,
+				8C9AACFE30A7ADC600E1BC5D /* offscreen.html in Resources */,
+				8C9AAD0530A7ADC600E1BC5D /* offscreen.js in Resources */,
+				8C9AAD0430A7ADC600E1BC5D /* manifest.json in Resources */,
+				8C9AAD0030A7ADC600E1BC5D /* popup.html in Resources */,
+				8C9AAD0330A7ADC600E1BC5D /* icons in Resources */,
+				8C9AAD0830A7ADC600E1BC5D /* popup.css in Resources */,
+				8C9AAD0930A7ADC600E1BC5D /* content.js in Resources */,
+				8C9AACFD30A7ADC600E1BC5D /* content.css in Resources */,
+				8C9AAD0130A7ADC600E1BC5D /* options.js in Resources */,
+				8C9AACFB30A7ADC600E1BC5D /* theme.css in Resources */,
+				8C9AACFC30A7ADC600E1BC5D /* popup.js in Resources */,
+				8C9AAD0A30A7ADC600E1BC5D /* options.css in Resources */,
+				8C9AACFF30A7ADC600E1BC5D /* background.js in Resources */,
 			);
 		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		8C57F41130A6ADDC00A029D6 /* Sources */ = {
+		8C9AACBA30A7ADC500E1BC5D /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			files = (
-				8C57F42530A6ADDC00A029D6 /* ViewController.swift in Sources */,
-				8C57F41930A6ADDC00A029D6 /* AppDelegate.swift in Sources */,
+				8C9AACCE30A7ADC500E1BC5D /* ViewController.swift in Sources */,
+				8C9AACC230A7ADC500E1BC5D /* AppDelegate.swift in Sources */,
 			);
 		};
-		8C57F42C30A6ADDD00A029D6 /* Sources */ = {
+		8C9AACD530A7ADC600E1BC5D /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			files = (
-				8C57F43630A6ADDD00A029D6 /* SafariWebExtensionHandler.swift in Sources */,
+				8C9AACDF30A7ADC600E1BC5D /* SafariWebExtensionHandler.swift in Sources */,
 			);
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		8C57F43330A6ADDD00A029D6 /* PBXTargetDependency */ = {
+		8C9AACDC30A7ADC600E1BC5D /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 8C57F42F30A6ADDD00A029D6 /* Aeacus Extension */;
-			targetProxy = 8C57F43230A6ADDD00A029D6 /* PBXContainerItemProxy */;
+			target = 8C9AACD830A7ADC600E1BC5D /* Aeacus Extension */;
+			targetProxy = 8C9AACDB30A7ADC600E1BC5D /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
-		8C57F41B30A6ADDC00A029D6 /* Main.html */ = {
+		8C9AACC430A7ADC500E1BC5D /* Main.html */ = {
 			isa = PBXVariantGroup;
 			children = (
-				8C57F41C30A6ADDC00A029D6 /* Base */,
+				8C9AACC530A7ADC500E1BC5D /* Base */,
 			);
 			name = Main.html;
 			sourceTree = "<group>";
 		};
-		8C57F42630A6ADDC00A029D6 /* Main.storyboard */ = {
+		8C9AACCF30A7ADC500E1BC5D /* Main.storyboard */ = {
 			isa = PBXVariantGroup;
 			children = (
-				8C57F42730A6ADDC00A029D6 /* Base */,
+				8C9AACD030A7ADC500E1BC5D /* Base */,
 			);
 			name = Main.storyboard;
 			sourceTree = "<group>";
@@ -333,7 +333,7 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
-		8C57F43830A6ADDD00A029D6 /* Debug configuration for PBXProject "Aeacus" */ = {
+		8C9AACE130A7ADC600E1BC5D /* Debug configuration for PBXProject "Aeacus" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -396,7 +396,7 @@
 			};
 			name = Debug;
 		};
-		8C57F43930A6ADDD00A029D6 /* Release configuration for PBXProject "Aeacus" */ = {
+		8C9AACE230A7ADC600E1BC5D /* Release configuration for PBXProject "Aeacus" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -451,7 +451,7 @@
 			};
 			name = Release;
 		};
-		8C57F43B30A6ADDD00A029D6 /* Debug configuration for PBXNativeTarget "Aeacus Extension" */ = {
+		8C9AACE430A7ADC600E1BC5D /* Debug configuration for PBXNativeTarget "Aeacus Extension" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
@@ -485,7 +485,7 @@
 			};
 			name = Debug;
 		};
-		8C57F43C30A6ADDD00A029D6 /* Release configuration for PBXNativeTarget "Aeacus Extension" */ = {
+		8C9AACE530A7ADC600E1BC5D /* Release configuration for PBXNativeTarget "Aeacus Extension" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
@@ -519,7 +519,7 @@
 			};
 			name = Release;
 		};
-		8C57F43F30A6ADDD00A029D6 /* Debug configuration for PBXNativeTarget "Aeacus" */ = {
+		8C9AACE830A7ADC600E1BC5D /* Debug configuration for PBXNativeTarget "Aeacus" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -549,7 +549,7 @@
 					"-framework",
 					WebKit,
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = dev.bgenc.Aeacus;
+				PRODUCT_BUNDLE_IDENTIFIER = dev.bgenc.aeacus;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = YES;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
@@ -561,7 +561,7 @@
 			};
 			name = Debug;
 		};
-		8C57F44030A6ADDD00A029D6 /* Release configuration for PBXNativeTarget "Aeacus" */ = {
+		8C9AACE930A7ADC600E1BC5D /* Release configuration for PBXNativeTarget "Aeacus" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -591,7 +591,7 @@
 					"-framework",
 					WebKit,
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = dev.bgenc.Aeacus;
+				PRODUCT_BUNDLE_IDENTIFIER = dev.bgenc.aeacus;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = YES;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
@@ -606,32 +606,32 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		8C57F41030A6ADDC00A029D6 /* Build configuration list for PBXProject "Aeacus" */ = {
+		8C9AACB930A7ADC500E1BC5D /* Build configuration list for PBXProject "Aeacus" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				8C57F43830A6ADDD00A029D6 /* Debug configuration for PBXProject "Aeacus" */,
-				8C57F43930A6ADDD00A029D6 /* Release configuration for PBXProject "Aeacus" */,
+				8C9AACE130A7ADC600E1BC5D /* Debug configuration for PBXProject "Aeacus" */,
+				8C9AACE230A7ADC600E1BC5D /* Release configuration for PBXProject "Aeacus" */,
 			);
 			defaultConfigurationName = Release;
 		};
-		8C57F43A30A6ADDD00A029D6 /* Build configuration list for PBXNativeTarget "Aeacus Extension" */ = {
+		8C9AACE330A7ADC600E1BC5D /* Build configuration list for PBXNativeTarget "Aeacus Extension" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				8C57F43B30A6ADDD00A029D6 /* Debug configuration for PBXNativeTarget "Aeacus Extension" */,
-				8C57F43C30A6ADDD00A029D6 /* Release configuration for PBXNativeTarget "Aeacus Extension" */,
+				8C9AACE430A7ADC600E1BC5D /* Debug configuration for PBXNativeTarget "Aeacus Extension" */,
+				8C9AACE530A7ADC600E1BC5D /* Release configuration for PBXNativeTarget "Aeacus Extension" */,
 			);
 			defaultConfigurationName = Release;
 		};
-		8C57F43E30A6ADDD00A029D6 /* Build configuration list for PBXNativeTarget "Aeacus" */ = {
+		8C9AACE730A7ADC600E1BC5D /* Build configuration list for PBXNativeTarget "Aeacus" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				8C57F43F30A6ADDD00A029D6 /* Debug configuration for PBXNativeTarget "Aeacus" */,
-				8C57F44030A6ADDD00A029D6 /* Release configuration for PBXNativeTarget "Aeacus" */,
+				8C9AACE830A7ADC600E1BC5D /* Debug configuration for PBXNativeTarget "Aeacus" */,
+				8C9AACE930A7ADC600E1BC5D /* Release configuration for PBXNativeTarget "Aeacus" */,
 			);
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
-	rootObject = 8C57F40D30A6ADDC00A029D6 /* Project object */;
+	rootObject = 8C9AACB630A7ADC500E1BC5D /* Project object */;
 	validationLevel = 1;
 }
