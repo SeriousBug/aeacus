@@ -11,7 +11,8 @@ export const MODEL_FILE = "onnx/model_q4f16.onnx";
 export const WINDOW = 510;
 export const STRIDE = 128;
 
-// The model was trained on passages of at least 30 words, so shorter blocks are left alone.
+// Under this length the model has too little to go on, so a block that short is left unmarked and a
+// page-level summary calls its text insufficient.
 export const MIN_WORDS = 30;
 
 // A page can hold more text than anyone wants to wait for. A window takes about a quarter of a

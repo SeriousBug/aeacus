@@ -1,7 +1,6 @@
 // What runs on the page: gather the prose, ask the model behind the extension's background, and draw
 // the answers back where they came from.
 
-import { MIN_WORDS } from "./config.js";
 import { Painter, Tooltip, label } from "./highlight.js";
 import { findBlocks, splitBlock } from "./page-text.js";
 import api from "./api.js";
@@ -11,8 +10,6 @@ import { reason } from "./errors.js";
 const OWN_HOST = "aeacus.bgenc.dev";
 const ownSite = () => location.hostname === OWN_HOST;
 
-/** @type {Settings} */
-let settings = { auto: false, minWords: MIN_WORDS, tooltips: true };
 const painter = Painter.supported() ? new Painter() : null;
 const tooltip = new Tooltip();
 
@@ -173,7 +170,8 @@ function finish(message) {
     phase: "done",
     progress: null,
     provider: message.provider,
-    seconds: Math.round(message.inferenceMs / 100) / 10,
+    threads: message.threads,
+    milliseconds: message.inferenceMs,
     summary: { ...scored, skipped: message.skipped },
   });
 }
@@ -188,7 +186,7 @@ async function begin() {
     publish({ phase: "unsupported" });
     return;
   }
-  const found = findBlocks({ minWords: settings.minWords }).flatMap((block) => splitBlock(block));
+  const found = findBlocks().flatMap((block) => splitBlock(block));
   if (!found.length) {
     publish({ phase: "empty", message: "" });
     return;
@@ -241,7 +239,7 @@ let pointer = null;
 let waiting = false;
 
 addEventListener("pointermove", (event) => {
-  if (!settings.tooltips || !painter) return;
+  if (!painter) return;
   pointer = { x: event.clientX, y: event.clientY };
   if (event.pointerType === "touch") return;
   if (waiting) return;
@@ -320,19 +318,4 @@ function randomId() {
   return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
 }
 
-// The model is already on this machine, so pages are checked without being asked; a first visit
-// waits for a click, which is when the download is explained.
-async function init() {
-  const stored = await api.storage.local.get(["settings", "modelReady"]);
-  settings = { ...settings, ...(stored.settings ?? {}) };
-  if (ownSite()) {
-    publish({ phase: "home" });
-    return;
-  }
-  if (!settings.auto || !stored.modelReady) return;
-  setTimeout(() => {
-    if (!running && state.phase === "idle") begin();
-  }, 600);
-}
-
-init();
+if (ownSite()) publish({ phase: "home" });

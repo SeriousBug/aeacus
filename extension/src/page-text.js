@@ -24,10 +24,10 @@ const IGNORED = "nav, header, footer, aside, form, dialog, [role='navigation'], 
 // the odd heading: the headings and the loose sentences still belong to the writing around them, and
 // a wrapper whose own text is short is dropped for saying nothing of its own.
 /**
- * @param {{ root?: Element | null, minWords?: number, maxBlocks?: number }} [options]
+ * @param {{ root?: Element | null, maxBlocks?: number }} [options]
  * @returns {PageBlock[]}
  */
-export function findBlocks({ root = document.body, minWords = MIN_WORDS, maxBlocks = MAX_BLOCKS } = {}) {
+export function findBlocks({ root = document.body, maxBlocks = MAX_BLOCKS } = {}) {
   if (!root) return [];
   const candidates = [...root.querySelectorAll(CANDIDATES)];
   /** @type {Set<Element>} */
@@ -52,7 +52,7 @@ export function findBlocks({ root = document.body, minWords = MIN_WORDS, maxBloc
     if (!usable(element)) continue;
     const block = readBlock(element, accepted);
     if (!block) continue;
-    if (block.words < minWords) continue;
+    if (block.words < MIN_WORDS) continue;
     if (block.linkShare > 0.5) continue;
     accepted.add(element);
     blocks.push(block);

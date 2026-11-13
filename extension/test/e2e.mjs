@@ -226,7 +226,7 @@ async function main() {
   const report = {
     summary: state.summary,
     provider: state.provider,
-    seconds: state.seconds,
+    milliseconds: state.milliseconds,
     highlights,
     offscreenDocument: Boolean(offscreen),
     modelReady: stored.modelReady,

@@ -3,56 +3,24 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Aeacus settings</title>
+  <title>Aeacus</title>
   <link rel="stylesheet" href="theme.css">
   <link rel="stylesheet" href="options.css">
 </head>
 <body>
   <main>
-    <header>
-      <p class="eyebrow">Aeacus AI Judge</p>
-      <h1>Settings</h1>
-    </header>
-
     <section class="card">
-      <label class="row">
-        <input type="checkbox" id="auto">
-        <span>
-          <strong>Check pages as they open</strong>
-          <em>Leave this off and a page is checked only when you ask, with the Aeacus button or
-            Alt+Shift+A.</em>
-        </span>
-      </label>
-
-      <label class="row">
-        <input type="checkbox" id="tooltips">
-        <span>
-          <strong>Say what Aeacus thinks when I point at text</strong>
-          <em>Hovering over a highlighted word shows how sure Aeacus is about it.</em>
-        </span>
-      </label>
-
-      <label class="row field">
-        <span>
-          <strong>Shortest paragraph to check</strong>
-          <em>Aeacus was trained on passages of at least 30 words, so paragraphs shorter than this are
-            left unmarked.</em>
-        </span>
-        <input type="number" id="minWords" min="10" max="200" step="5">
-      </label>
-    </section>
-
-    <section class="card">
-      <h2>Aeacus on this computer</h2>
-      <p id="model-status">Aeacus is downloaded the first time you check a page.</p>
+      <h2>Download Aeacus</h2>
+      <p>Aeacus S 1 will be downloaded from
+        <a href="https://huggingface.co/level20tauren/aeacus-s-1">Hugging Face</a>.</p>
       <div class="actions">
-        <button id="download" type="button">Download Aeacus now</button>
+        <button id="download" type="button">Download</button>
       </div>
+      <p id="progress" class="note" hidden></p>
     </section>
 
     <footer>
       <a href="https://aeacus.bgenc.dev">aeacus.bgenc.dev</a>
-      <a href="https://huggingface.co/level20tauren/aeacus-s-1">The model</a>
       <a href="https://github.com/SeriousBug/aeacus">Source</a>
     </footer>
   </main>

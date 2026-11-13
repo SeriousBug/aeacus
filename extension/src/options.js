@@ -1,4 +1,3 @@
-import { readSettings, writeSettings } from "./settings.js";
 import api from "./api.js";
 
 /**
@@ -8,63 +7,65 @@ import api from "./api.js";
  */
 const $ = (id) => /** @type {any} */ (document.getElementById(id));
 
-/** @type {HTMLInputElement} */
-const auto = $("auto");
-/** @type {HTMLInputElement} */
-const tooltips = $("tooltips");
-/** @type {HTMLInputElement} */
-const minWords = $("minWords");
-/** @type {HTMLElement} */
-const status = $("model-status");
 /** @type {HTMLButtonElement} */
 const download = $("download");
+/** @type {HTMLElement} */
+const progress = $("progress");
 
 /** @param {number} bytes @returns {string} */
 const megabytes = (bytes) => `${Math.round(bytes / 1e6)} MB`;
 
+/**
+ * @param {string} text
+ * @param {boolean} [error]
+ */
+function note(text, error = false) {
+  progress.textContent = text;
+  progress.classList.toggle("error", error);
+  progress.hidden = !text;
+}
+
+function downloaded() {
+  download.textContent = "Already downloaded";
+  download.disabled = true;
+}
+
 /** @type {chrome.runtime.Port | null} */
 let port = null;
 
-async function start() {
-  const settings = await readSettings();
-  auto.checked = settings.auto;
-  tooltips.checked = settings.tooltips;
-  minWords.value = String(settings.minWords);
-  const stored = await api.storage.local.get(["modelReady"]);
-  status.textContent = stored.modelReady
-    ? "Aeacus is on this computer, so checks run offline."
-    : "Aeacus is downloaded the first time you check a page, and stays on this computer after that.";
-  download.disabled = Boolean(stored.modelReady);
-}
-
-async function save() {
-  const words = Math.min(200, Math.max(10, Math.round(Number(minWords.value) || 30)));
-  minWords.value = String(words);
-  await writeSettings({ auto: auto.checked, tooltips: tooltips.checked, minWords: words });
-}
-
-for (const input of [auto, tooltips, minWords]) input.addEventListener("change", save);
-
 download.addEventListener("click", () => {
   port ??= api.runtime.connect({ name: "aeacus" });
+  port.onDisconnect.addListener(() => {
+    port = null;
+    if (download.textContent !== "Already downloaded") {
+      note("Aeacus stopped before it finished downloading. Try again.", true);
+      download.disabled = false;
+    }
+  });
   port.onMessage.addListener((message) => {
     if (message.type !== "model") return;
     if (message.state === "downloading") {
-      status.textContent = `Downloading Aeacus (${megabytes(message.loaded ?? 0)}`
-        + `${message.total ? ` of ${megabytes(message.total)}` : ""}).`;
+      const loaded = megabytes(message.loaded ?? 0);
+      const total = message.total ? ` of ${megabytes(message.total)}` : "";
+      note(`Downloading Aeacus, ${loaded}${total} so far.`);
       download.disabled = true;
     } else if (message.state === "starting") {
-      status.textContent = "Starting Aeacus…";
+      note("Starting Aeacus…");
     } else if (message.state === "ready") {
-      status.textContent = "Aeacus is on this computer, so checks run offline.";
-      download.disabled = true;
+      note("");
+      downloaded();
     } else if (message.state === "error") {
-      status.textContent = `Aeacus couldn't be downloaded: ${message.message}`;
+      note(`Aeacus couldn't be downloaded: ${message.message}`, true);
       download.disabled = false;
     }
   });
   port.postMessage({ type: "warm" });
   download.disabled = true;
 });
+
+async function start() {
+  const stored = await api.storage.local.get(["modelReady"]);
+  if (stored.modelReady) downloaded();
+}
 
 start();

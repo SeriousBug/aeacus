@@ -12,9 +12,9 @@ const $ = (id) => /** @type {any} */ (document.getElementById(id));
 /** @type {{
  *   lede: HTMLElement, shares: HTMLElement, shareHuman: HTMLElement, shareUnsure: HTMLElement,
  *   shareAi: HTMLElement, legend: HTMLElement, valueHuman: HTMLElement, valueUnsure: HTMLElement,
- *   valueAi: HTMLElement, progress: HTMLElement, bar: HTMLElement, fill: HTMLElement,
- *   progressLabel: HTMLElement, check: HTMLButtonElement, clear: HTMLButtonElement,
- *   note: HTMLElement, settings: HTMLAnchorElement
+ *   valueAi: HTMLElement, stats: HTMLElement, progress: HTMLElement, bar: HTMLElement,
+ *   fill: HTMLElement, progressLabel: HTMLElement, check: HTMLButtonElement,
+ *   clear: HTMLButtonElement, note: HTMLElement, download: HTMLAnchorElement
  * }} */
 const elements = {
   lede: $("lede"),
@@ -26,6 +26,7 @@ const elements = {
   valueHuman: $("value-human"),
   valueUnsure: $("value-unsure"),
   valueAi: $("value-ai"),
+  stats: $("stats"),
   progress: $("progress"),
   bar: $("bar"),
   fill: $("fill"),
@@ -33,7 +34,7 @@ const elements = {
   check: $("check"),
   clear: $("clear"),
   note: $("note"),
-  settings: $("settings"),
+  download: $("download"),
 };
 
 /** @type {chrome.runtime.Port | null} */
@@ -55,6 +56,22 @@ function note(text, error = false) {
   elements.note.hidden = !text;
 }
 
+// The same numbers the website shows under its stats toggle, on one line.
+/** @param {PageState} run @returns {string} */
+function stats(run) {
+  const device = run.provider === "webgpu"
+    ? "GPU (WebGPU)"
+    : `CPU (WebAssembly${run.threads ? `, ${run.threads} threads` : ""})`;
+  const tokens = run.tokens ?? 0;
+  const parts = [device, `${tokens.toLocaleString()} tokens`];
+  const ms = run.milliseconds ?? 0;
+  if (ms > 0) {
+    const seconds = ms / 1000;
+    parts.push(`${seconds.toFixed(1)} s`, `${Math.round(tokens / seconds)} tok/s`);
+  }
+  return parts.join(" · ");
+}
+
 /** @param {Partial<PageState>} next */
 function draw(next) {
   state = { ...state, ...next };
@@ -66,6 +83,7 @@ function draw(next) {
 
   elements.shares.hidden = !summary;
   elements.legend.hidden = !summary;
+  elements.stats.hidden = !summary;
   elements.progress.hidden = phase !== "checking";
   elements.check.hidden = phase === "checking";
   elements.check.disabled = false;
@@ -78,6 +96,7 @@ function draw(next) {
     elements.valueHuman.textContent = percent(summary.humanShare);
     elements.valueUnsure.textContent = percent(summary.unsureShare);
     elements.valueAi.textContent = percent(summary.aiShare);
+    elements.stats.textContent = stats(state);
 
     const paragraphs = `${summary.blocks} ${summary.blocks === 1 ? "paragraph" : "paragraphs"}`;
     elements.lede.textContent = summary.aiBlocks
@@ -125,8 +144,8 @@ function draw(next) {
   }
 
   if (phase === "empty") {
-    elements.lede.textContent = "There isn't enough text on this page to check.";
-    note(state.message || "Aeacus checks paragraphs of prose, and this page has none long enough.");
+    elements.lede.textContent = "Aeacus can't say on this page.";
+    note(state.message || "There's too little prose here for a verdict.");
   }
 
   if (phase === "home") {
@@ -153,7 +172,7 @@ function draw(next) {
 
 elements.check.addEventListener("click", () => port?.postMessage({ type: "run" }));
 elements.clear.addEventListener("click", () => port?.postMessage({ type: "clear" }));
-elements.settings.addEventListener("click", (event) => {
+elements.download.addEventListener("click", (event) => {
   event.preventDefault();
   api.runtime.openOptionsPage();
 });

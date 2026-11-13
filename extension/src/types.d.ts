@@ -110,7 +110,8 @@ interface PageState {
   summary: PageSummary | null;
   model?: ModelState;
   provider?: Provider;
-  seconds?: number;
+  threads?: number | null;
+  milliseconds?: number;
   tokens?: number;
   skipped?: number;
 }
@@ -121,9 +122,3 @@ interface Host {
 }
 
 type Post = (message: ModelReply) => void;
-
-interface Settings {
-  auto: boolean;
-  minWords: number;
-  tooltips: boolean;
-}
