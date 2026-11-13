@@ -111,7 +111,7 @@ export class Painter {
     }
     this.drawn.set(index, drawn);
     if (DEBUG) {
-      console.debug("aeacus:block", {
+      console.log("aeacus:block", {
         index,
         chars: block.text.length,
         tokens: probs.length,

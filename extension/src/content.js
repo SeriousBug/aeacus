@@ -91,7 +91,7 @@ function handle(message) {
       if (block) painter?.setTokens(message.block, { text: block.text, nodes: block.nodes,
         starts: message.starts, ends: message.ends });
       if (DEBUG) {
-        console.debug("aeacus:tokens", { block: message.block, chars: block?.text.length,
+        console.log("aeacus:tokens", { block: message.block, chars: block?.text.length,
           tokens: message.starts.length, ends: message.ends.length,
           lastEnd: message.ends[message.ends.length - 1], text: block?.text });
       }
@@ -194,7 +194,7 @@ async function begin() {
   }
   const found = findBlocks().flatMap((block) => splitBlock(block));
   if (DEBUG) {
-    console.debug("aeacus:page", { blocks: found.length, reads: found.map((block) => ({
+    console.log("aeacus:page", { blocks: found.length, reads: found.map((block) => ({
       chars: block.text.length, spans: block.nodes.length, text: block.text.slice(0, 80) })) });
   }
   if (!found.length) {
