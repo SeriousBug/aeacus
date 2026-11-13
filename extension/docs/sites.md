@@ -86,10 +86,15 @@ inside it nav, forms and hidden text are still dropped.
   `#description-inner` as a whole, because it starts with `#info`: view count, date and hashtags.
 - The description is folded until it is opened, so only the part on screen is laid out and read.
 
-## Not done yet
+## google.com/maps
 
-- Amazon reviews, Bluesky threads, X and Google Maps all put a sign-in in the way, so they need a
-  session in the browser before their markup can be checked. Everything else below is measured.
+- Keep: `.MyEned`, the wrapper around the text of a review. Checked on a restaurant with its reviews
+  open: three blocks, the three reviews.
+- Drop: `.wiI7pd` on its own. It is the class of the text inside `.MyEned`, and of the text of a
+  "Response from the owner" too, and those responses open with "Hello <name>, A huge thank you for
+  your review" from the business.
+- Without a rule the place panel gives 71 blocks of chrome: reviewer names, `Local Guide · 41 reviews ·
+  92 photos`, the star counts of the rating histogram, `+3`, `Like`.
 
 ## yelp.com
 
@@ -130,3 +135,8 @@ What the same pass does on two other sites with no rule:
   subscribers` heading where the free part ends.
 - A Mastodon thread (`main`, one `article` per post): 28 blocks, the post and its replies. Two small
   leftovers: the `GIF` badge of a media attachment and `You've reached the end of the conversation`.
+
+## Not done yet
+
+- Amazon reviews, Bluesky threads and X put a sign-in in the way, so they need a session in the
+  browser before their markup can be checked.
