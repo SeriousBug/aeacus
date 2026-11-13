@@ -10,6 +10,8 @@ const $ = (id) => /** @type {any} */ (document.getElementById(id));
 
 /** @type {HTMLInputElement} */
 const gpu = $("gpu");
+/** @type {HTMLInputElement} */
+const verbose = $("verbose");
 /** @type {HTMLButtonElement} */
 const download = $("download");
 /** @type {HTMLElement} */
@@ -72,9 +74,16 @@ gpu.addEventListener("change", () => {
   });
 });
 
+verbose.addEventListener("change", () => {
+  writeSettings({ verbose: verbose.checked }).catch((error) => {
+    note(`The setting couldn't be saved: ${error.message ?? error}`, true);
+  });
+});
+
 async function start() {
   const settings = await readSettings();
   gpu.checked = settings.gpu;
+  verbose.checked = settings.verbose;
   const stored = await api.storage.local.get(["modelReady"]);
   if (stored.modelReady) downloaded();
 }

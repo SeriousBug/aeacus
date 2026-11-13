@@ -1,7 +1,6 @@
 // Drawing the scores back over the page with the CSS Custom Highlight API, which styles ranges of
 // text without touching the page's own DOM.
 
-import { DEBUG } from "./config.js";
 import { rangesFor } from "./page-text.js";
 import { verdict } from "./scoring.js";
 
@@ -22,6 +21,9 @@ const short = (text) => (text.length <= 64 ? text : `${text.slice(0, 34)} … ${
 /** @typedef {{ text: string, nodes: TextNodeSpan[], starts: number[], ends: number[] }} TokenLayout */
 
 export class Painter {
+  // Whether a check says what it read and drew to the page's console; the options page turns it on.
+  verbose = false;
+
   constructor() {
     /** @type {Map<number, TokenLayout & { nodeStarts: Map<Text, number>,
       probs: number[] | null, words: number }>} */
@@ -57,7 +59,9 @@ export class Painter {
   setTokens(index, { text, nodes, starts, ends }) {
     const nodeStarts = new Map();
     for (const entry of nodes) {
-      nodeStarts.set(entry.node, entry.start);
+      // Where the node's own first character lands in the block, since a caret offset is counted
+      // from there and not from where the block's trimming left its span.
+      nodeStarts.set(entry.node, entry.start - entry.base);
       this.owned.set(entry.node, index);
     }
     this.blocks.set(index, { text, nodes, starts, ends, nodeStarts, probs: null, words: 0 });
@@ -110,13 +114,13 @@ export class Painter {
       }
     }
     this.drawn.set(index, drawn);
-    if (DEBUG) {
+    if (this.verbose) {
       console.log("aeacus:block", {
         index,
         chars: block.text.length,
         tokens: probs.length,
         lastEnd: block.ends[probs.length - 1],
-        spans: block.nodes.map((entry) => [entry.start, entry.end, entry.run]),
+        spans: block.nodes.map((entry) => [entry.start, entry.end, entry.run, entry.base]),
         runs: runs.map((entry) => `${entry.band}${entry.level} ${entry.start}-${entry.end}`),
         drawn: drawn.map(({ name, range }) => `${name} ${JSON.stringify(short(range.toString()))}`),
         text: block.text,

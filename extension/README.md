@@ -58,7 +58,7 @@ page as the page wrote it. Those ranges belong to the content script's own world
 console cannot reach them; Chrome's console lists that world in the context menu beside the prompt,
 and `CSS.highlights` there holds the ranges a check left on the page.
 
-Open a page with `?aeacus-debug` in its address, and the content script logs what it did to the
+Turn on "Enable verbose debug logs" in the extension's options, and a check logs what it did to the
 page's console:
 
 - `aeacus:page` lists every block it read, with its characters and how many text nodes they came

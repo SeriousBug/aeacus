@@ -26,12 +26,14 @@ interface Thresholds extends Bands {
 
 // A piece of a page: the text, and where each of its text nodes sits inside that text. Nodes that
 // something unread sits between, an image or a code block, carry different runs, so a highlight is
-// drawn over one run at a time instead of covering what broke it.
+// drawn over one run at a time instead of covering what broke it. `base` is where `start` lands
+// inside the node, which trimming the block's indentation pushes past the node's first character.
 interface TextNodeSpan {
   node: Text;
   start: number;
   end: number;
   run: number;
+  base: number;
 }
 
 // What one container on the page holds.
@@ -138,4 +140,5 @@ type Post = (message: ModelReply) => void;
 
 interface Settings {
   gpu: boolean;
+  verbose: boolean;
 }

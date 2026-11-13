@@ -4,8 +4,8 @@
 import { Painter, Tooltip, label } from "./highlight.js";
 import { findBlocks, splitBlock } from "./page-text.js";
 import api from "./api.js";
-import { DEBUG } from "./config.js";
 import { reason } from "./errors.js";
+import { readSettings } from "./settings.js";
 
 // Aeacus's own site describes the thing instead of being a page to judge, so nothing is read there.
 const OWN_HOST = "aeacus.bgenc.dev";
@@ -19,6 +19,7 @@ let thresholds = null;
 /** @type {Block[]} */
 let blocks = [];
 let running = false;
+let verbose = false;
 /** @type {string | null} */
 let runId = null;
 /** @type {chrome.runtime.Port | null} */
@@ -90,7 +91,7 @@ function handle(message) {
       const block = blocks[message.block];
       if (block) painter?.setTokens(message.block, { text: block.text, nodes: block.nodes,
         starts: message.starts, ends: message.ends });
-      if (DEBUG) {
+      if (verbose) {
         console.log("aeacus:tokens", { block: message.block, chars: block?.text.length,
           tokens: message.starts.length, ends: message.ends.length,
           lastEnd: message.ends[message.ends.length - 1], text: block?.text });
@@ -192,8 +193,11 @@ async function begin() {
     publish({ phase: "unsupported" });
     return;
   }
+  const settings = await readSettings();
+  verbose = settings.verbose;
+  painter.verbose = verbose;
   const found = findBlocks().flatMap((block) => splitBlock(block));
-  if (DEBUG) {
+  if (verbose) {
     console.log("aeacus:page", { blocks: found.length, reads: found.map((block) => ({
       chars: block.text.length, spans: block.nodes.length, text: block.text.slice(0, 80) })) });
   }
