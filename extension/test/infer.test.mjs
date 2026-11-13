@@ -194,6 +194,10 @@ test("a check walks every block through the model", async (t) => {
       for (let i = 1; i < progress.length; i++) {
         assert.equal(progress[i].done, progress[i - 1].done + 1, "windows report in order");
       }
+      // Chrome serializes port messages with JSON, where a typed array arrives as an object of
+      // indices and the page cannot iterate it.
+      assert.ok(Array.isArray(block.probs), `block ${index} sent a plain array`);
+      assert.ok(Array.isArray(progress.at(-1).probs), `block ${index} sent plain progress`);
       for (const p of block.probs) assert.ok(Number.isFinite(p) && p >= 0 && p <= 1);
       assert.ok(Math.max(...block.probs) > 0.9, "the fake session leans AI");
       assert.ok(Math.min(...block.probs) < 0.2, "and leans human on the rest");

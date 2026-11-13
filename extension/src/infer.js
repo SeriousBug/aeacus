@@ -12,6 +12,15 @@ const CACHE = "aeacus-model";
 
 const base = self.location.href;
 
+// Extension message channels serialize with JSON in Chrome, where a typed array arrives as an object
+// of indices and nothing downstream can read it. Scores are rounded on the way out, which is finer
+// than a color band can show.
+function plain(probs) {
+  const out = new Array(probs.length);
+  for (let i = 0; i < probs.length; i++) out[i] = Math.round(probs[i] * 1000) / 1000;
+  return out;
+}
+
 function modelURL(file) {
   return new URL(file, MODEL_BASE).href;
 }
@@ -192,13 +201,15 @@ export function createRunner(post) {
         for (let i = from; i < to; i++) {
           probs[i - from] = calibrate(sums[i] / counts[i], loaded.thresholds.calibration);
         }
-        post({ type: "progress", id, block: block.index, from, probs, done: ++done, total: windows });
+        post({ type: "progress", id, block: block.index, from, probs: plain(probs),
+          done: ++done, total: windows });
       }
       if (latest !== id) return;
       const probs = new Float32Array(plan.ids.length);
       for (let i = 0; i < probs.length; i++) probs[i] = calibrate(sums[i] / counts[i], loaded.thresholds.calibration);
-      post({ type: "block", id, block: block.index, probs,
-        words: plan.words, ...summary(Array.from(probs), plan.words, loaded.thresholds) });
+      const scores = plain(probs);
+      post({ type: "block", id, block: block.index, probs: scores, words: plan.words,
+        ...summary(scores, plan.words, loaded.thresholds) });
     }
     post({
       type: "done", id, blocks: plans.length, tokens,
