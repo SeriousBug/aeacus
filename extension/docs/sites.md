@@ -21,6 +21,11 @@ inside it nav, forms and hidden text are still dropped. The same goes for the `c
 that mark chrome: they are only read inside the region, because a card on Amazon sits in a
 `.a-carousel-card` and a wrapper on GitHub may be called `header` for reasons of its own.
 
+A highlight covers text that was read and nothing else. A block's text nodes carry a run number that
+steps up wherever something unread sits between them, an image, a button or a code block, and the
+marker is drawn once per run, so it never washes over a picture. On the Wikipedia article below, the
+ranges that covered an image of a formula were 3 before that and 0 after, over 306 blocks.
+
 ## github.com
 
 - Keep: `.markdown-body`. It is the readme (`article.markdown-body`), the body of an issue, a pull
@@ -29,11 +34,11 @@ that mark chrome: they are only read inside the region, because a card on Amazon
   thread.
 - Keep: the repo description, which sits in a sidebar cell whose `h2` reads "About"
   (`p.description__ej4leF`). Class names are hashed, so find that `h2` by its text and take the `p`s
-  beside it. The page holds two copies of the cell, one for each width, and the general extraction
+  in its parent. The page holds two copies of the cell, one for each width, and the general extraction
   drops whichever is not rendered.
-- Drop: the timeline around those bodies. Pull request #1 yields 371 blocks without a rule, mostly
-  `someone mentioned this pull request` rows (37 to 52 percent links), `Member`, `Closed`, and
-  `3 tasks done`.
+- Drop: the timeline around those bodies. llama.cpp issue #1 goes from 116 blocks to 25 with the rule:
+  the ones that go are the title, `Closed`, `Description`, `Activity`, `Member`, and a byline and a
+  `Reacted by …` row for every comment. Pull request #1 is the same story at 371 blocks.
 - Nothing inside a `.markdown-body` needs excluding.
 
 ## Steam
@@ -148,9 +153,11 @@ that mark chrome: they are only read inside the region, because a card on Amazon
 ## Pages no rule covers, measured on a WordPress blog
 
 ma.tt is the test case: a `[role=main]`, an `article` per post, `.entry-content` around the writing,
-`.screen-reader-text` labels, a sharing block, a Jetpack related-posts list, and the comment form. The
-general pass alone gives 25 blocks there, with the sharing and related blocks on top of the writing.
-The choices that fix it are the ones every site needs:
+`.screen-reader-text` labels, `.sharedaddy` sharing, `.jp-relatedposts`, and the comment form. On
+`/2026/10/standards/` the pass before these choices read 17 blocks, and 5 of them were the post and
+the comments heading. The other 12 were the title, date and tags three times over (each in its own
+wrapper), the sharing list, `Share this:`, `Related`, two related-post excerpts, and
+`SHARE YOUR THOUGHTS Cancel reply`. The choices that fix it are the ones every site needs:
 
 - Read inside `main, [role=main]` when the page has one, and the whole body when it does not. That
   container is what a site itself declares to be the writing.
@@ -159,11 +166,16 @@ The choices that fix it are the ones every site needs:
   `header`, `masthead`, `toolbar`, `pagination`, `share`, `related`, `social`, `cookie`, `newsletter`,
   `subscribe`, `promo`, `banner`, `advert`, `sponsor`, `modal`, `popup`, `overlay`, `drawer`, `skip`,
   `screen-reader`, `visually-hidden`, `sr`, `respond`, `reply`, `submit`, `meta`, `byline`, `rating`,
-  `vote`, `actions`, `search`, `widget`, `tab`, `carousel`, `slider`, `sticky`. Matched against whole
-  words so `comment-content` and `.comments-title` stay, while `comment-reply-title`, `#respond` and
-  `.comment-respond` go. With them, 21 blocks: the post, the comments, and two headings.
+  `vote`, `actions`, `search`, `widget`, `tab`, `carousel`, `slider`, `sticky`, `paywall`. Matched
+  against whole words so `comment-content` and `.comments-title` stay, while `comment-reply-title`,
+  `#respond` and `.comment-respond` go. The words of five letters and more also count as the start of
+  a name, because themes run two together: `jp-relatedposts` and `sharedaddy` are caught that way.
+  Shorter ones are whole words only, or `tab` would claim `table`.
 - Treat `aside`, `[role=complementary]`, `dialog`, `[role=dialog]`, `[role=alert]`, `[inert]` and
   `[aria-modal=true]` the way nav and forms are treated now.
+
+The same pass over a big page with a full sidebar, the article `Transformer (deep learning
+architecture)` on Wikipedia: 306 blocks, 11,424 words, no menu item among them.
 
 What the same pass does on two other sites with no rule:
 

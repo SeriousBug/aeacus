@@ -1,7 +1,7 @@
 // Drawing the scores back over the page with the CSS Custom Highlight API, which styles ranges of
 // text without touching the page's own DOM.
 
-import { rangeFor } from "./page-text.js";
+import { rangesFor } from "./page-text.js";
 import { verdict } from "./scoring.js";
 
 // How many steps of color strength each side has; content.css has a rule for every one of them.
@@ -97,11 +97,12 @@ export class Painter {
 
     const drawn = [];
     for (const entry of runs) {
-      const range = rangeFor(block, entry.start, entry.end);
-      if (!range) continue;
       const name = nameFor(entry.band, entry.level);
-      this.#highlight(name).add(range);
-      drawn.push({ name, range });
+      const highlight = this.#highlight(name);
+      for (const range of rangesFor(block, entry.start, entry.end)) {
+        highlight.add(range);
+        drawn.push({ name, range });
+      }
     }
     this.drawn.set(index, drawn);
   }

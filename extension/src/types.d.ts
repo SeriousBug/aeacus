@@ -24,11 +24,14 @@ interface Thresholds extends Bands {
   calibration: Calibration;
 }
 
-// A piece of a page: the text, and where each of its text nodes sits inside that text.
+// A piece of a page: the text, and where each of its text nodes sits inside that text. Nodes that
+// something unread sits between, an image or a code block, carry different runs, so a highlight is
+// drawn over one run at a time instead of covering what broke it.
 interface TextNodeSpan {
   node: Text;
   start: number;
   end: number;
+  run: number;
 }
 
 // What one container on the page holds.
@@ -43,6 +46,15 @@ interface PageBlock {
 // A container cut to the size of a window, with the text nodes counted from its own start.
 interface Block extends PageBlock {
   base: number;
+}
+
+// What a site's rule names: the parts of the page that hold its writing, and what to drop inside
+// them. A region can be a selector, or a function for a site whose markup is hashed or unlabelled.
+interface SiteRule {
+  host: RegExp;
+  path?: RegExp;
+  keep: (string | ((root: ParentNode) => Element[]))[];
+  drop?: string[];
 }
 
 interface BlockTask {

@@ -3,6 +3,7 @@
 // a plain page.
 
 import { MAX_BLOCKS } from "./config.js";
+import { regionsFor, ruleFor } from "./sites.js";
 
 const SKIP_TAGS = new Set([
   "SCRIPT", "STYLE", "NOSCRIPT", "TEMPLATE", "TEXTAREA", "INPUT", "SELECT", "OPTION", "BUTTON",
@@ -16,41 +17,103 @@ const CANDIDATES = "p, li, blockquote, dd, dt, td, th, figcaption, caption, summ
 // Menus, banners and forms are not the page's writing, and a block in them is never what someone
 // opened the extension for.
 const IGNORED = "nav, header, footer, aside, form, dialog, [role='navigation'], [role='banner'], "
-  + "[role='contentinfo'], [role='menu'], [role='search'], [aria-hidden='true'], [hidden], "
+  + "[role='contentinfo'], [role='complementary'], [role='menu'], [role='dialog'], [role='alert'], "
+  + "[role='search'], [aria-hidden='true'], [aria-modal='true'], [hidden], [inert], "
   + "[contenteditable='true'], [contenteditable='']";
 
-// Much of the web writes in divs. A container is read around the paragraphs inside it rather than
-// swallowing them, which matters for the pages that put an article in one div with line breaks and
-// the odd heading: the headings and the loose sentences still belong to the writing around them, and
-// a wrapper with nothing left of its own is dropped.
+// Words that name a piece of page chrome in an element's class or id. Themes and frameworks reuse
+// them, so they catch menus and widgets that are divs and carry no role. Matched against whole
+// words, and stopped at the edge of a region, because `comment-content` is writing while
+// `comment-reply-title` is the form under it, and a review card on Amazon sits in a carousel.
+const CHROME_WORDS = [
+  "nav", "menu", "sidebar", "breadcrumb", "footer", "header", "masthead", "toolbar", "pagination",
+  "share", "related", "social", "cookie", "newsletter", "subscribe", "promo", "banner", "advert",
+  "sponsor", "modal", "popup", "overlay", "drawer", "skip", "screen-reader", "visually-hidden", "sr",
+  "respond", "reply", "submit", "meta", "byline", "rating", "vote", "actions", "search", "widget",
+  "tab", "carousel", "slider", "sticky", "paywall",
+];
+const CHROME = new RegExp(`(^|[^a-z0-9])(${CHROME_WORDS.join("|")})([^a-z0-9]|$)`, "i");
+
+// A name can run two words together, as `jp-relatedposts` and `sharedaddy` do, and the longer words
+// are matched as the start of a name for that. Only those, because `tab` would then claim `table`.
+const CHROME_START = new RegExp(
+  `(^|[^a-z0-9])(${CHROME_WORDS.filter((word) => word.length >= 5).join("|")})`, "i",
+);
+
+/** @param {Element} element @returns {string} */
+const names = (element) => `${element.getAttribute("class") ?? ""} ${element.id}`;
+
+/** @param {Element} element @returns {boolean} */
+const chrome = (element) => {
+  const name = names(element);
+  return CHROME.test(name) || CHROME_START.test(name);
+};
+
+// Why an element is not writing, as one test, so the walk and the block filter agree on it.
 /**
- * @param {{ root?: Element | null, maxBlocks?: number }} [options]
+ * @param {Element} element
+ * @param {string} drop
+ * @returns {boolean}
+ */
+const refuse = (element, drop) => SKIP_TAGS.has(element.tagName) || element.matches(IGNORED)
+  || chrome(element) || (Boolean(drop) && element.matches(drop));
+
+/**
+ * @param {Element} element
+ * @param {Element} region
+ * @param {(node: Element) => boolean} test
+ * @returns {boolean}
+ */
+function within(element, region, test) {
+  /** @type {Element | null} */
+  let node = element;
+  for (; node; node = node.parentElement) {
+    if (test(node)) return true;
+    if (node === region) break;
+  }
+  return false;
+}
+
+// The container a page itself calls its writing, which is the whole body when it names none.
+/** @param {Element} root @returns {Element} */
+function mainOf(root) {
+  return root.querySelector("main, [role='main']") ?? root;
+}
+
+/**
+ * @param {{ root?: Element | null, maxBlocks?: number, rule?: SiteRule | null }} [options]
  * @returns {PageBlock[]}
  */
-export function findBlocks({ root = document.body, maxBlocks = MAX_BLOCKS } = {}) {
+export function findBlocks({ root = document.body, maxBlocks = MAX_BLOCKS, rule = ruleFor() } = {}) {
   if (!root) return [];
-  const candidates = [...root.querySelectorAll(CANDIDATES)];
-  /** @type {Set<Element>} */
-  const containers = new Set();
-  for (const element of candidates) {
-    if (element.querySelector(CANDIDATES)) containers.add(element);
+  const regions = rule ? regionsFor(rule, root) : [];
+  if (!regions.length) regions.push(mainOf(root));
+  const drop = rule?.drop?.length ? rule.drop.join(", ") : "";
+
+  /** @type {Map<Element, Element>} */
+  const homes = new Map();
+  for (const region of regions) {
+    if (region.matches(CANDIDATES)) homes.set(region, region);
+    for (const element of region.querySelectorAll(CANDIDATES)) {
+      if (!homes.has(element)) homes.set(element, region);
+    }
   }
+
+  // Deepest first, so a wrapper is left with only the text none of its children gave. Links and
+  // buttons are already skipped by the walk, and whatever is under an accepted block is skipped too.
+  const ordered = [...homes.keys()].sort((a, b) => depth(b) - depth(a));
 
   /** @type {PageBlock[]} */
   const blocks = [];
   /** @type {Set<Element>} */
   const accepted = new Set();
-
-  /** @param {Element} element @returns {boolean} */
-  const usable = (element) => !SKIP_TAGS.has(element.tagName) && element.isConnected
-    && !element.closest(IGNORED) && element.getClientRects().length > 0;
-
-  const innermost = candidates.filter((element) => !containers.has(element));
-  const around = candidates.filter((element) => containers.has(element));
-  for (const element of [...innermost, ...around]) {
+  for (const element of ordered) {
     if (blocks.length >= maxBlocks) break;
-    if (!usable(element)) continue;
-    const block = readBlock(element, accepted);
+    const region = homes.get(element);
+    if (!region) continue;
+    if (!element.isConnected || element.getClientRects().length === 0) continue;
+    if (within(element, region, (node) => refuse(node, drop))) continue;
+    const block = readBlock(element, accepted, drop);
     if (!block) continue;
     if (block.linkShare > 0.5) continue;
     accepted.add(element);
@@ -60,19 +123,32 @@ export function findBlocks({ root = document.body, maxBlocks = MAX_BLOCKS } = {}
     & Node.DOCUMENT_POSITION_FOLLOWING ? -1 : 1));
 }
 
+/** @param {Element} element @returns {number} */
+function depth(element) {
+  let levels = 0;
+  /** @type {Element | null} */
+  let node = element;
+  for (; node; node = node.parentElement) levels++;
+  return levels;
+}
+
 // The text of one container, plus where each text node starts in it. Adjacent inline elements are
-// joined with a space, which keeps the offsets exact and the tokenizer on prose.
+// joined with a space, which keeps the offsets exact and the tokenizer on prose. Every run of text
+// nodes that is not interrupted by something unread is numbered, so a highlight is never drawn over
+// an image, a button or a code block: a range from one run to another would cover them.
 /**
  * @param {Element} element
- * @param {Set<Element> | null} [skip]
+ * @param {Set<Element>} accepted
+ * @param {string} drop
  * @returns {PageBlock | null}
  */
-function readBlock(element, skip = null) {
+function readBlock(element, accepted, drop) {
   /** @type {TextNodeSpan[]} */
   const nodes = [];
   let text = "";
   let linkChars = 0;
   let allChars = 0;
+  let run = 0;
 
   /**
    * @param {Node} parent
@@ -85,15 +161,16 @@ function readBlock(element, skip = null) {
         const data = node.data;
         if (!data) continue;
         if (text && /\S$/.test(text) && /^\S/.test(data)) text += " ";
-        nodes.push({ node, start: text.length, end: text.length + data.length });
+        nodes.push({ node, start: text.length, end: text.length + data.length, run });
         text += data;
         allChars += data.replace(/\s+/g, "").length;
         if (inLink) linkChars += data.replace(/\s+/g, "").length;
       } else if (child.nodeType === Node.ELEMENT_NODE) {
         const inside = /** @type {Element} */ (child);
-        if (SKIP_TAGS.has(inside.tagName)) continue;
-        if (skip?.has(inside)) continue;
-        if (inside.hasAttribute("hidden") || inside.getAttribute("aria-hidden") === "true") continue;
+        if (accepted.has(inside) || refuse(inside, drop)) {
+          run++;
+          continue;
+        }
         walk(inside, inLink || inside.tagName === "A");
       }
     }
@@ -180,64 +257,37 @@ function localNodes(nodes, from, to) {
     const start = Math.max(entry.start, from);
     const end = Math.min(entry.end, to);
     if (end <= start) continue;
-    out.push({ node: entry.node, start: start - from, end: end - from });
+    out.push({ node: entry.node, start: start - from, end: end - from, run: entry.run });
   }
   return out;
 }
 
-// The range covering [start, end) of a block's text, or null when it falls outside it.
+// The ranges covering [start, end) of a block's text: one per run, since a single range would cover
+// whatever sits between two runs as well, which is the image or the button that broke them.
 /**
  * @param {{ nodes: TextNodeSpan[] }} block
  * @param {number} start
  * @param {number} end
- * @returns {Range | null}
+ * @returns {Range[]}
  */
-export function rangeFor(block, start, end) {
-  const from = locateStart(block.nodes, start);
-  const to = locateEnd(block.nodes, end);
-  if (!from || !to) return null;
-  const range = document.createRange();
-  range.setStart(from.node, from.offset);
-  range.setEnd(to.node, to.offset);
-  return range;
+export function rangesFor(block, start, end) {
+  /** @type {Range[]} */
+  const ranges = [];
+  /** @type {Range | null} */
+  let range = null;
+  let run = -1;
+  for (const entry of block.nodes) {
+    const from = Math.max(entry.start, start);
+    const to = Math.min(entry.end, end);
+    if (to <= from) continue;
+    if (!range || entry.run !== run) {
+      range = document.createRange();
+      range.setStart(entry.node, from - entry.start);
+      run = entry.run;
+      ranges.push(range);
+    }
+    range.setEnd(entry.node, to - entry.start);
+  }
+  return ranges;
 }
 
-/**
- * @param {TextNodeSpan[]} nodes
- * @param {number} offset
- * @returns {{ node: Text, offset: number } | null}
- */
-function locateStart(nodes, offset) {
-  let low = 0;
-  let high = nodes.length - 1;
-  while (low <= high) {
-    const middle = (low + high) >> 1;
-    const entry = nodes[middle];
-    if (offset < entry.start) high = middle - 1;
-    else if (offset >= entry.end) low = middle + 1;
-    else return { node: entry.node, offset: offset - entry.start };
-  }
-  return null;
-}
-
-// The caret position at `offset`, which is the boundary after the character before it, so it can sit
-// on the end of a node.
-/**
- * @param {TextNodeSpan[]} nodes
- * @param {number} offset
- * @returns {{ node: Text, offset: number } | null}
- */
-function locateEnd(nodes, offset) {
-  let low = 0;
-  let high = nodes.length - 1;
-  while (low <= high) {
-    const middle = (low + high) >> 1;
-    const entry = nodes[middle];
-    if (offset <= entry.start) high = middle - 1;
-    else if (offset > entry.end) low = middle + 1;
-    else return { node: entry.node, offset: offset - entry.start };
-  }
-  const first = nodes[0];
-  if (first && offset <= first.start) return { node: first.node, offset: 0 };
-  return null;
-}

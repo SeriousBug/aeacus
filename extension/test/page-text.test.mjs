@@ -12,7 +12,7 @@ function blockOf(text, nodeLength = 400) {
   const nodes = [];
   for (let from = 0; from < text.length; from += nodeLength) {
     const to = Math.min(text.length, from + nodeLength);
-    nodes.push({ node: { data: text.slice(from, to) }, start: from, end: to });
+    nodes.push({ node: { data: text.slice(from, to) }, start: from, end: to, run: 0 });
   }
   return { element: null, text, nodes, words: (text.match(/\S+/g) ?? []).length, linkShare: 0 };
 }
