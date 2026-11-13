@@ -17,7 +17,9 @@ Steam guide that ordering is the difference between four blocks and twelve, beca
 
 The general exclusions stop at the edge of a region. A rule may name something the general pass would
 throw away, like the rules of a subreddit, which live in an `aside`; that region is read anyway, and
-inside it nav, forms and hidden text are still dropped.
+inside it nav, forms and hidden text are still dropped. The same goes for the `class` and `id` words
+that mark chrome: they are only read inside the region, because a card on Amazon sits in a
+`.a-carousel-card` and a wrapper on GitHub may be called `header` for reasons of its own.
 
 ## github.com
 
@@ -53,14 +55,27 @@ inside it nav, forms and hidden text are still dropped.
   extraction already skips. Also the old page shell (`#global_header`, `#responsive_page_menu`,
   `.apphub_sectionTabs`, `.submenu_Store`) and collection and compatibility notices.
 
-## Amazon
+## amazon.com
 
-- Keep: `#productTitle`, `#feature-bullets` ("About this item"), `#productDescription`,
-  `#prodDetails` and `#detailBullets_feature_div` (product information), and the review bodies.
-- Reviews: `#cm-cr-dp-review-list [data-hook=review-body]`, `.review-text-content`, `.reviewText`.
-  They did not render logged out (Amazon served a bot checkpoint), so this needs a signed-in check.
+- Keep: `#feature-bullets` ("About this item"), `#productDescription`, `#prodDetails` and
+  `#detailBullets_feature_div` (product information). The store page shows them without a rule only
+  after the page's own chrome is stripped.
+- Keep: the review cards, `[data-hook=mobley-review-content]`, which is what Amazon renders now, plus
+  `[data-hook=review]` and `.review-text-content` for the older layouts. Checked signed in on a water
+  bottle: 43 blocks, the bullets, the description, the details, and each review's title and body,
+  including the paragraphs of a long review.
+- Drop, inside a card: `[data-hook=genome-widget]` (avatar and name), `[data-hook=review-star-rating]`,
+  `[data-hook=review-by-line]` and `[data-hook=review-date]` ("Reviewed in the United States on
+  November 3, 2026"), `[data-hook=format-strip]` ("Color: Off Road, Size: 24 Ounces"),
+  `[data-hook=review-badges]`, `[data-hook=helpful-vote-statement]` ("11 people found this helpful"),
+  `[data-hook=reviewActionBar]`, and the two `.a-teaser-describedby-*` divs, whose text is
+  "Brief content visible, double tap to read full content". The card alone gives 57 blocks, 34 with
+  those gone. Do not drop `[data-hook=reviewText]`: that is the deck that holds the visible body.
 - Drop: `#reviewsMedley` as a whole. It mixes the rating histogram and the "Customers say" summary
   into the review list.
+- A review card sits inside `.a-carousel-card`, so any check that walks all the way up a block's
+  ancestors finds a `carousel` and throws the card away. This is why the general exclusions have to
+  stop at the edge of a region.
 
 ## reddit.com
 
