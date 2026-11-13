@@ -1,0 +1,146 @@
+{
+  "shots": [
+    {
+      "id": "01-amazon-reviews",
+      "source": "amazon-reviews.webp",
+      "url": "amazon.com/product-reviews",
+      "headline": [
+        "Reviews,",
+        "before you buy"
+      ],
+      "sub": "Every review marked where it reads as a person and where it reads as AI, before you spend a thing on it.",
+      "bullets": [
+        "The mark sits on the words",
+        "Nothing leaves your computer"
+      ],
+      "crop": [
+        0,
+        0.02,
+        1,
+        0.86
+      ]
+    },
+    {
+      "id": "02-yelp-reviews",
+      "source": "yelp-reviews.webp",
+      "url": "yelp.com/biz/deep-dish-pizza",
+      "headline": [
+        "Somebody wrote",
+        "every star"
+      ],
+      "sub": "Reviews read paragraph by paragraph, so the ones written by a regular are easy to tell from the ones written to rank.",
+      "bullets": [
+        "One colour for each lean",
+        "A whole page at a time"
+      ],
+      "crop": [
+        0,
+        0.05,
+        1,
+        0.86
+      ]
+    },
+    {
+      "id": "03-steam-store",
+      "source": "steam-store.webp",
+      "url": "store.steampowered.com/app/2322680",
+      "headline": [
+        "A store page,",
+        "read at a glance"
+      ],
+      "sub": "The description, the highlights and the reviews under them, marked as you scroll, so a page selling you something is a minute's read.",
+      "bullets": [
+        "About This Game, straight away",
+        "No account, no upload"
+      ],
+      "crop": [
+        0,
+        0,
+        1,
+        0.62
+      ]
+    },
+    {
+      "id": "04-substack-notes",
+      "source": "substack-notes.webp",
+      "url": "substack.com/@jettfranzen/note",
+      "headline": [
+        "Notes and",
+        "replies, marked"
+      ],
+      "sub": "The short posts and the comments under them are marked too, which is where writing gets written the fastest.",
+      "bullets": [
+        "The feed and a single note",
+        "Runs on your GPU"
+      ],
+      "crop": [
+        0,
+        0.06,
+        1,
+        0.84
+      ]
+    },
+    {
+      "id": "05-maps-reviews",
+      "source": "maps-reviews.webp",
+      "url": "google.com/maps/place/Soldier+Field",
+      "headline": [
+        "Reviews for",
+        "the place you",
+        "are going to"
+      ],
+      "sub": "A restaurant or a stadium, marked where the writing gives itself away, so the fourth-best review of forty is easy to find.",
+      "bullets": [
+        "Marked where you already look",
+        "Nothing sent anywhere"
+      ],
+      "crop": [
+        0,
+        0,
+        1,
+        0.8
+      ]
+    },
+    {
+      "id": "06-steam-discussions",
+      "source": "steam-discussions.webp",
+      "url": "steamcommunity.com/app/250820/discussions",
+      "headline": [
+        "Threads,",
+        "paragraph by",
+        "paragraph"
+      ],
+      "sub": "Long discussions hold the most text on any page, and are where marking it saves the most reading.",
+      "bullets": [
+        "Answers marked where they stand",
+        "300 blocks on one big page"
+      ],
+      "crop": [
+        0,
+        0,
+        1,
+        0.84
+      ]
+    },
+    {
+      "id": "07-substack-blog",
+      "source": "substack-blog.webp",
+      "url": "newsletter.pragmaticengineer.com/p/scaling-slack",
+      "headline": [
+        "A whole essay,",
+        "line by line"
+      ],
+      "sub": "The posts you subscribe to are the longest writing on the web, and Aeacus marks each paragraph as you read it.",
+      "bullets": [
+        "Every paragraph, in place",
+        "One download, then offline"
+      ],
+      "crop": [
+        0,
+        0.04,
+        1,
+        0.88
+      ]
+    }
+  ]
+}

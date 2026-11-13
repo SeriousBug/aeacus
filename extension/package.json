@@ -9,6 +9,7 @@
     "icons": "node tools/icons.mjs",
     "safari": "node tools/safari.mjs",
     "zip": "node tools/pack.mjs",
+    "art": "node tools/store-art.mjs",
     "test": "node --test test/*.test.mjs",
     "types": "tsc -p tsconfig.json && tsc -p tsconfig.tools.json",
     "lint": "eslint .",

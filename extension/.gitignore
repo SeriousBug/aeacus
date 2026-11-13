@@ -3,3 +3,4 @@ dist/
 safari/*.xcodeproj/xcuserdata/
 safari/*.xcodeproj/project.xcworkspace/xcuserdata/
 artifacts/
+art/

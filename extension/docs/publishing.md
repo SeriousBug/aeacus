@@ -4,6 +4,12 @@ What each store takes, and what it asks for before it takes it. `pnpm zip` write
 `artifacts/aeacus-<browser>-<version>.zip` for Chrome and Firefox from a fresh build, with
 `manifest.json` at the archive's root.
 
+`pnpm art` draws the store artwork from the screenshots in `store/sources`, with the words kept
+outside the frame of each shot: `store/art/<layout>/screenshots` at 1280×800 for Chrome and AMO,
+`store/art/<layout>/mac` at 2560×1600 for the Mac, and `store/art/promo` for Chrome's 440×280 tile and
+1400×560 marquee. It needs Chrome, ImageMagick and a font that has SF or Helvetica on it. The front
+matter for it, the order of the shots and their headlines, is `store/art.json`.
+
 The weights are not in the package: the first check downloads 90 MB from Hugging Face, which both
 stores will ask about, and both show readers that the extension reads every site.
 
