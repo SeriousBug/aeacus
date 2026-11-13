@@ -14,7 +14,7 @@ const $ = (id) => /** @type {any} */ (document.getElementById(id));
  *   shareAi: HTMLElement, legend: HTMLElement, valueHuman: HTMLElement, valueUnsure: HTMLElement,
  *   valueAi: HTMLElement, stats: HTMLElement, progress: HTMLElement, bar: HTMLElement,
  *   fill: HTMLElement, progressLabel: HTMLElement, check: HTMLButtonElement,
- *   clear: HTMLButtonElement, note: HTMLElement, download: HTMLAnchorElement
+ *   clear: HTMLButtonElement, note: HTMLElement, settings: HTMLAnchorElement
  * }} */
 const elements = {
   lede: $("lede"),
@@ -34,7 +34,7 @@ const elements = {
   check: $("check"),
   clear: $("clear"),
   note: $("note"),
-  download: $("download"),
+  settings: $("settings"),
 };
 
 /** @type {chrome.runtime.Port | null} */
@@ -87,6 +87,7 @@ function draw(next) {
   elements.progress.hidden = phase !== "checking";
   elements.check.hidden = phase === "checking";
   elements.check.disabled = false;
+  elements.check.textContent = modelReady ? "Check this page" : "Download Aeacus";
   elements.clear.hidden = !(phase === "checking" || summary);
 
   if (summary) {
@@ -139,8 +140,9 @@ function draw(next) {
     elements.lede.textContent = "Check which parts are likely to be AI-generated, and which parts are"
       + " likely to be written by a human.";
     note(modelReady
-      ? "The check runs on this computer. Nothing is sent anywhere."
-      : "The first check downloads Aeacus, about 87 MB, and keeps it on this computer.");
+      ? "Runs locally inside your browser, no data is sent."
+      : "Aeacus S 1 needs to be downloaded from Hugging Face. This only needs to be done once."
+        + " 90 MB will be downloaded.");
   }
 
   if (phase === "empty") {
@@ -172,7 +174,7 @@ function draw(next) {
 
 elements.check.addEventListener("click", () => port?.postMessage({ type: "run" }));
 elements.clear.addEventListener("click", () => port?.postMessage({ type: "clear" }));
-elements.download.addEventListener("click", (event) => {
+elements.settings.addEventListener("click", (event) => {
   event.preventDefault();
   api.runtime.openOptionsPage();
 });
