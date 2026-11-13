@@ -21,6 +21,16 @@ inside it nav, forms and hidden text are still dropped. The same goes for the `c
 that mark chrome: they are only read inside the region, because a card on Amazon sits in a
 `.a-carousel-card` and a wrapper on GitHub may be called `header` for reasons of its own.
 
+A name that claims a menu is only believed when the element is small next to what it sits in. Sites
+often name a wrapper after everything it lays out: a post on Substack sits in
+`div.main-content-and-sidebar`, and its notes in `#reader-nav-page-scroll`; read as chrome, both lost
+every word of their writing. An element holding more than half of its region's text is layout
+whatever its name says. The region itself is never refused either, since a rule or the page's own
+`main` named it.
+
+`inert` is not on the list of things that hold no writing. It takes the keyboard away and leaves the
+text on screen, and Substack keeps a note's own writing inside one.
+
 A highlight covers text that was read and nothing else. A block's text nodes carry a run number that
 steps up wherever something unread sits between them, an image, a button or a code block, and the
 marker is drawn once per run, so it never washes over a picture. On the Wikipedia article below, the
@@ -177,8 +187,9 @@ wrapper), the sharing list, `Share this:`, `Related`, two related-post excerpts,
   against whole words so `comment-content` and `.comments-title` stay, while `comment-reply-title`,
   `#respond` and `.comment-respond` go. The words of five letters and more also count as the start of
   a name, because themes run two together: `jp-relatedposts` and `sharedaddy` are caught that way.
-  Shorter ones are whole words only, or `tab` would claim `table`.
-- Treat `aside`, `[role=complementary]`, `dialog`, `[role=dialog]`, `[role=alert]`, `[inert]` and
+  Shorter ones are whole words only, or `tab` would claim `table`. A name is only believed when the
+  element holds less than half of its region's text.
+- Treat `aside`, `[role=complementary]`, `dialog`, `[role=dialog]`, `[role=alert]` and
   `[aria-modal=true]` the way nav and forms are treated now.
 
 The same pass over a big page with a full sidebar, the article `Transformer (deep learning

@@ -15,10 +15,11 @@ const SKIP_TAGS = new Set([
 const CANDIDATES = "p, li, blockquote, dd, dt, td, th, figcaption, caption, summary, h1, h2, h3, h4, h5, h6, div";
 
 // Menus, banners and forms are not the page's writing, and a block in them is never what someone
-// opened the extension for.
+// opened the extension for. `[inert]` is left out: it takes the keyboard away and leaves the text on
+// screen, and Substack keeps a note's own writing inside one.
 const IGNORED = "nav, header, footer, aside, form, dialog, [role='navigation'], [role='banner'], "
   + "[role='contentinfo'], [role='complementary'], [role='menu'], [role='dialog'], [role='alert'], "
-  + "[role='search'], [aria-hidden='true'], [aria-modal='true'], [hidden], [inert], "
+  + "[role='search'], [aria-hidden='true'], [aria-modal='true'], [hidden], "
   + "[contenteditable='true'], [contenteditable='']";
 
 // Words that name a piece of page chrome in an element's class or id. Themes and frameworks reuse
@@ -49,15 +50,31 @@ const chrome = (element) => {
   return CHROME.test(name) || CHROME_START.test(name);
 };
 
-// Why an element is not writing, as one test, so the walk and the block filter agree on it.
+// A name that claims a menu is wrong when the element holds most of what it sits in, because a site
+// often names a wrapper after everything it lays out: Substack's whole post sits in
+// `div.main-content-and-sidebar`, and its notes in `#reader-nav-page-scroll`.
+/**
+ * @param {Element} element
+ * @param {Element} scope
+ * @returns {boolean}
+ */
+const crowded = (element, scope) => element !== scope
+  && element.textContent.length > scope.textContent.length / 2;
+
+// Why an element is not writing, as one test, so the walk and the block filter agree on it. `scope`
+// is what the element is read inside, which is how far a chrome name is believed.
 /**
  * @param {Element} element
  * @param {string} drop
+ * @param {Element} scope
  * @returns {boolean}
  */
-const refuse = (element, drop) => SKIP_TAGS.has(element.tagName) || element.matches(IGNORED)
-  || chrome(element) || (Boolean(drop) && element.matches(drop));
+const refuse = (element, drop, scope) => SKIP_TAGS.has(element.tagName) || element.matches(IGNORED)
+  || (chrome(element) && !crowded(element, scope)) || (Boolean(drop) && element.matches(drop));
 
+// Whether anything between an element and its region is not writing. The region itself is left out:
+// a rule named it, and a site that calls its own main `reader-nav-page-scroll` would otherwise have
+// every block under it thrown away.
 /**
  * @param {Element} element
  * @param {Element} region
@@ -68,8 +85,8 @@ function within(element, region, test) {
   /** @type {Element | null} */
   let node = element;
   for (; node; node = node.parentElement) {
-    if (test(node)) return true;
     if (node === region) break;
+    if (test(node)) return true;
   }
   return false;
 }
@@ -112,7 +129,7 @@ export function findBlocks({ root = document.body, maxBlocks = MAX_BLOCKS, rule 
     const region = homes.get(element);
     if (!region) continue;
     if (!element.isConnected || element.getClientRects().length === 0) continue;
-    if (within(element, region, (node) => refuse(node, drop))) continue;
+    if (within(element, region, (node) => refuse(node, drop, region))) continue;
     const block = readBlock(element, accepted, drop);
     if (!block) continue;
     if (block.linkShare > 0.5) continue;
@@ -167,7 +184,7 @@ function readBlock(element, accepted, drop) {
         if (inLink) linkChars += data.replace(/\s+/g, "").length;
       } else if (child.nodeType === Node.ELEMENT_NODE) {
         const inside = /** @type {Element} */ (child);
-        if (accepted.has(inside) || refuse(inside, drop)) {
+        if (accepted.has(inside) || refuse(inside, drop, element)) {
           run++;
           continue;
         }

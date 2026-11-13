@@ -14,6 +14,10 @@
 <body>
   <nav><a href="/">Home</a> <a href="/about">About</a> <a href="/archive">Archive</a></nav>
 
+  <!-- Everything the page says, in one div named after a part of itself, the way Substack wraps a
+       whole post in `div.main-content-and-sidebar`. The name must not cost the page its writing. -->
+  <div class="main-content-and-sidebar">
+
   <article>
     <h1>Two paragraphs</h1>
     <!-- Dickens, then AI writing carrying on from it, as the website's sample does. -->
@@ -29,6 +33,13 @@
       connect, and create, even as they unsettle the work and relationships that give our days their
       shape. Across widening divides, people look at the same events and see entirely different
       stories.</p>
+
+    <!-- `inert` takes the keyboard away and leaves the text on screen, which is where Substack keeps
+         a note's own writing. -->
+    <div inert>
+      <p id="inert">A note's writing can sit in an inert div, laid out and readable, and it is the
+        first thing anyone would want marked on that page.</p>
+    </div>
 
     <h2>Inline markup</h2>
     <!-- Links, emphasis and an image inside a paragraph: the offsets have to survive them, and a
@@ -122,6 +133,7 @@
     The cleaners arrive. One of them reads the notepad left on the desk, laughs at the handwriting,
     and wipes the table anyway. Outside, the street lights come on in the order the council wired them
     forty years ago, and the city goes on being a city, indifferent to the numbers it makes.
+  </div>
   </div>
 
   <footer>

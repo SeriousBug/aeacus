@@ -1,7 +1,7 @@
 {
   "name": "aeacus-extension",
   "private": true,
-  "version": "0.1.1",
+  "version": "0.1.2",
   "type": "module",
   "description": "Marks up the parts of a page that read as AI-written, on your own computer",
   "scripts": {
