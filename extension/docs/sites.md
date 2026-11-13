@@ -26,6 +26,13 @@ steps up wherever something unread sits between them, an image, a button or a co
 marker is drawn once per run, so it never washes over a picture. On the Wikipedia article below, the
 ranges that covered an image of a formula were 3 before that and 0 after, over 306 blocks.
 
+The indentation a page puts around a block is not part of its text, so a block starts at its first
+real character, and a highlight has to start there too. Reddit indents every comment body
+(`<p>\n      …\n    </p>`), 7 characters that are neither scored nor drawn: measured from the node's
+own first character, every comment came out marked 7 characters too early, and a short one lost its
+last word or two. Each text node span therefore keeps `base`, where the block's first character
+lands inside that node.
+
 ## github.com
 
 - Keep: `.markdown-body`. It is the readme (`article.markdown-body`), the body of an issue, a pull

@@ -161,7 +161,7 @@ function readBlock(element, accepted, drop) {
         const data = node.data;
         if (!data) continue;
         if (text && /\S$/.test(text) && /^\S/.test(data)) text += " ";
-        nodes.push({ node, start: text.length, end: text.length + data.length, run });
+        nodes.push({ node, start: text.length, end: text.length + data.length, run, base: 0 });
         text += data;
         allChars += data.replace(/\s+/g, "").length;
         if (inLink) linkChars += data.replace(/\s+/g, "").length;
@@ -181,6 +181,9 @@ function readBlock(element, accepted, drop) {
   const trimmed = text.trim();
   if (!trimmed) return null;
   for (const entry of nodes) {
+    // The block's first character sits part way into the node that held the indentation, and what is
+    // trimmed off has to stay counted here, or a drawn range would start that many characters early.
+    entry.base = Math.max(0, lead - entry.start);
     entry.start -= lead;
     entry.end -= lead;
   }
@@ -257,7 +260,8 @@ function localNodes(nodes, from, to) {
     const start = Math.max(entry.start, from);
     const end = Math.min(entry.end, to);
     if (end <= start) continue;
-    out.push({ node: entry.node, start: start - from, end: end - from, run: entry.run });
+    out.push({ node: entry.node, start: start - from, end: end - from, run: entry.run,
+      base: entry.base + (start - entry.start) });
   }
   return out;
 }
@@ -282,11 +286,11 @@ export function rangesFor(block, start, end) {
     if (to <= from) continue;
     if (!range || entry.run !== run) {
       range = document.createRange();
-      range.setStart(entry.node, from - entry.start);
+      range.setStart(entry.node, entry.base + from - entry.start);
       run = entry.run;
       ranges.push(range);
     }
-    range.setEnd(entry.node, to - entry.start);
+    range.setEnd(entry.node, entry.base + to - entry.start);
   }
   return ranges;
 }
