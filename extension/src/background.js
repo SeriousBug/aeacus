@@ -3,6 +3,7 @@
 // worker in; on Firefox and Safari the background page itself is that document.
 
 import { reason } from "./errors.js";
+import { readSettings } from "./settings.js";
 import { startHost } from "./host.js";
 import api from "./api.js";
 
@@ -120,6 +121,11 @@ async function receive(port, message) {
     return;
   }
   if (message.type === "check" && message.id) owners.set(message.id, port);
+  // The model lives past any one message, so the setting it opens with is read here rather than
+  // carried by every page.
+  if (message.type === "check" || message.type === "warm") {
+    message = { ...message, gpu: (await readSettings()).gpu };
+  }
   try {
     const target = await host();
     // The page can go away while the offscreen document is still opening.

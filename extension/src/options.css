@@ -5,6 +5,7 @@ main {
 }
 
 .card {
+  margin-bottom: 16px;
   padding: 4px 16px 16px;
   border: 1px solid var(--border);
   border-radius: 10px;
@@ -14,6 +15,33 @@ main {
 .card h2 {
   margin: 16px 0 6px;
   font-size: 14px;
+}
+
+.row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 14px 0 10px;
+}
+
+.row input[type="checkbox"] {
+  margin: 3px 0 0;
+  width: 16px;
+  height: 16px;
+  accent-color: var(--button);
+}
+
+.row strong {
+  display: block;
+  font-weight: 600;
+}
+
+.row em {
+  display: block;
+  margin-top: 2px;
+  color: var(--muted);
+  font-size: 12px;
+  font-style: normal;
 }
 
 .actions {

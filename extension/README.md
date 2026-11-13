@@ -67,6 +67,7 @@ worker runs the model itself over WebAssembly.
 | `src/host.js` | Runs `infer.js` in a worker, or in place when the browser has none |
 | `src/background.js` | Connects each page to the document that holds the worker |
 | `src/scoring.js` | Thresholds, calibration and the page-level numbers, on the bands the website and the CLI use |
+| `src/settings.js` | The one setting, whether the model may use the GPU, and what it defaults to |
 | `src/api.js` | The browser's API under one name, since Firefox calls it `browser` and Chrome `chrome` |
 | `src/types.d.ts` | The shapes that cross a boundary: the model's messages and the page's state |
 
@@ -83,6 +84,6 @@ AEACUS_MODEL_BASE=http://localhost:8799/ pnpm build
 
 ## Permissions
 
-`storage` holds whether the model is downloaded; `unlimitedStorage` lets the 87 MB
-weights sit in the cache. The host permissions are for the Hugging Face addresses the model comes
+`storage` holds the setting and whether the model is downloaded; `unlimitedStorage` lets the 90 MB
+model sit in the cache. The host permissions are for the Hugging Face addresses the model comes
 from. Nothing is sent anywhere.

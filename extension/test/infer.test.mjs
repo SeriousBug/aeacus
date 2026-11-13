@@ -107,7 +107,7 @@ function checker(createRunner) {
     messages.push(message);
     if (message.type === "done" || message.type === "error") finish?.(message);
   });
-  async function check(blocks, { words = false } = {}) {
+  async function check(blocks, { words = false, gpu } = {}) {
     messages.length = 0;
     const finished = new Promise((resolve, reject) => {
       const timer = setTimeout(() => reject(new Error("the model never finished")), 120_000);
@@ -122,6 +122,7 @@ function checker(createRunner) {
       id,
       blocks: blocks.map((text, index) =>
         (words ? { index, text, words: (text.match(/\S+/g) ?? []).length } : { index, text })),
+      ...(gpu === undefined ? {} : { gpu }),
     });
     return { messages, last: await finished };
   }
@@ -161,6 +162,26 @@ test("a check walks every block through the model", async (t) => {
       message.type === "model" && ["downloading", "starting"].includes(message.state)).length;
     assert.ok(loads((await check([UNIT.repeat(4)])).messages) > 0, "the first check loads it");
     assert.equal(loads((await check([UNIT.repeat(4)])).messages), 0, "the second check reuses it");
+  });
+
+  await t.test("the GPU is left alone when the setting says no", async () => {
+    const before = warnings.length;
+    const { check } = checker(createRunner);
+    const { messages } = await check([UNIT.repeat(4)], { gpu: false });
+    const ready = messages.find((message) => message.type === "model" && message.state === "ready");
+    assert.equal(ready.provider, "wasm");
+    assert.equal(warnings.length, before, "WebGPU was never asked for");
+  });
+
+  await t.test("changing the setting builds the session again", async () => {
+    const { check } = checker(createRunner);
+    const starts = (messages) => messages.filter((message) =>
+      message.type === "model" && message.state === "starting").length;
+    assert.ok(starts((await check([UNIT.repeat(4)], { gpu: true })).messages) > 0, "the first check loads it");
+    assert.equal(starts((await check([UNIT.repeat(4)], { gpu: true })).messages), 0, "the same engine is reused");
+    const off = await check([UNIT.repeat(4)], { gpu: false });
+    assert.ok(starts(off.messages) > 0, "turning the GPU off closes the session and builds another");
+    assert.equal(off.last.type, "done");
   });
 
   await t.test("total, tokens, progress and block arrive for every block", async () => {

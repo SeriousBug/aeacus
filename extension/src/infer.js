@@ -65,6 +65,9 @@ function modelURL(file) {
 export function createRunner(post) {
   /** @type {ModelState} */
   let state = { state: "idle" };
+  // Which engine the session that is open was built on, and which one the settings ask for now.
+  let gpuAllowed = true;
+  let wantGpu = true;
   /** @type {Promise<Loaded> | null} */
   let reading = null;
   /** @type {string | null} */
@@ -72,6 +75,16 @@ export function createRunner(post) {
   /** @type {Set<string>} */
   const stopped = new Set();
   let queue = Promise.resolve();
+
+  // The engine is picked when the session is built, so changing the setting closes the session and
+  // the next check builds another. Checks are queued, so this never runs beside one.
+  function retune() {
+    if (latest !== null || wantGpu === gpuAllowed) return;
+    gpuAllowed = wantGpu;
+    const opened = reading;
+    reading = null;
+    opened?.then((loaded) => loaded.session.release?.()).catch(() => {});
+  }
 
   /** @param {ModelState} next */
   function announce(next) {
@@ -106,7 +119,7 @@ export function createRunner(post) {
     ]);
     announce({ state: "starting" });
     const ort = await import(new URL(ORT_BUNDLE, base).href);
-    const { session, provider, threads } = await openSession(ort, weights);
+    const { session, provider, threads } = await openSession(ort, weights, gpuAllowed);
     return { ort, session, provider, threads, thresholds, tokenizer: new Tokenizer(tokenizerJson) };
   }
 
@@ -124,9 +137,10 @@ export function createRunner(post) {
   /**
    * @param {any} ort
    * @param {ArrayBuffer} weights
+   * @param {boolean} gpu
    * @returns {Promise<{ session: any, provider: Provider, threads: number | null }>}
    */
-  async function openSession(ort, weights) {
+  async function openSession(ort, weights, gpu) {
     ort.env.logLevel = "error";
     ort.env.wasm.wasmPaths = new URL("ort/", base).href;
     // Threads need a SharedArrayBuffer, which an extension page only has when the browser isolates
@@ -139,7 +153,8 @@ export function createRunner(post) {
       if (!response.ok) throw new Error(`couldn't load ONNX Runtime (HTTP ${response.status})`);
       return response.arrayBuffer();
     });
-    if (typeof navigator !== "undefined" && navigator.gpu && await navigator.gpu.requestAdapter()) {
+    if (gpu && typeof navigator !== "undefined" && navigator.gpu
+      && await navigator.gpu.requestAdapter()) {
       try {
         const session = await ort.InferenceSession.create(weights,
           { executionProviders: ["webgpu"], logSeverityLevel: 3 });
@@ -289,6 +304,8 @@ export function createRunner(post) {
         return;
       }
       if (message.type === "warm") {
+        if (typeof message.gpu === "boolean") wantGpu = message.gpu;
+        retune();
         model().catch(() => {});
         return;
       }
@@ -298,6 +315,8 @@ export function createRunner(post) {
       // rather than cutting it short. Only a page that was left stops part way.
       queue = queue.then(async () => {
         if (stopped.delete(message.id)) return;
+        if (typeof message.gpu === "boolean") wantGpu = message.gpu;
+        retune();
         latest = message.id;
         try {
           await check(message);

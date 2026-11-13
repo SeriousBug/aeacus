@@ -1,3 +1,4 @@
+import { readSettings, writeSettings } from "./settings.js";
 import api from "./api.js";
 
 /**
@@ -7,6 +8,8 @@ import api from "./api.js";
  */
 const $ = (id) => /** @type {any} */ (document.getElementById(id));
 
+/** @type {HTMLInputElement} */
+const gpu = $("gpu");
 /** @type {HTMLButtonElement} */
 const download = $("download");
 /** @type {HTMLElement} */
@@ -63,7 +66,15 @@ download.addEventListener("click", () => {
   download.disabled = true;
 });
 
+gpu.addEventListener("change", () => {
+  writeSettings({ gpu: gpu.checked }).catch((error) => {
+    note(`The setting couldn't be saved: ${error.message ?? error}`, true);
+  });
+});
+
 async function start() {
+  const settings = await readSettings();
+  gpu.checked = settings.gpu;
   const stored = await api.storage.local.get(["modelReady"]);
   if (stored.modelReady) downloaded();
 }

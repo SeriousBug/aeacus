@@ -69,12 +69,13 @@ interface ModelVerdict {
   ai_score: number | null;
 }
 
-// What the page asks the model to do.
+// What the page asks the model to do. `gpu` is filled in by the background, which is where the
+// setting is read, so neither the page nor the popup has to know about it.
 type ModelRequest =
-  | { type: "check"; id: string; blocks: BlockTask[] }
+  | { type: "check"; id: string; blocks: BlockTask[]; gpu?: boolean }
   | { type: "cancel"; id: string }
   | { type: "state" }
-  | { type: "warm" };
+  | { type: "warm"; gpu?: boolean };
 
 // What the model says back. Every score-carrying message names the check it belongs to.
 type ModelReply =
@@ -122,3 +123,7 @@ interface Host {
 }
 
 type Post = (message: ModelReply) => void;
+
+interface Settings {
+  gpu: boolean;
+}

@@ -30,7 +30,7 @@ function port(name) {
 const fake = { runtime: {}, offscreen: {}, storage: {}, tabs: {} };
 globalThis.browser = fake;
 
-async function load(caseName, { slow = 0 } = {}) {
+async function load(caseName, { slow = 0, settings = null } = {}) {
   const stored = [];
   const connects = [];
   fake.runtime = {
@@ -50,7 +50,7 @@ async function load(caseName, { slow = 0 } = {}) {
   };
   fake.storage = {
     local: {
-      get: async () => ({}),
+      get: async () => (settings ? { settings } : {}),
       set: async (values) => stored.push(values),
       remove: async () => {},
     },
@@ -73,8 +73,9 @@ test("a page gets the scores it asked for", async () => {
   page.onMessage.fire({ type: "check", id: "c1", blocks: [{ index: 0, text: "words" }] });
   await tick();
   const host = model(connects);
-  assert.deepEqual(host.sent.at(-1),
-    { message: { type: "check", id: "c1", blocks: [{ index: 0, text: "words" }] } });
+  assert.deepEqual(host.sent.at(-1), { message: {
+    type: "check", id: "c1", blocks: [{ index: 0, text: "words" }], gpu: true,
+  } }, "the setting goes with the check, and GPU acceleration is on by default");
 
   host.onMessage.fire({ message: { type: "tokens", id: "c1", block: 0, starts: [0], ends: [5] } });
   assert.equal(page.sent.at(-1).type, "tokens");
@@ -88,6 +89,15 @@ test("a page gets the scores it asked for", async () => {
   const after = page.sent.length;
   host.onMessage.fire({ message: { type: "progress", id: "c1", block: 0, from: 0, probs: [0.2] } });
   assert.equal(page.sent.length, after, "a finished check delivers nothing more");
+});
+
+test("a check carries the GPU setting the user chose", async () => {
+  const { api, connects } = await load("nogpu", { settings: { gpu: false } });
+  const page = port("aeacus");
+  api.runtime.onConnect.fire(page);
+  page.onMessage.fire({ type: "check", id: "c5", blocks: [{ index: 0, text: "words" }] });
+  await tick();
+  assert.equal(model(connects).sent.at(-1).message.gpu, false);
 });
 
 test("a page that goes away stops its check", async () => {
