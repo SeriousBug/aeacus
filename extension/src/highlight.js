@@ -1,6 +1,7 @@
 // Drawing the scores back over the page with the CSS Custom Highlight API, which styles ranges of
 // text without touching the page's own DOM.
 
+import { DEBUG } from "./config.js";
 import { rangesFor } from "./page-text.js";
 import { verdict } from "./scoring.js";
 
@@ -13,6 +14,10 @@ const LEVELS = 4;
  * @returns {string}
  */
 const nameFor = (band, level) => (band === "unsure" ? "aeacus-unsure" : `aeacus-${band}-${level}`);
+
+// A drawn range's text, cut in the middle so one line of console shows both of its ends.
+/** @param {string} text @returns {string} */
+const short = (text) => (text.length <= 64 ? text : `${text.slice(0, 34)} … ${text.slice(-26)}`);
 
 /** @typedef {{ text: string, nodes: TextNodeSpan[], starts: number[], ends: number[] }} TokenLayout */
 
@@ -105,6 +110,18 @@ export class Painter {
       }
     }
     this.drawn.set(index, drawn);
+    if (DEBUG) {
+      console.debug("aeacus:block", {
+        index,
+        chars: block.text.length,
+        tokens: probs.length,
+        lastEnd: block.ends[probs.length - 1],
+        spans: block.nodes.map((entry) => [entry.start, entry.end, entry.run]),
+        runs: runs.map((entry) => `${entry.band}${entry.level} ${entry.start}-${entry.end}`),
+        drawn: drawn.map(({ name, range }) => `${name} ${JSON.stringify(short(range.toString()))}`),
+        text: block.text,
+      });
+    }
   }
 
   /** @param {number} index */

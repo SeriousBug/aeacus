@@ -4,6 +4,7 @@
 import { Painter, Tooltip, label } from "./highlight.js";
 import { findBlocks, splitBlock } from "./page-text.js";
 import api from "./api.js";
+import { DEBUG } from "./config.js";
 import { reason } from "./errors.js";
 
 // Aeacus's own site describes the thing instead of being a page to judge, so nothing is read there.
@@ -89,6 +90,11 @@ function handle(message) {
       const block = blocks[message.block];
       if (block) painter?.setTokens(message.block, { text: block.text, nodes: block.nodes,
         starts: message.starts, ends: message.ends });
+      if (DEBUG) {
+        console.debug("aeacus:tokens", { block: message.block, chars: block?.text.length,
+          tokens: message.starts.length, ends: message.ends.length,
+          lastEnd: message.ends[message.ends.length - 1], text: block?.text });
+      }
       break;
     }
     case "progress":
@@ -187,6 +193,10 @@ async function begin() {
     return;
   }
   const found = findBlocks().flatMap((block) => splitBlock(block));
+  if (DEBUG) {
+    console.debug("aeacus:page", { blocks: found.length, reads: found.map((block) => ({
+      chars: block.text.length, spans: block.nodes.length, text: block.text.slice(0, 80) })) });
+  }
   if (!found.length) {
     publish({ phase: "empty", message: "" });
     return;

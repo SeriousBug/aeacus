@@ -50,6 +50,27 @@ which Xcode builds and runs as a small app holding the extension; turn the exten
 settings afterwards. Running it again regenerates the project, so changes made inside Xcode are
 lost. The project points at `dist/safari` rather than copying it.
 
+## Seeing what was drawn
+
+A highlight is not an element. `src/highlight.js` puts `Range` objects in a `Highlight`, registers
+that with `CSS.highlights`, and `src/content.css` styles it by name, so the Elements panel shows the
+page as the page wrote it. Those ranges belong to the content script's own world, where the page's
+console cannot reach them; Chrome's console lists that world in the context menu beside the prompt,
+and `CSS.highlights` there holds the ranges a check left on the page.
+
+Open a page with `?aeacus-debug` in its address, and the content script logs what it did to the
+page's console:
+
+- `aeacus:page` lists every block it read, with its characters and how many text nodes they came
+  from.
+- `aeacus:tokens` puts a block's characters next to the tokens its text was cut into, and where the
+  last of them ends.
+- `aeacus:block` is what the scores made: the runs, and every range drawn, with its text.
+
+A highlight that stops short of its text is one of those three lines showing it: a block whose
+`chars` already lack the end, a `lastEnd` short of the characters, or a `drawn` range whose text is a
+fragment of a block that had all of it.
+
 ## How it fits together
 
 The content script reads the page and reports back; the model runs in a worker held by a document

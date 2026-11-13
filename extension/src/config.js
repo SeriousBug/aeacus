@@ -17,3 +17,7 @@ export const MAX_TOKENS = 24000;
 export const MAX_TOKENS_WASM = 3000;
 
 export const MAX_BLOCKS = 400;
+
+// A page opened with `?aeacus-debug` says what was read and drawn to its own console, which is the
+// only way to see the ranges a highlight is made of: they are not elements.
+export const DEBUG = /[?&]aeacus-debug\b/.test(globalThis.location?.search ?? "");
