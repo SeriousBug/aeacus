@@ -17,6 +17,10 @@ pnpm build
 its own manifest. `pnpm test` runs the Node tests, which need no browser; they skip the model tests
 when the weights are not at `../../publish/aeacus-s-1`, or wherever `AEACUS_WEIGHTS` points.
 
+`node test/e2e.mjs` loads the built Chrome extension in a throwaway profile, checks the test page in
+`test/fixtures/`, and reports what the popup and the page ended up showing. Chrome loads no unpacked
+extension in headless mode, so it opens a window.
+
 ## Load it in a browser
 
 Chrome: open `chrome://extensions`, turn on Developer mode, choose "Load unpacked", and pick

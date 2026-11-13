@@ -3,10 +3,16 @@
 <head>
   <meta charset="utf-8">
   <title>Aeacus test page</title>
-  <style>body { max-width: 40rem; margin: 40px auto; font: 17px/1.6 Georgia, serif; }</style>
+  <style>
+    body { max-width: 40rem; margin: 40px auto; font: 17px/1.6 Georgia, serif; }
+    nav { font: 14px/1.4 system-ui, sans-serif; margin-bottom: 2rem; }
+    .short, .links { color: #666; }
+    footer { margin-top: 3rem; font: 14px/1.4 system-ui, sans-serif; }
+  </style>
 </head>
 <body>
-  <nav><a href="/">Home</a> <a href="/about">About</a></nav>
+  <nav><a href="/">Home</a> <a href="/about">About</a> <a href="/archive">Archive</a></nav>
+
   <article>
     <h1>Two paragraphs</h1>
     <!-- Dickens, then AI writing carrying on from it, as the website's sample does. -->
@@ -22,6 +28,99 @@
       connect, and create, even as they unsettle the work and relationships that give our days their
       shape. Across widening divides, people look at the same events and see entirely different
       stories.</p>
+
+    <h2>Inline markup</h2>
+    <!-- Links and emphasis inside a paragraph: the offsets have to survive them. -->
+    <p id="inline">Making <a href="https://example.com/one">a decision under uncertainty</a> is the
+      ordinary condition of work, not an exception to it. When the evidence is thin, the useful move is
+      to <em>shrink the size of the bet</em>, learn from what happens, and keep enough room to change
+      course. Teams that treat every choice as reversible until it turns out otherwise tend to move
+      faster than teams that wait for certainty, and they are usually
+      <a href="https://example.com/two">wrong less often than they fear</a>.</p>
+
+    <h2>Short lines</h2>
+    <p class="short" id="short">Too short to say anything about.</p>
+    <p class="links" id="links"><a href="https://example.com/a">One</a> <a href="https://example.com/b">two</a>
+      <a href="https://example.com/c">three</a> <a href="https://example.com/d">four</a>
+      <a href="https://example.com/e">five</a> <a href="https://example.com/f">six</a>
+      <a href="https://example.com/g">seven</a> <a href="https://example.com/h">eight</a></p>
   </article>
+
+  <!-- A whole article written in one div with line breaks, the way some editors publish. -->
+  <div id="one-div">
+    <h2>A whole essay in one div</h2>
+    A morning in late October, and the market is already loud.<br><br>
+    The traders who arrive first do not talk about the news; they talk about the weather, about the
+    train, about the small misfortunes of the commute, and only then do they turn to the screens. By
+    the time the bell rings the room has the particular quiet of people who have decided to be
+    careful.<br><br>
+    What follows is not a story about money, though money is what everyone is counting. It is a story
+    about attention: who gets it, who spends it, and what it costs to hold it for an hour, a season, a
+    career. A desk that watches one number all day learns a great deal about that number and very
+    little about anything else.<br><br>
+    There is an older argument, made in every generation and settled in none, about whether prices
+    describe the world or make it. The traders do not settle it either. They take positions, they
+    explain themselves afterwards, and they go home.<br><br>
+    Somewhere in the middle of the afternoon, a junior analyst is asked to explain a fall that
+    everyone can see and nobody can account for. She writes three sentences, deletes two, and settles
+    on the least interesting explanation, because it is the one she can defend. Her manager reads it,
+    nods, and sends it upward, where it becomes part of the record, and where nobody will look at it
+    again unless something goes wrong.<br><br>
+    The machines in the room are older than most of the people in it. They were bought for a purpose
+    that has since changed hands twice, and they are kept because replacing them would cost more than
+    the confusion they cause. Someone has taped a label to one of them: do not turn off. Nobody
+    remembers who, or what happens if you do.<br><br>
+    In the hallway, two colleagues argue about a book neither has finished. The argument is warm and
+    entirely without consequence, which is what makes it a good one. They will have it again next
+    week with the positions reversed, and neither will notice.<br><br>
+    Downstairs, the lobby has been redecorated in a style the staff call the waiting room, all grey
+    felt and indirect light. The plants are real, which surprises visitors, and are watered by a
+    contractor who comes on Tuesdays and never speaks. There is a screen showing the price of
+    something, and a clock that is four minutes fast, and a revolving door that sticks in wet
+    weather. Nobody has ever seen the contractor arrive, though the plants are always watered and
+    the leaves are always clean.<br><br>
+    The building itself is a compromise between two architects who did not get along. One wanted
+    windows, the other wanted walls, and the result is a facade that looks, from the street, like a
+    decision nobody has quite finished making. Tenants have learned to live with it. The upper floors
+    are hot in summer, the lower floors are dark in winter, and every few years a committee proposes
+    a fix that is costed, discussed, and quietly dropped. The doorman, who has been here longer than
+    the committee, says the building was better before the renovation, and he says it to everyone,
+    and he is probably right.<br><br>
+    What the room teaches, if it teaches anything, is that attention is a resource like any other: it
+    can be spent, saved, wasted, and borrowed against next week. The traders know this in their hands
+    long before they can say it. They watch the number, they watch each other, and they watch the
+    door, and the day passes in a rhythm nobody wrote down and everybody follows.<br><br>
+    By four o'clock the room has thinned. The screens still flicker, the last orders are called, and
+    someone in the corner is writing down what happened, because tomorrow the same argument will need
+    the same evidence, and nobody will remember this day in particular.<br><br>
+    The cleaning crew arrives at six, three of them, with a cart that rattles over the tile. They
+    work the floor in a pattern they have worked out between themselves and never discussed: one does
+    the desks, one does the glass, one does the bins, and they meet at the far end by the fire door
+    where the radio gets reception. The radio plays the same station every night, and they argue
+    about it every night, and nothing is ever changed. The one who does the glass has been doing it
+    for eleven years and can tell you, from the state of a desk, roughly how the person who uses it
+    slept.<br><br>
+    By then the building has a different sound. The lifts sound louder with nobody to soften them,
+    the corridors carry a voice from one end to the other, and the vending machine on the third floor
+    makes a noise like a small animal settling down. Anyone who has worked late knows this sound and
+    knows what it means: the day is over, and the numbers are where they are.<br><br>
+    There is a particular kind of conversation that happens in an office at this hour, when the work
+    is finished and nobody wants to go home yet. It is not about work, though work is its excuse. It
+    is about the town someone grew up in, the flat someone is trying to buy, the dog that has learned
+    to open the fridge, the sister who is getting married in the spring. The sentences are short and
+    unfinished and they overlap, and by the time the lights are switched off in the corridor nobody
+    can remember who said what.<br><br>
+    Somebody once proposed putting a camera in the room, to see how people worked, and the proposal
+    died in a meeting about something else. The traders still talk about it, years later, the way
+    people talk about a near miss on a road they use every day: not with fear exactly, but with the
+    sense that something was decided and nobody was asked.<br><br>
+    The cleaners arrive. One of them reads the notepad left on the desk, laughs at the handwriting,
+    and wipes the table anyway. Outside, the street lights come on in the order the council wired them
+    forty years ago, and the city goes on being a city, indifferent to the numbers it makes.
+  </div>
+
+  <footer>
+    <p>A footer, which Aeacus leaves alone: it is not the page's writing.</p>
+  </footer>
 </body>
 </html>

@@ -236,6 +236,9 @@ async function main() {
 
   const problems = [];
   if (!state.summary) problems.push("no summary reached the popup");
+  if (!(state.summary?.blocks >= 4)) {
+    problems.push(`only ${state.summary?.blocks} blocks were read, and the page has four`);
+  }
   if (!(state.summary?.aiShare > 0)) problems.push("nothing on the page was read as AI");
   if (!(state.summary?.humanShare > 0)) problems.push("nothing on the page was read as human");
   if (!Object.keys(highlights).some((name) => name.startsWith("aeacus-ai"))) {

@@ -19,34 +19,43 @@ const IGNORED = "nav, header, footer, aside, form, dialog, [role='navigation'], 
   + "[role='contentinfo'], [role='menu'], [role='search'], [aria-hidden='true'], [hidden], "
   + "[contenteditable='true'], [contenteditable='']";
 
-// Much of the web writes in divs; those are read too, but only where no smaller candidate holds the
-// text, so a wrapper never swallows the paragraphs inside it.
+// Much of the web writes in divs. A container is read around the paragraphs inside it rather than
+// swallowing them, which matters for the pages that put an article in one div with line breaks and
+// the odd heading: the headings and the loose sentences still belong to the writing around them, and
+// a wrapper whose own text is short is dropped for saying nothing of its own.
 export function findBlocks({ root = document.body, minWords = MIN_WORDS, maxBlocks = 400 } = {}) {
   if (!root) return [];
   const candidates = [...root.querySelectorAll(CANDIDATES)];
-  const inner = new Set();
+  const containers = new Set();
   for (const element of candidates) {
-    if (element.querySelector(CANDIDATES)) inner.add(element);
+    if (element.querySelector(CANDIDATES)) containers.add(element);
   }
+
   const blocks = [];
-  for (const element of candidates) {
+  const accepted = new Set();
+
+  const usable = (element) => !SKIP_TAGS.has(element.tagName) && element.isConnected
+    && !element.closest(IGNORED) && element.getClientRects().length > 0;
+
+  const innermost = candidates.filter((element) => !containers.has(element));
+  const around = candidates.filter((element) => containers.has(element));
+  for (const element of [...innermost, ...around]) {
     if (blocks.length >= maxBlocks) break;
-    if (inner.has(element)) continue;
-    if (SKIP_TAGS.has(element.tagName) || !element.isConnected) continue;
-    if (element.closest(IGNORED)) continue;
-    if (!element.getClientRects().length) continue;
-    const block = readBlock(element);
+    if (!usable(element)) continue;
+    const block = readBlock(element, accepted);
     if (!block) continue;
     if (block.words < minWords) continue;
     if (block.linkShare > 0.5) continue;
+    accepted.add(element);
     blocks.push(block);
   }
-  return blocks;
+  return blocks.sort((a, b) => (a.element.compareDocumentPosition(b.element)
+    & Node.DOCUMENT_POSITION_FOLLOWING ? -1 : 1));
 }
 
 // The text of one container, plus where each text node starts in it. Adjacent inline elements are
 // joined with a space, which keeps the offsets exact and the tokenizer on prose.
-function readBlock(element) {
+function readBlock(element, skip = null) {
   const nodes = [];
   let text = "";
   let linkChars = 0;
@@ -64,6 +73,7 @@ function readBlock(element) {
         if (inLink) linkChars += data.replace(/\s+/g, "").length;
       } else if (child.nodeType === Node.ELEMENT_NODE) {
         if (SKIP_TAGS.has(child.tagName)) continue;
+        if (skip?.has(child)) continue;
         if (child.hasAttribute("hidden") || child.getAttribute("aria-hidden") === "true") continue;
         walk(child, inLink || child.tagName === "A");
       }
