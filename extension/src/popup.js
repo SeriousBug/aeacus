@@ -189,6 +189,13 @@ async function start() {
     draw({ phase: "unsupported" });
     return;
   }
+  // The click that opened this popup is what lets the background put the page script in.
+  const loaded = await api.runtime.sendMessage({ type: "load-page", tabId: tab.id })
+    .catch(() => null);
+  if (!loaded?.ok) {
+    draw({ phase: "unsupported" });
+    return;
+  }
   try {
     port = api.tabs.connect(tab.id, { name: "aeacus-popup" });
   } catch {

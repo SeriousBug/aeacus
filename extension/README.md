@@ -109,6 +109,8 @@ AEACUS_MODEL_BASE=http://localhost:8799/ pnpm build
 
 ## Permissions
 
-`storage` holds the setting and whether the model is downloaded; `unlimitedStorage` lets the 90 MB
-model sit in the cache. The host permissions are for the Hugging Face addresses the model comes
-from. Nothing is sent anywhere.
+`activeTab` and `scripting` are how a page gets read: clicking the action, or pressing the shortcut,
+is what grants access to that one tab, and the page script goes in then. Nothing runs on a page
+nobody asked about. `storage` holds the setting and whether the model is downloaded;
+`unlimitedStorage` lets the 90 MB model sit in the cache. The host permissions are for the Hugging
+Face addresses the model comes from. Nothing is sent anywhere.

@@ -30,11 +30,13 @@ function port(name) {
 const fake = { runtime: {}, offscreen: {}, storage: {}, tabs: {} };
 globalThis.browser = fake;
 
-async function load(caseName, { slow = 0, settings = null } = {}) {
+async function load(caseName, { slow = 0, settings = null, there = false, refuse = false } = {}) {
   const stored = [];
   const connects = [];
+  const files = [];
   fake.runtime = {
     onConnect: event(),
+    onMessage: event(),
     connect({ name }) {
       const opened = port(name);
       connects.push(opened);
@@ -55,10 +57,24 @@ async function load(caseName, { slow = 0, settings = null } = {}) {
       remove: async () => {},
     },
   };
-  fake.tabs = { query: async () => [], sendMessage: async () => {} };
+  fake.tabs = {
+    query: async () => [],
+    sendMessage: async (tabId, message) => {
+      if (message?.type !== "ping") return;
+      if (!there) throw new Error("Could not establish connection. Receiving end does not exist.");
+      return true;
+    },
+  };
+  fake.scripting = {
+    insertCSS: async ({ files: names }) => files.push(...names),
+    executeScript: async ({ files: names }) => {
+      if (refuse) throw new Error("Cannot access contents of the page.");
+      files.push(...names);
+    },
+  };
   globalThis.self = { location: { href: `file:///tmp/aeacus-bg-${caseName}/infer-worker.js` } };
   await import(`../src/background.js?case=${caseName}`);
-  return { api: fake, connects, stored };
+  return { api: fake, connects, stored, files };
 }
 
 const tick = () => new Promise((resolve) => setTimeout(resolve, 0));
@@ -151,4 +167,31 @@ test("two pages are served one after the other", async () => {
   host.onMessage.fire({ message: { type: "block", id: "b", block: 0, probs: [0.9] } });
   assert.equal(first.sent.at(-1).type, "model", "the other page is not sent b's scores");
   assert.equal(second.sent.at(-1).type, "block");
+});
+
+test("a page gets its script when the action is clicked", async () => {
+  const { api, files } = await load("loading");
+  const replies = [];
+  api.runtime.onMessage.fire({ type: "load-page", tabId: 7 }, {}, (reply) => replies.push(reply));
+  await tick();
+  assert.deepEqual(files, ["content.css", "content.js"], "the page script goes in on the ask");
+  assert.deepEqual(replies, [{ ok: true }]);
+});
+
+test("a page that already runs the script is left alone", async () => {
+  const { api, files } = await load("loaded", { there: true });
+  const replies = [];
+  api.runtime.onMessage.fire({ type: "load-page", tabId: 7 }, {}, (reply) => replies.push(reply));
+  await tick();
+  assert.deepEqual(files, [], "nothing is loaded twice");
+  assert.deepEqual(replies, [{ ok: true }]);
+});
+
+test("a page the browser keeps the extension out of is reported", async () => {
+  const { api } = await load("blocked", { refuse: true });
+  const replies = [];
+  api.runtime.onMessage.fire({ type: "load-page", tabId: 7 }, {}, (reply) => replies.push(reply));
+  await tick();
+  assert.equal(replies.length, 1);
+  assert.equal(replies[0].ok, false, "the popup is told, so it can say so");
 });

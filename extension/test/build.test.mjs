@@ -33,6 +33,17 @@ for (const browser of BROWSERS) {
     assert.equal(manifest.manifest_version, 3);
     assert.match(manifest.version, /^\d+\.\d+\.\d+$/);
     assert.ok(manifest.host_permissions?.length, "the model's host permissions are there");
+
+    // The stores read site access off the manifest, and a page nobody checked is not a page this
+    // extension reads: the page script goes in on the click that asks for a check.
+    assert.equal(manifest.content_scripts, undefined, "no page script up front");
+    for (const pattern of manifest.host_permissions) {
+      assert.doesNotMatch(pattern, /^(<all_urls>|\*|\w+\/\/\*)/, `${pattern} is every site`);
+    }
+    assert.ok(manifest.permissions.includes("activeTab"), "activeTab is what opens a page");
+    for (const file of ["content.js", "content.css"]) {
+      assert.ok(existsSync(path.join(dir, file)), `${file} is missing`);
+    }
     for (const file of references(manifest)) {
       assert.ok(existsSync(path.join(dir, file)), `${file} is missing`);
     }

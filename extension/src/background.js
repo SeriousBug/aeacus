@@ -150,8 +150,30 @@ api.runtime.onConnect.addListener((port) => {
   port.postMessage({ type: "model", ...lastModel });
 });
 
+// A page is read only after the reader asks for it, and asking is what grants activeTab for that
+// tab, so the extension asks for no site access of its own and never runs on a page nobody checked.
+/** @param {number} tabId @returns {Promise<void>} */
+async function loadPage(tabId) {
+  const there = await api.tabs.sendMessage(tabId, { type: "ping" }).catch(() => false);
+  if (there) return;
+  await api.scripting.insertCSS({ target: { tabId }, files: ["content.css"] });
+  await api.scripting.executeScript({ target: { tabId }, files: ["content.js"] });
+}
+
+api.runtime.onMessage.addListener((message, sender, reply) => {
+  const tabId = message?.type === "load-page" ? message.tabId : undefined;
+  if (tabId === undefined) return undefined;
+  loadPage(tabId).then(
+    () => reply({ ok: true }),
+    (error) => reply({ ok: false, message: reason(error) }),
+  );
+  return true;
+});
+
 api.commands?.onCommand.addListener(async (command) => {
   if (command !== "check-page") return;
   const [tab] = await api.tabs.query({ active: true, currentWindow: true });
-  if (tab?.id !== undefined) api.tabs.sendMessage(tab.id, { type: "run" }).catch(() => {});
+  const tabId = tab?.id;
+  if (tabId === undefined) return;
+  loadPage(tabId).then(() => api.tabs.sendMessage(tabId, { type: "run" })).catch(() => {});
 });

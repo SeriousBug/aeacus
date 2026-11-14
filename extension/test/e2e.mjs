@@ -1,7 +1,10 @@
 // Loads the built Chrome extension in a throwaway profile, checks the test page the way a person
-// would, and reports what the popup and the page ended up showing. Chrome loads no unpacked
-// extension in headless mode, so this opens a window.
+// would, and reports what the popup and the page ended up showing. It opens a window, since Chrome
+// loads no unpacked extension in headless mode.
 //   node test/e2e.mjs [--keep]
+//
+// Google Chrome ignores --load-extension from version 137 on, so CHROME has to name Chromium or
+// Chrome for Testing.
 
 import { spawn } from "node:child_process";
 import { existsSync } from "node:fs";
@@ -79,6 +82,52 @@ class Cdp {
   }
 }
 
+// Site access arrives with a click on the action, and a script cannot make that click. So the
+// harness loads a copy of the build that also names the page it serves, and that can read tab URLs
+// to find it.
+async function loadable(source) {
+  const dir = await fs.mkdtemp(path.join(os.tmpdir(), "aeacus-load-"));
+  await fs.cp(source, dir, { recursive: true });
+  const file = path.join(dir, "manifest.json");
+  const manifest = JSON.parse(await fs.readFile(file, "utf8"));
+  manifest.host_permissions = [...manifest.host_permissions, "http://127.0.0.1/*"];
+  manifest.permissions = [...manifest.permissions, "tabs"];
+  await fs.writeFile(file, JSON.stringify(manifest, null, 2));
+  return dir;
+}
+
+// An unpacked extension is named after the folder it came from, and Chrome writes that name down
+// only when it shuts down. Its own page lists what it has loaded, which is where the name is until
+// then.
+async function extensionId(browser, targets, dir) {
+  const page = await browser.send("Target.createTarget", { url: "chrome://extensions-internals" });
+  const target = await waitFor("chrome://extensions-internals", async () =>
+    (await targets()).find((candidate) => candidate.id === page.targetId), { timeout: 15000 });
+  const session = await Cdp.connect(target.webSocketDebuggerUrl);
+  const id = await waitFor("the extension to be listed", async () => {
+    const text = await evaluate(session, "document.body.innerText").catch(() => "");
+    try {
+      return JSON.parse(text).find((entry) => entry.path === dir)?.id ?? null;
+    } catch {
+      return null;
+    }
+  }, { timeout: 15000, every: 500 });
+  session.close();
+  await browser.send("Target.closeTarget", { targetId: page.targetId });
+  return id;
+}
+
+// Nothing runs until the reader asks, so no worker exists at start. Opening the popup in a tab is
+// what asks, which wakes one, and the tab is closed again.
+async function wake(browser, targets, id) {
+  const popup = await browser.send("Target.createTarget", { url: `chrome-extension://${id}/popup.html` });
+  const worker = await waitFor("the extension's service worker", async () =>
+    (await targets()).find((target) => target.url === `chrome-extension://${id}/background.js`),
+    { timeout: 30000 });
+  await browser.send("Target.closeTarget", { targetId: popup.targetId });
+  return worker;
+}
+
 async function evaluate(session, expression, options = {}) {
   const result = await session.send("Runtime.evaluate",
     { expression, awaitPromise: true, returnByValue: true, userGesture: true, ...options });
@@ -104,10 +153,11 @@ async function main() {
   if (!chrome) throw new Error(`no Chrome found, set CHROME to one: tried ${CHROMES.join(", ")}`);
 
   const profile = await fs.mkdtemp(path.join(os.tmpdir(), "aeacus-e2e-"));
+  const extension = await loadable(EXTENSION);
   const child = spawn(chrome, [
     `--user-data-dir=${profile}`,
-    `--load-extension=${EXTENSION}`,
-    `--disable-extensions-except=${EXTENSION}`,
+    `--load-extension=${extension}`,
+    `--disable-extensions-except=${extension}`,
     "--remote-debugging-port=0",
     "--no-first-run",
     "--no-default-browser-check",
@@ -130,13 +180,9 @@ async function main() {
   const browser = await Cdp.connect((await (await fetch(`http://127.0.0.1:${port}/json/version`)).json())
     .webSocketDebuggerUrl);
 
-  const worker = await waitFor("the extension's service worker", async () => {
-    const list = await targets();
-    return list.find((target) => target.url.startsWith("chrome-extension://")
-      && target.url.endsWith("/background.js"));
-  }, { timeout: 30000 });
-  const id = new URL(worker.url).host;
+  const id = await extensionId(browser, targets, extension);
   console.log(`extension ${id}`);
+  const worker = await wake(browser, targets, id);
 
   const sw = await Cdp.connect(worker.webSocketDebuggerUrl);
   await sw.send("Runtime.enable");
@@ -170,6 +216,17 @@ async function main() {
     }
   });
 
+  await waitFor("the page to finish loading", async () =>
+    (await evaluate(pageSession, "document.readyState")) === "complete", { timeout: 30000 });
+
+  const tabs = await evaluate(sw, "chrome.tabs.query({}).then((tabs) => tabs.map((t) => ({ id: t.id, url: t.url })))");
+  const tab = tabs.find((candidate) => candidate.url?.endsWith("/page.html"));
+  if (!tab) throw new Error(`the test page is not a tab: ${JSON.stringify(tabs)}`);
+
+  // What the background does on the click that opens the popup.
+  await evaluate(sw, `chrome.scripting.insertCSS({ target: { tabId: ${tab.id} }, files: ["content.css"] })
+    .then(() => chrome.scripting.executeScript({ target: { tabId: ${tab.id}, files: ["content.js"] } }))`);
+
   // The content script runs in an isolated world, whose origin is the page's; what tells it apart is
   // chrome.runtime, so the contexts are asked.
   const contentContext = await waitFor("the content script", async () => {
@@ -182,13 +239,6 @@ async function main() {
     }
     return null;
   }, { timeout: 60000 });
-
-  await waitFor("the page to finish loading", async () =>
-    (await evaluate(pageSession, "document.readyState")) === "complete", { timeout: 30000 });
-
-  const tabs = await evaluate(sw, "chrome.tabs.query({}).then((tabs) => tabs.map((t) => ({ id: t.id, url: t.url })))");
-  const tab = tabs.find((candidate) => candidate.url.endsWith("/page.html"));
-  if (!tab) throw new Error(`the test page is not a tab: ${JSON.stringify(tabs)}`);
 
   // The popup's own side of the content script's port, so the state a person would see can be read
   // without opening the popup.
@@ -279,7 +329,11 @@ async function main() {
   pageSession.close();
   sw.close();
   child.kill();
-  if (!keep) await fs.rm(profile, { recursive: true, force: true, maxRetries: 5 }).catch(() => {});
+  if (!keep) {
+    for (const dir of [profile, extension]) {
+      await fs.rm(dir, { recursive: true, force: true, maxRetries: 5 }).catch(() => {});
+    }
+  }
 
   if (problems.length) {
     console.error(`\nFAILED:\n  ${problems.join("\n  ")}`);

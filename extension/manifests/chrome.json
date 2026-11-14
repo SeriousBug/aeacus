@@ -1,5 +1,5 @@
 {
-  "permissions": ["storage", "unlimitedStorage", "offscreen"],
+  "permissions": ["activeTab", "scripting", "storage", "unlimitedStorage", "offscreen"],
   "background": {
     "service_worker": "background.js"
   },

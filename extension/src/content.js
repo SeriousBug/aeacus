@@ -243,8 +243,9 @@ api.runtime.onConnect.addListener((popup) => {
   popup.postMessage(state);
 });
 
-api.runtime.onMessage.addListener((message) => {
+api.runtime.onMessage.addListener((message, sender, reply) => {
   if (message?.type === "run") begin();
+  if (message?.type === "ping") reply(true);
 });
 
 // Pointing at the text says what Aeacus thinks of that word, the way the website's tooltip does.

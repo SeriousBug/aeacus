@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Aeacus",
   "description": "Detects which parts of text are likely to be AI generated, and which parts are likely to be human written. Runs entirely locally.",
-  "permissions": ["storage", "unlimitedStorage"],
+  "permissions": ["activeTab", "scripting", "storage", "unlimitedStorage"],
   "host_permissions": [
     "https://huggingface.co/*",
     "https://cdn-lfs.huggingface.co/*",
@@ -28,14 +28,6 @@
   "options_ui": {
     "page": "options.html"
   },
-  "content_scripts": [
-    {
-      "matches": ["http://*/*", "https://*/*"],
-      "js": ["content.js"],
-      "css": ["content.css"],
-      "run_at": "document_idle"
-    }
-  ],
   "commands": {
     "check-page": {
       "suggested_key": {

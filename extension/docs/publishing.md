@@ -28,18 +28,29 @@ stores will ask about, and both show readers that the extension reads every site
    Single purpose, 1000 characters at most:
 
    > Aeacus marks which parts of a web page read as AI-written and which read as written by a
-   > person. The reader asks for a check from the toolbar button, the Alt+Shift+A shortcut, or the
-   > small control on the page; the text of the page in view is scored, and the paragraphs and
-   > comments it finds are tinted from likely human to likely AI. A model runs inside the extension
-   > on the reader's own computer, so the page is never sent anywhere and nothing is stored off the
-   > device.
+   > person. The reader asks for a check from the toolbar button or the Alt+Shift+A shortcut, the
+   > text of the page in view is scored, and the paragraphs and comments it finds are tinted from
+   > likely human to likely AI. A model runs inside the extension on the reader's own computer, so
+   > the page is never sent anywhere and nothing is stored off the device.
+
+   `activeTab`:
+
+   > This is what lets a page be read at all. Clicking the toolbar button or pressing the shortcut
+   > grants access to that one tab and no other, and the grant ends when the tab goes to another
+   > page. Nothing runs on a page the reader has not asked about.
+
+   `scripting`:
+
+   > No page script sits in the manifest, so nothing runs until a check is asked for. On that click
+   > the background puts `content.js` and `content.css` into the tab, using the activeTab grant for
+   > it, and injects nowhere else.
 
    `storage`:
 
    > Keeps the reader's own settings and whether the model has finished downloading, so the
    > extension behaves the same on the next page. It holds a handful of fields in `storage.local`:
-   > the score at which marks appear, the colours, whether checks run on their own, and one flag for
-   > the downloaded model. Nothing leaves the computer, and the reader can clear it from the options
+   > the score at which marks appear, the colours, whether to use the GPU, and one flag for the
+   > downloaded model. Nothing leaves the computer, and the reader can clear it from the options
    > page.
 
    `unlimitedStorage`:
