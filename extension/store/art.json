@@ -38,8 +38,7 @@
       "source": "yelp-reviews.webp",
       "url": "yelp.com",
       "headline": [
-        "Check",
-        "local reviews"
+        "Spot the locals"
       ],
       "sub": "See which businesses are likely using AI services to respond.",
       "crop": [
@@ -50,9 +49,9 @@
       ]
     },
     {
-      "id": "04-steam-discussions",
-      "source": "steam-discussions.webp",
-      "url": "steamcommunity.com",
+      "id": "04-substack-notes",
+      "source": "substack-notes.webp",
+      "url": "substack.com/notes",
       "headline": [
         "Find potential bots",
         "on social media"
@@ -81,9 +80,9 @@
       ]
     },
     {
-      "id": "06-substack-notes",
-      "source": "substack-notes.webp",
-      "url": "substack.com/notes",
+      "id": "06-steam-discussions",
+      "source": "steam-discussions.webp",
+      "url": "steamcommunity.com",
       "headline": [
         "Works anywhere"
       ],
