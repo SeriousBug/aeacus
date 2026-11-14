@@ -1,6 +1,6 @@
 // Draws the store artwork: the screenshots from `store/sources` framed in a window, with the words
 // outside the frame and never over it.
-//   node tools/store-art.mjs [side|top]
+//   node tools/store-art.mjs
 //
 // Each store takes its own sizes from the same composition: Chrome and AMO at 1280×800, the Mac at
 // 2560×1600, and Chrome's two promo tiles are drawn from the icon instead of a shot.
@@ -28,11 +28,7 @@ const RETINA = 2;
 /** @typedef {{ id: string, source: string, url: string, headline: string[], sub: string,
  *   note?: string, crop: [number, number, number, number] }} Shot */
 
-const layouts = process.argv.slice(2).filter((arg) => arg === "side" || arg === "top");
-const LAYOUTS = layouts.length ? layouts : ["side", "top"];
-
-const styles = () => `
-  * { box-sizing: border-box; }
+const styles = () => `  * { box-sizing: border-box; }
   body {
     margin: 0; width: ${SIZE.width}px; height: ${SIZE.height}px; overflow: hidden;
     font-family: ui-sans-serif, -apple-system, "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
@@ -142,7 +138,7 @@ const say = (shot) => `<p class="sub">${shot.sub}</p>`
   + (shot.note ? `<p class="note">${shot.note}</p>` : "");
 
 /** @param {Shot} shot @returns {Promise<string>} */
-async function sidePage(shot) {
+async function pageOf(shot) {
   const file = path.join(SOURCES, shot.source);
   const size = await measure(file);
   const shown = place(size.width, size.height, shot.crop, 744);
@@ -160,32 +156,6 @@ async function sidePage(shot) {
         <div class="brand"><img src="file://${ICON}"><span>Aeacus</span></div>
         ${headline(shot)}
         ${say(shot)}
-      </div>
-      <div class="win">${windowBar(shot)}<div class="shot">${image(shown, file)}</div></div>
-    </div>`;
-}
-
-/** @param {Shot} shot @returns {Promise<string>} */
-async function topPage(shot) {
-  const file = path.join(SOURCES, shot.source);
-  const size = await measure(file);
-  const shown = place(size.width, size.height, shot.crop, 1156);
-  return `<!doctype html><meta charset="utf-8"><style>${styles()}
-    .page { height: 100%; padding: 46px 62px 0; display: flex; flex-direction: column; }
-    .head { display: flex; align-items: flex-end; justify-content: space-between; gap: 40px; }
-    h1 { margin: 18px 0 0; font-size: 42px; }
-    p.sub { margin: 12px 0 0; max-width: 52ch; }
-    p.note { margin: 8px 0 0; max-width: 52ch; }
-    .win { margin-top: 30px; width: ${Math.round(shown.frame)}px;
-      height: ${Math.round(shown.frameHeight) + 32}px; }
-    .shot { height: ${Math.round(shown.frameHeight)}px; }</style>
-    <div class="page">
-      <div class="head">
-        <div>
-          <div class="brand"><img src="file://${ICON}"><span>Aeacus</span></div>
-          ${headline(shot)}
-        </div>
-        <div>${say(shot)}</div>
       </div>
       <div class="win">${windowBar(shot)}<div class="shot">${image(shown, file)}</div></div>
     </div>`;
@@ -212,7 +182,6 @@ const promoPage = (width, height, icon, type, wordmark) => `<!doctype html><meta
 /** @type {{ shots: Shot[] }} */
 const { shots } = JSON.parse(await fs.readFile(path.join(STORE, "art.json"), "utf8"));
 
-// One folder per layout, since both are rendered to be compared before either goes to a store.
 const out = {
   screenshots: path.join(ART, "screenshots"),
   mac: path.join(ART, "mac"),
@@ -220,29 +189,22 @@ const out = {
 };
 for (const dir of Object.values(out)) await fs.mkdir(dir, { recursive: true });
 
-for (const layout of LAYOUTS) {
-  const here = {
-    screenshots: path.join(ART, layout, "screenshots"),
-    mac: path.join(ART, layout, "mac"),
-  };
-  for (const dir of Object.values(here)) await fs.mkdir(dir, { recursive: true });
-  for (const shot of shots) {
-    const html = layout === "top" ? await topPage(shot) : await sidePage(shot);
-    const retina = path.join(os.tmpdir(), `aeacus-art-${shot.id}-${layout}@2x.png`);
-    await shoot(html, retina);
-    // Chrome writes the shot at twice the size; the stores want one of each, and no alpha channel.
-    await run(MAGICK, [retina, "-alpha", "off", path.join(here.mac, `${shot.id}.png`)]);
-    await run(MAGICK, [retina, "-alpha", "off", "-resize", "50%",
-      path.join(here.screenshots, `${shot.id}.png`)]);
-    console.log(`${layout} ${shot.id}`);
-  }
-  // One sheet per layout, so the whole set can be judged side by side in one image.
-  await run(MAGICK, [
-    "montage", ...shots.map((shot) => path.join(here.screenshots, `${shot.id}.png`)),
-    "-tile", "2x", "-geometry", "620x388+12+12", "-background", "#0b1020",
-    path.join(ART, layout, "contact.png"),
-  ]);
+for (const shot of shots) {
+  const retina = path.join(os.tmpdir(), `aeacus-art-${shot.id}@2x.png`);
+  await shoot(await pageOf(shot), retina);
+  // Chrome writes the shot at twice the size; the stores want one of each, and no alpha channel.
+  await run(MAGICK, [retina, "-alpha", "off", path.join(out.mac, `${shot.id}.png`)]);
+  await run(MAGICK, [retina, "-alpha", "off", "-resize", "50%",
+    path.join(out.screenshots, `${shot.id}.png`)]);
+  console.log(`art ${shot.id}`);
 }
+
+// One sheet, so the whole set can be judged side by side in one image.
+await run(MAGICK, [
+  "montage", ...shots.map((shot) => path.join(out.screenshots, `${shot.id}.png`)),
+  "-tile", "2x", "-geometry", "620x388+12+12", "-background", "#0b1020",
+  path.join(ART, "contact.png"),
+]);
 
 const small = path.join(os.tmpdir(), "aeacus-promo-small@2x.png");
 await shoot(promoPage(440, 280, 88, 34, "Aeacus"), small, 440, 280);
