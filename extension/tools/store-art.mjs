@@ -161,26 +161,31 @@ async function pageOf(shot) {
     </div>`;
 }
 
-/** @param {number} width @param {number} height @param {number} icon @param {number} type
- *  @param {string} wordmark @returns {string} */
-const promoPage = (width, height, icon, type, wordmark) => `<!doctype html><meta charset="utf-8">
+/** @param {{ width: number, height: number, icon: number, type: number, tagline: string,
+ *    taglineSize: number }} promo @returns {string} */
+const promoPage = ({ width, height, icon, type, tagline, taglineSize }) => `<!doctype html><meta charset="utf-8">
   <style>
     body { margin: 0; width: ${width}px; height: ${height}px; overflow: hidden;
-      display: flex; align-items: center; justify-content: center; gap: ${icon * 0.28}px;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: ${Math.round(icon * 0.3)}px;
       font-family: ui-sans-serif, -apple-system, "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
       background:
         radial-gradient(${width * 0.8}px ${height * 1.2}px at 6% -20%, rgba(37, 99, 235, .55), transparent 65%),
         radial-gradient(${width * 0.8}px ${height * 1.2}px at 104% 120%, rgba(168, 85, 247, .6), transparent 66%),
         linear-gradient(135deg, #101a33 0%, #131b3a 50%, #1a1033 100%);
       color: #fff; }
+    .mark { display: flex; align-items: center; gap: ${Math.round(icon * 0.28)}px; }
     img { width: ${icon}px; height: ${icon}px; filter: drop-shadow(0 12px 24px rgba(0, 0, 0, .35)); }
-    span { font-size: ${type}px; font-weight: 600; letter-spacing: -.02em;
+    .mark span { font-size: ${type}px; font-weight: 600; letter-spacing: -.02em;
       text-shadow: 0 10px 30px rgba(0, 0, 0, .35); }
+    p { margin: 0; max-width: ${Math.round(width * 0.72)}px; text-align: center;
+      font-size: ${taglineSize}px; line-height: 1.35; color: rgba(255, 255, 255, .82); }
   </style>
-  <img src="file://${ICON}"><span>${wordmark}</span>`;
+  <div class="mark"><img src="file://${ICON}"><span>Aeacus</span></div>
+  <p>${tagline}</p>`;
 
-/** @type {{ shots: Shot[] }} */
-const { shots } = JSON.parse(await fs.readFile(path.join(STORE, "art.json"), "utf8"));
+/** @type {{ shots: Shot[], promo: { tagline: string } }} */
+const { shots, promo } = JSON.parse(await fs.readFile(path.join(STORE, "art.json"), "utf8"));
 
 const out = {
   screenshots: path.join(ART, "screenshots"),
@@ -207,11 +212,13 @@ await run(MAGICK, [
 ]);
 
 const small = path.join(os.tmpdir(), "aeacus-promo-small@2x.png");
-await shoot(promoPage(440, 280, 88, 34, "Aeacus"), small, 440, 280);
+await shoot(promoPage({ width: 440, height: 280, icon: 76, type: 32, tagline: promo.tagline,
+  taglineSize: 15 }), small, 440, 280);
 await run(MAGICK, [small, "-alpha", "off", "-resize", "50%", path.join(out.promo, "small-440x280.png")]);
 
 const marquee = path.join(os.tmpdir(), "aeacus-promo-marquee@2x.png");
-await shoot(promoPage(1400, 560, 132, 62, "Aeacus"), marquee, 1400, 560);
+await shoot(promoPage({ width: 1400, height: 560, icon: 116, type: 58, tagline: promo.tagline,
+  taglineSize: 30 }), marquee, 1400, 560);
 await run(MAGICK, [marquee, "-alpha", "off", "-resize", "50%",
   path.join(out.promo, "marquee-1400x560.png")]);
 
