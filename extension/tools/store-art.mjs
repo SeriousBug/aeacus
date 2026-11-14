@@ -1,6 +1,6 @@
 // Draws the store artwork: the screenshots from `store/sources` framed in a window, with the words
 // outside the frame and never over it.
-//   node tools/store-art.mjs [side|top] [--without-copy]
+//   node tools/store-art.mjs [side|top]
 //
 // Each store takes its own sizes from the same composition: Chrome and AMO at 1280×800, the Mac at
 // 2560×1600, and Chrome's two promo tiles are drawn from the icon instead of a shot.
@@ -26,7 +26,7 @@ const SIZE = { width: 1280, height: 800 };
 const RETINA = 2;
 
 /** @typedef {{ id: string, source: string, url: string, headline: string[], sub: string,
- *   bullets: string[], crop: [number, number, number, number] }} Shot */
+ *   note?: string, crop: [number, number, number, number] }} Shot */
 
 const layouts = process.argv.slice(2).filter((arg) => arg === "side" || arg === "top");
 const LAYOUTS = layouts.length ? layouts : ["side", "top"];
@@ -52,12 +52,7 @@ const styles = () => `
     -webkit-background-clip: text; background-clip: text; color: transparent;
   }
   p.sub { margin: 20px 0 0; font-size: 17px; line-height: 1.55; color: #475569; }
-  ul { margin: 26px 0 0; padding: 0; list-style: none; }
-  li { display: flex; align-items: center; gap: 10px; margin-top: 12px; font-size: 15px; color: #334155; }
-  li i {
-    width: 18px; height: 18px; border-radius: 50%; flex: none;
-    background: linear-gradient(135deg, #2563eb, #9333ea);
-  }
+  p.note { margin: 14px 0 0; font-size: 14px; line-height: 1.5; color: #8592a6; }
   .win {
     background: #fff; border: 1px solid #e6eaf2; border-radius: 14px; overflow: hidden;
     box-shadow: 0 34px 64px -24px rgba(15, 23, 42, .42), 0 12px 26px -14px rgba(15, 23, 42, .24);
@@ -97,17 +92,24 @@ async function shoot(html, out, width = SIZE.width, height = SIZE.height) {
   ]);
 }
 
-/** Where a cropped piece of a source image lands inside a box of its own size. */
-/** @param {number} srcWidth @param {number} srcHeight @param {[number, number, number, number]} crop
- *  @param {number} boxWidth @param {number} boxHeight */
-function place(srcWidth, srcHeight, [x, y, w, h], boxWidth, boxHeight) {
-  const piece = { x: x * srcWidth, y: y * srcHeight, w: w * srcWidth, h: h * srcHeight };
-  const scale = Math.max(boxWidth / piece.w, boxHeight / piece.h);
+// Where a source image lands inside the window. The crop's width is scaled to the frame the layout
+// gives it, and the page is anchored at the frame's top left, so a crop only ever takes from the
+// right and the bottom: the page's own top and left edge stay where the page put them.
+/**
+ * @param {number} srcWidth
+ * @param {number} srcHeight
+ * @param {[number, number, number, number]} crop
+ * @param {number} frame
+ */
+function place(srcWidth, srcHeight, [x, y, w, h], frame) {
+  const scale = frame / (w * srcWidth);
   return {
     width: srcWidth * scale,
     height: srcHeight * scale,
-    left: -(piece.x * scale) - (piece.w * scale - boxWidth) / 2,
-    top: -(piece.y * scale) - (piece.h * scale - boxHeight) / 2,
+    frame,
+    frameHeight: h * srcHeight * scale,
+    left: -x * srcWidth * scale,
+    top: -y * srcHeight * scale,
   };
 }
 
@@ -119,7 +121,8 @@ async function measure(file) {
   return { width, height };
 }
 
-/** @param {{ left: number, top: number, width: number, height: number }} spot @param {string} file */
+/** @param {{ left: number, top: number, width: number, height: number }} spot
+ *  @param {string} file */
 const image = (spot, file) => `<img src="file://${file}" style="width:${spot.width}px;`
   + `height:${spot.height}px;left:${spot.left}px;top:${spot.top}px">`;
 
@@ -127,23 +130,36 @@ const image = (spot, file) => `<img src="file://${file}" style="width:${spot.wid
 const windowBar = (shot) => `<div class="bar"><div class="dots"><b></b><b></b><b></b></div>`
   + `<div class="url">${shot.url}</div></div>`;
 
+// The words all sit outside the frame: the last line of the headline carries the gradient, and the
+// note is for the sentence a shot wants on a line of its own.
+/** @param {Shot} shot @returns {string} */
+const headline = (shot) => `<h1>${shot.headline
+  .map((line, at) => at === shot.headline.length - 1 ? `<em>${line}</em>` : line)
+  .join("<br>")}</h1>`;
+
+/** @param {Shot} shot @returns {string} */
+const say = (shot) => `<p class="sub">${shot.sub}</p>`
+  + (shot.note ? `<p class="note">${shot.note}</p>` : "");
+
 /** @param {Shot} shot @returns {Promise<string>} */
 async function sidePage(shot) {
   const file = path.join(SOURCES, shot.source);
   const size = await measure(file);
-  const box = { width: 690, height: 590 };
-  const shown = place(size.width, size.height, shot.crop, box.width, box.height - 32);
+  const shown = place(size.width, size.height, shot.crop, 744);
   return `<!doctype html><meta charset="utf-8"><style>${styles()}
-    .page { display: grid; grid-template-columns: 440px 690px; gap: 58px;
-      height: 100%; padding: 80px 76px 80px 84px; align-items: center; }
-    .win { height: ${box.height + 32}px; }
-    .shot { height: ${box.height}px; }</style>
+    .page { display: flex; gap: 32px; height: 100%; padding: 46px 34px 46px 54px;
+      align-items: center; }
+    .copy { width: 404px; flex: none; }
+    h1 { font-size: 38px; }
+    p.sub { font-size: 16px; }
+    .win { width: ${Math.round(shown.frame)}px;
+      height: ${Math.round(shown.frameHeight) + 32}px; flex: none; }
+    .shot { height: ${Math.round(shown.frameHeight)}px; }</style>
     <div class="page">
-      <div>
+      <div class="copy">
         <div class="brand"><img src="file://${ICON}"><span>Aeacus</span></div>
-        <h1>${shot.headline.map((line, at) => at === shot.headline.length - 1 ? `<em>${line}</em>` : line).join("<br>")}</h1>
-        <p class="sub">${shot.sub}</p>
-        <ul>${shot.bullets.map((text) => `<li><i></i>${text}</li>`).join("")}</ul>
+        ${headline(shot)}
+        ${say(shot)}
       </div>
       <div class="win">${windowBar(shot)}<div class="shot">${image(shown, file)}</div></div>
     </div>`;
@@ -153,22 +169,23 @@ async function sidePage(shot) {
 async function topPage(shot) {
   const file = path.join(SOURCES, shot.source);
   const size = await measure(file);
-  const box = { width: 1156, height: 556 };
-  const shown = place(size.width, size.height, shot.crop, box.width, box.height - 32);
+  const shown = place(size.width, size.height, shot.crop, 1156);
   return `<!doctype html><meta charset="utf-8"><style>${styles()}
     .page { height: 100%; padding: 46px 62px 0; display: flex; flex-direction: column; }
     .head { display: flex; align-items: flex-end; justify-content: space-between; gap: 40px; }
     h1 { margin: 18px 0 0; font-size: 42px; }
     p.sub { margin: 12px 0 0; max-width: 52ch; }
-    .win { margin-top: 34px; height: ${box.height + 32}px; }
-    .shot { height: ${box.height}px; }</style>
+    p.note { margin: 8px 0 0; max-width: 52ch; }
+    .win { margin-top: 30px; width: ${Math.round(shown.frame)}px;
+      height: ${Math.round(shown.frameHeight) + 32}px; }
+    .shot { height: ${Math.round(shown.frameHeight)}px; }</style>
     <div class="page">
       <div class="head">
         <div>
           <div class="brand"><img src="file://${ICON}"><span>Aeacus</span></div>
-          <h1>${shot.headline.map((line, at) => at === shot.headline.length - 1 ? `<em>${line}</em>` : line).join("<br>")}</h1>
+          ${headline(shot)}
         </div>
-        <p class="sub">${shot.sub}</p>
+        <div>${say(shot)}</div>
       </div>
       <div class="win">${windowBar(shot)}<div class="shot">${image(shown, file)}</div></div>
     </div>`;
