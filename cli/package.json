@@ -1,6 +1,7 @@
 {
   "name": "aeacus-cli",
   "version": "0.1.0",
+  "license": "MIT",
   "description": "Check writing with the Aeacus human-vs-AI classifier",
   "repository": "git+https://github.com/SeriousBug/aeacus.git",
   "type": "module",

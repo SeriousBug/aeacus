@@ -1,5 +1,6 @@
 {
   "name": "aeacus-website",
+  "license": "MIT",
   "private": true,
   "type": "module",
   "scripts": {

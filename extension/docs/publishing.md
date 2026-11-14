@@ -39,9 +39,9 @@ stores will ask about, and both show readers that the extension reads every site
 2. Upload `artifacts/aeacus-firefox-<version>.zip`.
 3. Attach the source code when asked. AMO requires it whenever a bundler touches the code, and
    `build.mjs` bundles with esbuild. A source archive holds `extension/` without `node_modules` or
-   `dist`, plus `shared/tokenizer.js`; the build instructions are `pnpm install --frozen-lockfile &&
-   pnpm build`, which writes `dist/firefox`, and reviewers compare it against the upload. Dependencies
-   come from npm, which the add-on policies allow.
+   `dist`, plus `shared/tokenizer.js` and `LICENSE`; the build instructions are `pnpm install
+   --frozen-lockfile && pnpm build`, which writes `dist/firefox`, and reviewers compare it against the
+   upload. Dependencies come from npm, which the add-on policies allow.
 4. Fill the listing: name, summary, description, category, screenshots, the MIT license, and a
    privacy policy.
 5. Data collection is already declared `none` in the manifest, which AMO requires of new submissions.

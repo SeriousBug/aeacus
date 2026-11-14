@@ -2,6 +2,7 @@
   "name": "aeacus-extension",
   "private": true,
   "version": "1.0.0",
+  "license": "MIT",
   "type": "module",
   "description": "Marks up the parts of a page that read as AI-written, on your own computer",
   "scripts": {
