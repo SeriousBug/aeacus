@@ -35,15 +35,18 @@ stores will ask about, and both show readers that the extension reads every site
 
    `activeTab`:
 
-   > This is what lets a page be read at all. Clicking the toolbar button or pressing the shortcut
-   > grants access to that one tab and no other, and the grant ends when the tab goes to another
-   > page. Nothing runs on a page the reader has not asked about.
+   > Aeacus marks up the page the reader is looking at, so it has to read that page's words, and
+   > this is the only way it gets to. Reading happens when the reader asks for a check, clicking
+   > the toolbar button or pressing the shortcut, and the words come from that one tab at that
+   > moment. No page is read in the background, when the browser starts, or on a tab the reader has
+   > not checked, which is why the extension asks for no access to sites of its own.
 
    `scripting`:
 
-   > No page script sits in the manifest, so nothing runs until a check is asked for. On that click
-   > the background puts `content.js` and `content.css` into the tab, using the activeTab grant for
-   > it, and injects nowhere else.
+   > The page script is what gathers the prose and draws the marks. Because nothing may run on a
+   > page until a check is asked for, the script is not declared in the manifest, and the
+   > background puts it into the tab on the ask, using the access the click just gave. Only a tab
+   > the reader checked gets it.
 
    `storage`:
 
