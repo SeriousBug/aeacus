@@ -144,16 +144,18 @@ export function createRunner(post) {
     ort.env.logLevel = "error";
     ort.env.wasm.wasmPaths = new URL("ort/", base).href;
     // Threads need a SharedArrayBuffer, which an extension page only has when the browser isolates
-    // it; a single thread is what is left otherwise.
-    const threads = typeof SharedArrayBuffer === "undefined"
-      ? 1
-      : Math.max(1, Math.min(8, navigator.hardwareConcurrency || 1));
+    // it. Chromium does, Firefox never does (bug 1673477), so there the model runs on one thread.
+    const shared = typeof SharedArrayBuffer !== "undefined";
+    const threads = shared ? Math.max(1, Math.min(8, navigator.hardwareConcurrency || 1)) : 1;
     ort.env.wasm.numThreads = threads;
     ort.env.wasm.wasmBinary = await fetch(new URL(ORT_WASM, base)).then((response) => {
       if (!response.ok) throw new Error(`couldn't load ONNX Runtime (HTTP ${response.status})`);
       return response.arrayBuffer();
     });
-    if (gpu && typeof navigator !== "undefined" && navigator.gpu
+    // ONNX Runtime drives the GPU from an asyncified wasm stack, which has to park on a second
+    // thread for every async call. Without one it unwinds the whole stack each time: 3 tok/s on
+    // Firefox against 47 for a single-threaded WebAssembly session on the same window.
+    if (gpu && shared && typeof navigator !== "undefined" && navigator.gpu
       && await navigator.gpu.requestAdapter()) {
       try {
         const session = await ort.InferenceSession.create(weights,

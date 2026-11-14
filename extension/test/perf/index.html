@@ -1,61 +1,74 @@
 <!doctype html>
 <html lang="en">
-<head><meta charset="utf-8"><title>Aeacus extension perf</title></head>
+<head><meta charset="utf-8"><title>Aeacus extension perf</title>
+<style>
+  body { font: 13px/1.55 ui-monospace, SFMono-Regular, Menlo, monospace; margin: 24px; color: #0f172a; }
+  pre { margin: 0; }
+  .head { font-weight: 600; margin-bottom: 12px; }
+</style>
+</head>
 <body>
-<pre id="out">running…</pre>
+<div class="head" id="head">running…</div>
+<pre id="out"></pre>
 <script type="module">
-import { run } from "./perf.js";
+// Every setting runs in a worker of its own, because ONNX Runtime reads its env once per context and
+// a second variant in the same one would silently reuse the first one's engine and thread pool.
+const query = new URLSearchParams(location.search);
+const PROVIDERS = (query.get("providers") ?? "webgpu,wasm").split(",").filter(Boolean);
+const THREADS = (query.get("threads") ?? "1,8").split(",").map(Number).filter(Boolean);
 
 const out = document.getElementById("out");
-const lines = [];
+const rows = [];
 
-function show(text) {
-  lines.push(text);
-  out.textContent = lines.join("\n\n");
+const pad = (text, width, right = false) => {
+  const value = String(text);
+  return right ? value.padStart(width) : value.padEnd(width);
+};
+
+function draw() {
+  const columns = [
+    ["engine", 10], ["threads", 9], ["used", 10], ["load", 10], ["run", 10], ["tok/s", 8],
+  ];
+  const line = columns.map(([name, width], at) => pad(name, width, at > 1)).join("  ");
+  const body = rows.map((row) => [
+    pad(row.asked, 10), pad(row.threadsWanted, 9, true), pad(row.provider ?? "-", 10),
+    pad(row.loadMs === undefined ? "-" : `${row.loadMs} ms`, 10, true),
+    pad(row.runsMs ? `${Math.min(...row.runsMs)} ms` : "-", 10, true),
+    pad(row.tokensPerSecond === undefined ? "-" : row.tokensPerSecond, 8, true),
+  ].join("  "));
+  const notes = rows.filter((row) => row.webgpuError || row.sessionError)
+    .map((row) => `${row.asked}: ${row.webgpuError ?? row.sessionError}`);
+  const best = rows.filter((row) => row.tokensPerSecond).sort((a, b) => b.tokensPerSecond - a.tokensPerSecond)[0];
+  out.textContent = [line, "-".repeat(line.length), ...body, "",
+    notes.length ? `errors:\n${notes.join("\n")}\n` : "",
+    best ? `fastest: ${best.asked}, ${best.threadsWanted} threads, ${best.tokensPerSecond} tok/s` : "",
+  ].join("\n");
 }
 
-function errors(error) {
-  return String(error?.stack ?? error);
+function timeOne(provider, threads) {
+  return new Promise((resolve) => {
+    const url = `worker.js?provider=${provider}&threads=${threads}`;
+    const worker = new Worker(url, { type: "module" });
+    worker.onmessage = ({ data }) => { worker.terminate(); resolve(data); };
+    worker.onerror = (event) => {
+      worker.terminate();
+      resolve({ asked: provider, threadsWanted: threads, sessionError: String(event.message ?? event) });
+    };
+  });
 }
 
-const which = new URLSearchParams(location.search).get("only");
+const first = await timeOne(PROVIDERS[0], THREADS[0]);
+document.getElementById("head").textContent =
+  `512-token window, dedicated worker, crossOriginIsolated=${first.crossOriginIsolated},`
+  + ` SharedArrayBuffer=${first.sharedArrayBuffer}, hasGpu=${first.hasGpu}`;
 
-if (!which || which === "page") {
-  try {
-    show(JSON.stringify(await run("page"), null, 2));
-  } catch (e) {
-    show(`page failed: ${errors(e)}`);
-  }
-}
-
-if (!which || which === "worker") {
-  try {
-    const results = await new Promise((resolve, reject) => {
-      const worker = new Worker(new URL(`worker.js${location.search}`, location.href), { type: "module" });
-      worker.onmessage = ({ data }) => resolve(data);
-      worker.onerror = (e) => reject(e.message ?? e);
-    });
-    show(JSON.stringify(results, null, 2));
-  } catch (e) {
-    show(`worker failed: ${errors(e)}`);
-  }
-}
-
-if (!which || which === "sw") {
-  try {
-    await navigator.serviceWorker.register(new URL("sw.js", location.href), { type: "module" });
-    await navigator.serviceWorker.ready;
-    const registration = (await navigator.serviceWorker.getRegistration()).waiting
-      ?? (await navigator.serviceWorker.getRegistration()).active;
-    const results = await new Promise((resolve, reject) => {
-      const channel = new MessageChannel();
-      channel.port1.onmessage = ({ data }) => resolve(data);
-      setTimeout(() => reject(new Error("service worker timed out")), 600000);
-      registration.postMessage({ go: true }, [channel.port2]);
-    });
-    show(JSON.stringify(results, null, 2));
-  } catch (e) {
-    show(`service worker failed: ${errors(e)}`);
+for (const provider of PROVIDERS) {
+  for (const threads of THREADS) {
+    const row = provider === PROVIDERS[0] && threads === THREADS[0]
+      ? first
+      : await timeOne(provider, threads);
+    rows.push(row);
+    draw();
   }
 }
 

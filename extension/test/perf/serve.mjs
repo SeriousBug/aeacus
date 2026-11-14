@@ -16,7 +16,8 @@ const TYPES = {
 };
 
 http.createServer((req, res) => {
-  const file = path.join(ROOT, decodeURIComponent(req.url.split("?")[0]));
+  const asked = decodeURIComponent(req.url.split("?")[0]);
+  const file = path.join(ROOT, asked === "/" ? "index.html" : asked);
   if (!file.startsWith(ROOT) || !fs.existsSync(file) || !fs.statSync(file).isFile()) {
     res.writeHead(404).end("not found");
     return;
@@ -25,6 +26,11 @@ http.createServer((req, res) => {
   res.writeHead(200, {
     "Content-Type": TYPES[path.extname(file)] ?? "application/octet-stream",
     "Content-Length": stat.size,
+    // The extension's pages are isolated, so the harness has to be too for SharedArrayBuffer and
+    // therefore wasm threads to exist at all.
+    "Cross-Origin-Opener-Policy": "same-origin",
+    "Cross-Origin-Embedder-Policy": "require-corp",
+    "Cross-Origin-Resource-Policy": "same-origin",
   });
   fs.createReadStream(file).pipe(res);
 }).listen(PORT, () => console.log(`http://localhost:${PORT}/`));
