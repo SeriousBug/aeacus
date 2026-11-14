@@ -27,56 +27,56 @@ stores will ask about, and both show readers that the extension reads every site
 
    Single purpose, 1000 characters at most:
 
-   > Aeacus marks which parts of a web page read as AI-written and which read as written by a
-   > person. The reader asks for a check from the toolbar button or the Alt+Shift+A shortcut, the
-   > text of the page in view is scored, and the paragraphs and comments it finds are tinted from
-   > likely human to likely AI. A model runs inside the extension on the reader's own computer, so
-   > the page is never sent anywhere and nothing is stored off the device.
+   > Aeacus marks which paragraphs and comments on a page read as AI-written and which read as
+   > written by a person. The reader asks for a check with the toolbar button or the Alt+Shift+A
+   > shortcut, the text of the page in view is scored, and each block it found is tinted from
+   > likely human to likely AI, with the score on hover. The model that does the scoring runs inside
+   > the extension on the reader's own computer, so the text is never sent anywhere and nothing is
+   > stored off the device.
 
    `activeTab`:
 
-   > Aeacus marks up the page the reader is looking at, so it has to read that page's words, and
-   > this is the only way it gets to. Reading happens when the reader asks for a check, clicking
-   > the toolbar button or pressing the shortcut, and the words come from that one tab at that
-   > moment. No page is read in the background, when the browser starts, or on a tab the reader has
-   > not checked, which is why the extension asks for no access to sites of its own.
+   > Aeacus draws its marks on the page the reader is reading, so it has to read that page's words:
+   > the prose, the reviews, the comments. It reads them only on the ask, from the toolbar button
+   > or the shortcut, and only from the tab in front of the reader at that moment. Nothing is read
+   > at start-up, in the background, or on a tab nobody checked, so there is no reason for the
+   > extension to hold access to sites of its own.
 
    `scripting`:
 
-   > The page script is what gathers the prose and draws the marks. Because nothing may run on a
-   > page until a check is asked for, the script is not declared in the manifest, and the
-   > background puts it into the tab on the ask, using the access the click just gave. Only a tab
-   > the reader checked gets it.
+   > The script that gathers the page's prose and draws the marks goes into the tab when a check is
+   > asked for, rather than sitting on every page the reader visits. The styles for the marks go in
+   > with it, so nothing on the page changes before the reader asks.
 
    `storage`:
 
-   > Keeps the reader's own settings and whether the model has finished downloading, so the
-   > extension behaves the same on the next page. It holds a handful of fields in `storage.local`:
-   > the score at which marks appear, the colours, whether to use the GPU, and one flag for the
-   > downloaded model. Nothing leaves the computer, and the reader can clear it from the options
-   > page.
+   > Keeps three things the extension needs on the next visit: whether checks may use the GPU,
+   > whether the debug log is verbose, and whether the model has finished downloading. That last
+   > one is what makes the toolbar button say "Check this page" instead of "Download Aeacus". They
+   > are a few small values on the reader's computer, sent nowhere, and they go when the extension
+   > is removed.
 
    `unlimitedStorage`:
 
-   > The checking model is a 90 MB file, kept in the extension's Cache Storage so it is downloaded
-   > once. That storage shares the extension's quota, and a file this big can be evicted when the
-   > quota fills, which would mean another 90 MB download. Unlimited storage keeps the weights in
-   > place, and nothing else large is written.
+   > The model is a 90 MB file, and Aeacus keeps it in the browser's local cache so a check costs no
+   > download after the first. That cache falls under the storage an extension is given, and a file
+   > this big can be evicted when it fills, which would leave the reader downloading 90 MB again.
+   > Nothing else Aeacus writes is large.
 
    `offscreen`:
 
-   > The model runs in a Web Worker, which a Chrome service worker cannot create. The offscreen
-   > document exists to host that worker, opened with reason WORKERS, and it keeps the loaded model
-   > between checks so a check does not download or load it again. It has no UI, reads no pages, and
-   > only the extension's service worker talks to it.
+   > Scoring takes a worker thread, and the extension's background service worker cannot start one.
+   > This document exists for that worker: it loads the model once, keeps it loaded so the next
+   > check starts straight away, and hands the scores back. It has no window, touches no page, and
+   > sees only the text blocks it is asked to score.
 
    Site access, the same text for all four host permissions:
 
-   > Downloads the model the first time a page is checked. It is three files from a public Hugging
-   > Face repository, about 90 MB in total: `huggingface.co` serves the address, which redirects to
-   > the other three, where Hugging Face keeps the weights. These are GET requests for the model;
-   > nothing on the page is uploaded, and after the first check the copy in Cache Storage is read
-   > instead.
+   > The model comes from a public Hugging Face repository, and this lets the browser fetch it on
+   > the first check: the 90 MB weights, a tokenizer, and a thresholds file. huggingface.co serves
+   > the address and redirects to the CDN hosts, which is why all four are listed. The requests ask
+   > for those files and carry no page text, and after the first check the copy in the local cache
+   > is read instead.
 
    Remote code is answered no: WebAssembly ships inside the package, and what comes from Hugging
    Face is weights, not code. Under data usage, every data type stays unchecked and all three
