@@ -21,16 +21,54 @@ stores will ask about, and both show readers that the extension reads every site
 2. Add a new item and upload `artifacts/aeacus-chrome-<version>.zip`.
 3. Fill the store listing: name, summary of 132 characters or fewer, description, category,
    language, and at least one screenshot at 1280×800 or 640×400. The 128×128 icon is in the package.
-4. Fill the privacy practices tab, which is what review reads first:
-   - Single purpose: marks the parts of a page that read as AI-written, with a model that runs on the
-     reader's computer.
-   - `storage` and `unlimitedStorage`: the model and the settings stay on the reader's computer.
-   - Site access: text is read on the page being checked and nothing is uploaded.
-   - Remote code: WebAssembly ships inside the package, and what is downloaded from Hugging Face is
-     weights, not code.
-   - Data usage: nothing is collected.
-5. Link a privacy policy, which the site at `aeacus.bgenc.dev` does not have yet.
-6. Submit for review, with distribution set to public and all regions.
+4. Fill the privacy practices tab, which is what review reads first. The dashboard refuses a
+   submission without the single purpose, a justification per permission, and the data usage
+   certification, so all of the text below goes in before the first submit, not after:
+
+   Single purpose, 1000 characters at most:
+
+   > Aeacus marks which parts of a web page read as AI-written and which read as written by a
+   > person. The reader asks for a check from the toolbar button, the Alt+Shift+A shortcut, or the
+   > small control on the page; the text of the page in view is scored, and the paragraphs and
+   > comments it finds are tinted from likely human to likely AI. A model runs inside the extension
+   > on the reader's own computer, so the page is never sent anywhere and nothing is stored off the
+   > device.
+
+   `storage`:
+
+   > Keeps the reader's own settings and whether the model has finished downloading, so the
+   > extension behaves the same on the next page. It holds a handful of fields in `storage.local`:
+   > the score at which marks appear, the colours, whether checks run on their own, and one flag for
+   > the downloaded model. Nothing leaves the computer, and the reader can clear it from the options
+   > page.
+
+   `unlimitedStorage`:
+
+   > The checking model is a 90 MB file, kept in the extension's Cache Storage so it is downloaded
+   > once. That storage shares the extension's quota, and a file this big can be evicted when the
+   > quota fills, which would mean another 90 MB download. Unlimited storage keeps the weights in
+   > place, and nothing else large is written.
+
+   `offscreen`:
+
+   > The model runs in a Web Worker, which a Chrome service worker cannot create. The offscreen
+   > document exists to host that worker, opened with reason WORKERS, and it keeps the loaded model
+   > between checks so a check does not download or load it again. It has no UI, reads no pages, and
+   > only the extension's service worker talks to it.
+
+   Site access, the same text for all four host permissions:
+
+   > Downloads the model the first time a page is checked. It is three files from a public Hugging
+   > Face repository, about 90 MB in total: `huggingface.co` serves the address, which redirects to
+   > the other three, where Hugging Face keeps the weights. These are GET requests for the model;
+   > nothing on the page is uploaded, and after the first check the copy in Cache Storage is read
+   > instead.
+
+   Remote code is answered no: WebAssembly ships inside the package, and what comes from Hugging
+   Face is weights, not code. Under data usage, every data type stays unchecked and all three
+   certifications are checked.
+5. Submit for review, with distribution set to public and all regions. A privacy policy URL is only
+   required once an item declares that it collects data, and this one declares nothing.
 
 ## Firefox AMO
 
