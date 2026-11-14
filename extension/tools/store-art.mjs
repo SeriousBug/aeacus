@@ -178,7 +178,7 @@ const promoPage = ({ width, height, icon, type, tagline, taglineSize }) => `<!do
     img { width: ${icon}px; height: ${icon}px; filter: drop-shadow(0 12px 24px rgba(0, 0, 0, .35)); }
     .mark span { font-size: ${type}px; font-weight: 600; letter-spacing: -.02em;
       text-shadow: 0 10px 30px rgba(0, 0, 0, .35); }
-    p { margin: 0; max-width: ${Math.round(width * 0.72)}px; text-align: center;
+    p { margin: 0; max-width: ${Math.round(width * 0.68)}px; text-align: center; text-wrap: balance;
       font-size: ${taglineSize}px; line-height: 1.35; color: rgba(255, 255, 255, .82); }
   </style>
   <div class="mark"><img src="file://${ICON}"><span>Aeacus</span></div>
