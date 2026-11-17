@@ -47,8 +47,10 @@ Firefox: open `about:debugging#/runtime/this-firefox`, choose "Load Temporary Ad
 
 Safari: `pnpm safari` builds `dist/safari` and converts it into the Xcode project in `safari/`,
 which Xcode builds and runs as a small app holding the extension; turn the extension on in Safari's
-settings afterwards. Running it again regenerates the project, so changes made inside Xcode are
-lost. The project points at `dist/safari` rather than copying it.
+settings afterwards. The project carries an app for the Mac and one for the iPhone and iPad, both
+under the same bundle identifier so the App Store can sell them as one. Running it again regenerates
+the project, so changes made inside Xcode are lost. The project points at `dist/safari` rather than
+copying it.
 
 ## Seeing what was drawn
 

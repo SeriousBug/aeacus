@@ -6,10 +6,10 @@ What each store takes, and what it asks for before it takes it. `pnpm zip` write
 
 `pnpm art` draws the store artwork from the screenshots in `store/sources`, with the words kept
 outside the frame of each shot: `store/art/screenshots` at 1280×800 for Chrome and AMO,
-`store/art/mac` at 2560×1600 for the Mac, and `store/art/promo` for Chrome's 440×280 tile and
-1400×560 marquee. It needs Chrome, ImageMagick and a font that has SF or Helvetica on it.
-`store/art.json` holds the order of the shots, the address bar each one shows, its words and its
-crop.
+`store/art/mac` at 2560×1600 for the Mac, `store/art/phone` at 1320×2868 and `store/art/tablet` at
+2064×2752 for the iPhone and iPad, and `store/art/promo` for Chrome's 440×280 tile and 1400×560
+marquee. It needs Chrome, ImageMagick and a font that has SF or Helvetica on it. `store/art.json`
+holds the order of the shots, the address bar each one shows, its words and its crop.
 
 The weights are not in the package: the first check downloads 90 MB from Hugging Face, which both
 stores will ask about, and both show readers that the extension reads every site.
@@ -111,4 +111,6 @@ AMO, and `fetch` against the Chrome Web Store API for Chrome.
 ## Safari
 
 The Safari build is an app around the extension, which `pnpm safari` writes to `safari/` and Xcode
-builds. `docs/safari.md` has the certificate, the app record and the upload.
+builds. The same project holds an iOS app and a macOS app under one bundle identifier, so one App
+Store record sells both as a universal purchase, and the record has to be created as iOS for that to
+work. `docs/safari.md` has the certificate, the app record, the upload and the listing.

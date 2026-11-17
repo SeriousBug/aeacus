@@ -5,6 +5,10 @@ converts `dist/safari` into the Xcode project in `safari/`, which Xcode builds. 
 `dist/safari` instead of copying it, so a rebuild is picked up without converting again, and
 converting again regenerates the project, losing any change made inside Xcode.
 
+The converter is given neither `--macos-only` nor `--ios-only`, so the project carries an app and an
+extension for each platform, `Aeacus (macOS)` and `Aeacus (iOS)`, sharing one group of extension
+sources and the same bundle identifiers. That is what an App Store record selling both needs.
+
 The converter names the app's bundle identifier with the app name's case, which puts
 `dev.bgenc.aeacus.Extension` inside an app called `dev.bgenc.Aeacus`, and Xcode stops the build at
 `ValidateEmbeddedBinary` because the extension's identifier is not prefixed by its parent's.
@@ -12,9 +16,12 @@ The converter names the app's bundle identifier with the app name's case, which 
 
 ```sh
 pnpm safari
-xcodebuild -project safari/Aeacus/Aeacus.xcodeproj -scheme Aeacus -configuration Release \
+xcodebuild -project safari/Aeacus/Aeacus.xcodeproj -scheme "Aeacus (macOS)" -configuration Release \
   -archivePath build/aeacus.xcarchive archive
 ```
+
+The iOS app builds the same way with `-scheme "Aeacus (iOS)" -destination 'generic/platform=iOS
+Simulator'`, which is how to see it without a device.
 
 ## Testing it locally
 
@@ -22,7 +29,7 @@ xcodebuild -project safari/Aeacus/Aeacus.xcodeproj -scheme Aeacus -configuration
 extension's own sources changed; a plain build picks up a new `dist/safari` without it.
 
 ```sh
-xcodebuild -project safari/Aeacus/Aeacus.xcodeproj -scheme Aeacus -configuration Debug \
+xcodebuild -project safari/Aeacus/Aeacus.xcodeproj -scheme "Aeacus (macOS)" -configuration Debug \
   -derivedDataPath build/dd build -allowProvisioningUpdates DEVELOPMENT_TEAM=63QQLP356Q
 cp -R build/dd/Build/Products/Debug/Aeacus.app /Applications
 open /Applications/Aeacus.app
@@ -41,6 +48,20 @@ downloads the weights from Hugging Face the first time.
 Xcode does the same by hand: open `safari/Aeacus/Aeacus.xcodeproj`, set the team under Signing &
 Capabilities on both targets, and Run.
 
+For a phone or a tablet, build the iOS scheme into the simulator, install and launch it:
+
+```sh
+xcodebuild -project safari/Aeacus/Aeacus.xcodeproj -scheme "Aeacus (iOS)" -configuration Debug \
+  -destination 'generic/platform=iOS Simulator' -derivedDataPath build/ios build
+xcrun simctl boot "iPhone 16 Pro"
+xcrun simctl install booted build/ios/Build/Products/Debug-iphonesimulator/Aeacus.app
+xcrun simctl launch booted dev.bgenc.aeacus
+xcrun simctl io booted screenshot build/ios/shot.png
+```
+
+The extension turns on in Settings > Apps > Safari > Extensions, and a check starts from the Aa menu,
+because `commands`, the Alt+Shift+A shortcut, has no iOS counterpart.
+
 ## What the App Store wants
 
 - A distribution signature. Archiving signs with Apple Development, and `-exportArchive` below
@@ -56,11 +77,15 @@ Capabilities on both targets, and Run.
 
   `build/export/Aeacus.pkg` is the upload, and `DistributionSummary.plist` beside it records which
   certificate and profile signed what.
-- An app record in App Store Connect: platform macOS, name Aeacus, bundle identifier
-  `dev.bgenc.aeacus`, a SKU and a primary language. The API cannot create one.
+- An app record in App Store Connect: name Aeacus, bundle identifier `dev.bgenc.aeacus`, a SKU and
+  a primary language. The API cannot create one. Create it with platform **iOS** and the macOS
+  version is added to the same record, which is the direction universal purchase works in: Apple's
+  help on adding platforms lets macOS, tvOS and visionOS join an existing iOS app, sharing its
+  Apple ID, SKU and bundle ID, and says records cannot be merged afterwards. Uploading the macOS
+  build with the same bundle identifier is what attaches it.
 - An upload of `Aeacus.pkg` from Xcode's Organizer (Distribute App, App Store Connect) or from the
   command line, which needs an App Store Connect API key at `~/.appstoreconnect/private_keys` that
-  is not set up here:
+  is not set up here. The iOS build uploads the same way, with `-t ios`:
 
   ```sh
   xcrun altool --upload-app -f build/export/Aeacus.pkg -t macos \
@@ -68,7 +93,9 @@ Capabilities on both targets, and Run.
   ```
 - A privacy policy URL, screenshots, a category, and the app's privacy answers. The extension
   declares no data collection, and the weights are downloaded from Hugging Face on first use, which
-  review asks about.
+  review asks about. `pnpm art` writes the Mac screenshots to `store/art/mac` at 2560×1600, the
+  6.9-inch iPhone ones to `store/art/phone` at 1320×2868, and the 13-inch iPad ones to
+  `store/art/tablet` at 2064×2752.
 
 The app's `MARKETING_VERSION` is 1.0 while the extension reports the version in `package.json`; the
 two are independent, and App Store versions only move forward. `CURRENT_PROJECT_VERSION` is 1 and
@@ -110,7 +137,8 @@ Description:
 Support URL `https://github.com/SeriousBug/aeacus/issues`, marketing URL `https://aeacus.bgenc.dev`,
 privacy policy `https://aeacus.bgenc.dev/privacy.html`, category Productivity, price free, App
 Privacy "Data Not Collected". Screenshots are the seven at 2560×1600 that `pnpm art` writes to
-`store/art/mac`.
+`store/art/mac`, and the iPhone and iPad versions of the same seven beside them in `store/art/phone`
+and `store/art/tablet`.
 
 Notes for review, which is where the download and the extension both get explained:
 
