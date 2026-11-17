@@ -3,7 +3,8 @@
 //   node tools/store-art.mjs
 //
 // Each store takes its own sizes from the same composition: Chrome and AMO at 1280×800, the Mac at
-// 2560×1600, and Chrome's two promo tiles are drawn from the icon instead of a shot.
+// 2560×1600, the iPhone at 1320×2868 and the iPad at 2064×2752 with the words above the frame, and
+// Chrome's two promo tiles are drawn from the icon instead of a shot.
 
 import { execFile } from "node:child_process";
 import fs from "node:fs/promises";
@@ -28,9 +29,10 @@ const RETINA = 2;
 /** @typedef {{ id: string, source: string, url: string, headline: string[], sub: string,
  *   note?: string, crop: [number, number, number, number] }} Shot */
 
-const styles = () => `  * { box-sizing: border-box; }
+/** @param {number} width @param {number} height @returns {string} */
+const styles = (width, height) => `  * { box-sizing: border-box; }
   body {
-    margin: 0; width: ${SIZE.width}px; height: ${SIZE.height}px; overflow: hidden;
+    margin: 0; width: ${width}px; height: ${height}px; overflow: hidden;
     font-family: ui-sans-serif, -apple-system, "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
     color: #0f172a;
     background:
@@ -142,7 +144,7 @@ async function pageOf(shot) {
   const file = path.join(SOURCES, shot.source);
   const size = await measure(file);
   const shown = place(size.width, size.height, shot.crop, 744);
-  return `<!doctype html><meta charset="utf-8"><style>${styles()}
+  return `<!doctype html><meta charset="utf-8"><style>${styles(SIZE.width, SIZE.height)}
     .page { display: flex; gap: 32px; height: 100%; padding: 46px 34px 46px 54px;
       align-items: center; }
     .copy { width: 404px; flex: none; }
@@ -159,6 +161,42 @@ async function pageOf(shot) {
       </div>
       <div class="win">${windowBar(shot)}<div class="shot">${image(shown, file)}</div></div>
     </div>`;
+}
+
+// The phones and tablets are held upright, so the words go above the frame. Each device gets the
+// widest frame that still leaves room for them: the frame keeps the crop's own shape, which keeps
+// the page from being stretched or cut off at a word.
+/** @param {Shot} shot @param {{ width: number, height: number, frame: number }} device
+ *  @returns {Promise<string>} */
+async function tallPage(shot, device) {
+  const { width, height } = device;
+  const file = path.join(SOURCES, shot.source);
+  const size = await measure(file);
+  const pad = Math.round(width * 0.055);
+  const shown = place(size.width, size.height, shot.crop, Math.round(width * device.frame));
+  /** @param {number} share @returns {number} */
+  const type = (share) => Math.round(width * share);
+  return `<!doctype html><meta charset="utf-8"><style>${styles(width, height)}
+    .page { display: flex; flex-direction: column; justify-content: center;
+      gap: ${type(0.05)}px; height: 100%; padding: ${pad}px; }
+    .copy { flex: none; }
+    h1 { font-size: ${type(0.098)}px; margin-top: ${type(0.046)}px; }
+    p.sub { font-size: ${type(0.038)}px; margin-top: ${type(0.03)}px; }
+    p.note { font-size: ${type(0.03)}px; margin-top: ${type(0.022)}px; }
+    .brand img { width: ${type(0.06)}px; height: ${type(0.06)}px; }
+    .brand span { font-size: ${type(0.042)}px; }
+    .win { flex: none; width: ${Math.round(shown.frame)}px; margin: 0 auto;
+      height: ${Math.round(shown.frameHeight) + 32}px; }
+    .shot { height: ${Math.round(shown.frameHeight)}px; }
+  </style>
+  <div class="page">
+    <div class="copy">
+      <div class="brand"><img src="file://${ICON}"><span>Aeacus</span></div>
+      ${headline(shot)}
+      ${say(shot)}
+    </div>
+    <div class="win">${windowBar(shot)}<div class="shot">${image(shown, file)}</div></div>
+  </div>`;
 }
 
 /** @param {{ width: number, height: number, icon: number, type: number, tagline: string,
@@ -190,9 +228,18 @@ const { shots, promo } = JSON.parse(await fs.readFile(path.join(STORE, "art.json
 const out = {
   screenshots: path.join(ART, "screenshots"),
   mac: path.join(ART, "mac"),
+  phone: path.join(ART, "phone"),
+  tablet: path.join(ART, "tablet"),
   promo: path.join(ART, "promo"),
 };
 for (const dir of Object.values(out)) await fs.mkdir(dir, { recursive: true });
+
+// The App Store asks for 6.9-inch iPhone and 13-inch iPad screenshots, drawn at twice the CSS size
+// and kept there. The frame's share of the width is what leaves the words their room above it.
+const DEVICES = [
+  { name: "phone", width: 660, height: 1434, frame: 0.92, dir: out.phone },
+  { name: "tablet", width: 1032, height: 1376, frame: 0.75, dir: out.tablet },
+];
 
 for (const shot of shots) {
   const retina = path.join(os.tmpdir(), `aeacus-art-${shot.id}@2x.png`);
@@ -201,6 +248,11 @@ for (const shot of shots) {
   await run(MAGICK, [retina, "-alpha", "off", path.join(out.mac, `${shot.id}.png`)]);
   await run(MAGICK, [retina, "-alpha", "off", "-resize", "50%",
     path.join(out.screenshots, `${shot.id}.png`)]);
+  for (const device of DEVICES) {
+    const upright = path.join(os.tmpdir(), `aeacus-art-${shot.id}-${device.name}@2x.png`);
+    await shoot(await tallPage(shot, device), upright, device.width, device.height);
+    await run(MAGICK, [upright, "-alpha", "off", path.join(device.dir, `${shot.id}.png`)]);
+  }
   console.log(`art ${shot.id}`);
 }
 
