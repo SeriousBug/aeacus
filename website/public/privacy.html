@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Privacy - Aeacus</title>
+  <meta name="description" content="What Aeacus reads, what stays on your device, and what it downloads.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect x='1' y='3' width='6' height='10' rx='1.5' fill='%232563eb'/%3E%3Crect x='9' y='3' width='6' height='10' rx='1.5' fill='%239333ea'/%3E%3C/svg%3E">
+  <style>
+    :root {
+      --bg: #f7f6f3;
+      --text: #1c1c1f;
+      --muted: #66666e;
+      --border: #d9d7d1;
+      color-scheme: light;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #141416;
+        --text: #ececef;
+        --muted: #9d9da6;
+        --border: #34343a;
+        color-scheme: dark;
+      }
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font: 16px/1.6 system-ui, -apple-system, "Segoe UI", sans-serif;
+    }
+
+    main {
+      max-width: 660px;
+      margin: 0 auto;
+      padding: 48px 16px 64px;
+    }
+
+    a {
+      color: inherit;
+    }
+
+    h1 {
+      margin: 0 0 4px;
+      font-size: 1.9rem;
+      letter-spacing: -0.02em;
+    }
+
+    h2 {
+      margin: 2em 0 0.4em;
+      font-size: 1.05rem;
+    }
+
+    p {
+      margin: 0 0 1em;
+    }
+
+    .updated {
+      color: var(--muted);
+      font-size: 0.9rem;
+      margin: 0 0 2em;
+    }
+
+    .back {
+      display: inline-block;
+      margin-bottom: 2em;
+      color: var(--muted);
+      font-size: 0.9rem;
+      text-decoration: none;
+    }
+
+    .back:hover {
+      color: var(--text);
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <a class="back" href="/">&larr; Aeacus</a>
+    <h1>Privacy</h1>
+    <p class="updated">Last updated November 16, 2026</p>
+
+    <p>Aeacus marks which parts of a piece of writing read as AI generated and which read as written
+      by a person. It does that on your own device, and the text it looks at never leaves it.</p>
+
+    <h2>What Aeacus reads</h2>
+    <p>On this website, the text you paste into the box. In the browser extension, the text of the
+      page you ask it to check: the paragraphs, reviews and comments in view at the moment you press
+      the button or the shortcut. Nothing else on the page is read, and no page is read until you ask
+      for that check.</p>
+
+    <h2>Where that text goes</h2>
+    <p>Nowhere. The model that scores it runs inside your browser or on your Mac, and no copy of the
+      text is sent to a server. There is no account to make, no history of what you checked, and no
+      analytics, advertising or crash reporting built into the site or the extension.</p>
+
+    <h2>What Aeacus downloads</h2>
+    <p>The model itself, about 90 MB, once. It comes from a public
+      <a href="https://huggingface.co/level20tauren/aeacus-s-1">Hugging Face repository</a> and is
+      kept on your device afterwards, so a later check does not download it again. The request asks
+      for those files and carries nothing about the page you were reading.</p>
+
+    <h2>What is kept on your device</h2>
+    <p>The downloaded model, and the few settings that go with it: whether checks may use the GPU,
+      whether the log is verbose, and whether the model has finished downloading. Nothing there
+      describes what you read or what the model said about it.</p>
+
+    <h2>This website</h2>
+    <p>The site is served by Cloudflare Pages and keeps standard access logs the way any web host
+      does: the address requested, the time, and the browser's user agent. Those logs describe the
+      page load, never the text you paste, which stays in your browser. There are no cookies beyond
+      what serving the files requires.</p>
+
+    <h2>Questions</h2>
+    <p>Ask at <a href="https://github.com/SeriousBug/aeacus/issues">github.com/SeriousBug/aeacus</a>.</p>
+  </main>
+</body>
+</html>
