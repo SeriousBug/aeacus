@@ -17,6 +17,7 @@ const project = path.join(root, "safari");
 const app = path.join(project, "Aeacus", "Aeacus");
 const settingsFile = path.join(project, "Aeacus", "Aeacus.xcodeproj", "project.pbxproj");
 const bundleId = "dev.bgenc.aeacus";
+const category = "public.app-category.productivity";
 const icons = path.join(app, "Assets.xcassets", "AppIcon.appiconset");
 const resources = path.join(app, "Resources");
 
@@ -34,12 +35,25 @@ await run("xcrun", [
 // validate the embedded binary, which fails the build.
 const converted = "PRODUCT_BUNDLE_IDENTIFIER = dev.bgenc.Aeacus;";
 const wanted = `PRODUCT_BUNDLE_IDENTIFIER = ${bundleId};`;
-const settings = await readFile(settingsFile, "utf8");
+let settings = await readFile(settingsFile, "utf8");
 if (settings.includes(converted)) {
-  await writeFile(settingsFile, settings.replaceAll(converted, wanted));
+  settings = settings.replaceAll(converted, wanted);
 } else if (!settings.includes(wanted)) {
   throw new Error(`${settingsFile} has neither ${converted} nor ${wanted}`);
 }
+
+// The App Store wants a category, and Xcode warns about a target without one.
+const storyboard = "\t\t\t\tINFOPLIST_KEY_NSMainStoryboardFile = Main;";
+if (!settings.includes("INFOPLIST_KEY_LSApplicationCategoryType")) {
+  if (!settings.includes(storyboard)) throw new Error(`${settingsFile} has no app target settings`);
+  settings = settings.replaceAll(storyboard,
+    `\t\t\t\tINFOPLIST_KEY_LSApplicationCategoryType = "${category}";\n${storyboard}`);
+}
+
+// Neither target ever opens a file, so the sandbox keeps asking for an entitlement review would
+// ask about for nothing.
+settings = settings.replace(/^.*ENABLE_USER_SELECTED_FILES = readonly;.*\n/gm, "");
+await writeFile(settingsFile, settings);
 
 // The converter fills the app icon set with placeholders; ours carries the same mark as the browser
 // action, at every size the set asks for.

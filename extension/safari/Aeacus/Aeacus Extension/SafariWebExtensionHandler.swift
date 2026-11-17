@@ -2,7 +2,7 @@
 //  SafariWebExtensionHandler.swift
 //  Aeacus Extension
 //
-//  Created by Kaan Barmore-Genc on 11/13/26.
+//  Created by Kaan Barmore-Genc on 11/16/26.
 //
 
 import SafariServices
