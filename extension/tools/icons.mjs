@@ -13,6 +13,10 @@ const OUT = path.join(HERE, "..", "src", "icons");
 const HUMAN = [37, 99, 235];
 /** @type {[number, number, number]} */
 const AI = [147, 51, 234];
+/** The wash behind an opaque icon, corner to corner. @type {[number, number, number]} */
+const LIGHT = [246, 249, 255];
+/** @type {[number, number, number]} */
+const WASH = [250, 246, 255];
 const SAMPLES = 4;
 
 /** @param {number} x @param {number} y @param {number} x0 @param {number} y0 @param {number} x1
@@ -28,8 +32,8 @@ const inside = (x, y, x0, y0, x1, y1, radius) => {
     || (y >= y0 + radius && y <= y1 - radius);
 };
 
-/** @param {number} size @returns {Buffer} */
-function draw(size) {
+/** @param {number} size @param {{ opaque?: boolean }} [options] @returns {Buffer} */
+function draw(size, { opaque = false } = {}) {
   const scale = size * SAMPLES;
   const margin = Math.round(scale * 0.12);
   const gap = Math.round(scale * 0.1);
@@ -62,7 +66,19 @@ function draw(size) {
       }
       const total = SAMPLES * SAMPLES;
       const offset = (y * size + x) * 4;
-      if (a > 0) {
+      if (opaque) {
+        // The App Store rejects a marketing icon with an alpha channel, so the mark sits on the same
+        // pale wash the store artwork uses.
+        const covered = a / total / 255;
+        const wash = (x + y) / (2 * size);
+        const under = [0, 1, 2].map((i) => LIGHT[i] + (WASH[i] - LIGHT[i]) * wash);
+        const over = [r / (a / 255), g / (a / 255), b / (a / 255)];
+        for (let i = 0; i < 3; i++) {
+          buffer[offset + i] = Math.round(covered > 0 ? over[i] * covered + under[i] * (1 - covered)
+            : under[i]);
+        }
+        buffer[offset + 3] = 255;
+      } else if (a > 0) {
         buffer[offset] = Math.round(r / (a / 255));
         buffer[offset + 1] = Math.round(g / (a / 255));
         buffer[offset + 2] = Math.round(b / (a / 255));
@@ -98,17 +114,27 @@ function chunk(type, data) {
   return Buffer.concat([length, body, crc]);
 }
 
-/** @param {Buffer} pixels @param {number} size @returns {Buffer} */
-function png(pixels, size) {
+/** @param {Buffer} pixels @param {number} size @param {{ opaque?: boolean }} [options]
+ *  @returns {Buffer} */
+function png(pixels, size, { opaque = false } = {}) {
   const header = Buffer.alloc(13);
   header.writeUInt32BE(size, 0);
   header.writeUInt32BE(size, 4);
   header[8] = 8;
-  header[9] = 6;
-  const raw = Buffer.alloc(size * (size * 4 + 1));
+  // Colour type 2 is RGB and 6 is RGBA, and the App Store validation reads the file's channel count
+  // rather than the pixels, so an opaque icon leaves the alpha out of the file.
+  header[9] = opaque ? 2 : 6;
+  const stride = opaque ? size * 3 : size * 4;
+  const raw = Buffer.alloc(size * (stride + 1));
   for (let y = 0; y < size; y++) {
-    raw[y * (size * 4 + 1)] = 0;
-    pixels.copy(raw, y * (size * 4 + 1) + 1, y * size * 4, (y + 1) * size * 4);
+    raw[y * (stride + 1)] = 0;
+    if (opaque) {
+      for (let x = 0; x < size; x++) {
+        pixels.copy(raw, y * (stride + 1) + 1 + x * 3, (y * size + x) * 4, (y * size + x) * 4 + 3);
+      }
+    } else {
+      pixels.copy(raw, y * (stride + 1) + 1, y * size * 4, (y + 1) * size * 4);
+    }
   }
   return Buffer.concat([
     Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]),
@@ -124,3 +150,9 @@ for (const size of [16, 32, 48, 64, 128, 256, 512, 1024]) {
   await fs.writeFile(file, png(draw(size), size));
   console.log(`${file} ${size}×${size}`);
 }
+
+// The iOS asset catalogue takes one 1024 icon for light, dark and tinted, and App Store Connect
+// refuses one that has transparency.
+const ios = path.join(OUT, "icon-1024-ios.png");
+await fs.writeFile(ios, png(draw(1024, { opaque: true }), 1024, { opaque: true }));
+console.log(`${ios} 1024×1024, opaque`);

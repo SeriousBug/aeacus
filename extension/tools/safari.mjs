@@ -14,7 +14,9 @@ const run = /** @type {(file: string, args: string[], options: { stdio: "inherit
 
 const root = path.resolve(import.meta.dirname, "..");
 const project = path.join(root, "safari");
-const app = path.join(project, "Aeacus", "Aeacus");
+// Two app targets share one group of extension sources, so what the app shows lives in Shared (App)
+// rather than beside a single target.
+const app = path.join(project, "Aeacus", "Shared (App)");
 const settingsFile = path.join(project, "Aeacus", "Aeacus.xcodeproj", "project.pbxproj");
 const bundleId = "dev.bgenc.aeacus";
 const category = "public.app-category.productivity";
@@ -22,12 +24,14 @@ const icons = path.join(app, "Assets.xcassets", "AppIcon.appiconset");
 const resources = path.join(app, "Resources");
 
 await run(process.execPath, [path.join(root, "build.mjs")], { stdio: "inherit" });
+// No --macos-only or --ios-only, so the project carries a target for each platform and the App Store
+// can sell both under one record.
 await run("xcrun", [
   "safari-web-extension-converter", path.join(root, "dist", "safari"),
   "--project-location", project,
   "--app-name", "Aeacus",
   "--bundle-identifier", bundleId,
-  "--swift", "--macos-only", "--no-open", "--no-prompt", "--force",
+  "--swift", "--no-open", "--no-prompt", "--force",
 ], { stdio: "inherit" });
 
 // The converter writes the app's identifier in the app name's case, so the extension's
@@ -56,24 +60,27 @@ settings = settings.replace(/^.*ENABLE_USER_SELECTED_FILES = readonly;.*\n/gm, "
 await writeFile(settingsFile, settings);
 
 // The converter fills the app icon set with placeholders; ours carries the same mark as the browser
-// action, at every size the set asks for.
+// action, at every size the set asks for. The iOS entries are one 1024 icon for light, dark and
+// tinted, and the App Store rejects those with transparency.
 const { images } = JSON.parse(await readFile(path.join(icons, "Contents.json"), "utf8"));
 for (const image of images) {
-  const size = Number.parseInt(image.size, 10) * Number.parseInt(image.scale, 10);
-  const source = path.join(root, "src", "icons", `icon-${size}.png`);
+  const size = Number.parseInt(image.size, 10) * Number.parseInt(image.scale ?? "1", 10);
+  const source = image.platform === "ios"
+    ? path.join(root, "src", "icons", "icon-1024-ios.png")
+    : path.join(root, "src", "icons", `icon-${size}.png`);
   await writeFile(path.join(icons, image.filename), await readFile(source));
 }
 await writeFile(path.join(resources, "Icon.png"),
   await readFile(path.join(root, "src", "icons", "icon-512.png")));
 
 // The window the app opens only says whether the extension is on. One line above that says what it
-// is for.
+// is for, on either platform.
 const html = path.join(resources, "Base.lproj", "Main.html");
 const page = await readFile(html, "utf8");
 const after = 'alt="Aeacus Icon">';
 if (!page.includes(after)) throw new Error(`${html} is not what the converter used to write`);
 const lede = "\n    <p class=\"lede\">Aeacus detects which parts of text on a page are likely AI generated, "
-  + "and which are likely human written. Everything it reads stays on this Mac.</p>";
+  + "and which are likely human written. Everything it reads stays on your device.</p>";
 if (!page.includes(lede)) {
   await writeFile(html, page.replace(after, after + lede));
 }

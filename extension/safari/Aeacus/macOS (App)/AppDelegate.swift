@@ -1,6 +1,6 @@
 //
 //  AppDelegate.swift
-//  Aeacus
+//  macOS (App)
 //
 //  Created by Kaan Barmore-Genc on 11/16/26.
 //

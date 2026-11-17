@@ -1,6 +1,6 @@
 //
 //  SafariWebExtensionHandler.swift
-//  Aeacus Extension
+//  Shared (Extension)
 //
 //  Created by Kaan Barmore-Genc on 11/16/26.
 //
