@@ -18,7 +18,7 @@ const rules = {
 };
 
 export default [
-  { ignores: ["dist/", "safari/", "test/perf/ort/"] },
+  { ignores: ["dist/", "safari/", "build/", "test/perf/ort/"] },
   js.configs.recommended,
   {
     // The extension itself: the browser it runs in, and nothing from Node.
