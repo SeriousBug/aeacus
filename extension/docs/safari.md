@@ -16,6 +16,31 @@ xcodebuild -project safari/Aeacus/Aeacus.xcodeproj -scheme Aeacus -configuration
   -archivePath build/aeacus.xcarchive archive
 ```
 
+## Testing it locally
+
+`pnpm safari` rebuilds `dist/safari` and regenerates the project, so it is only needed when the
+extension's own sources changed; a plain build picks up a new `dist/safari` without it.
+
+```sh
+xcodebuild -project safari/Aeacus/Aeacus.xcodeproj -scheme Aeacus -configuration Debug \
+  -derivedDataPath build/dd build -allowProvisioningUpdates DEVELOPMENT_TEAM=63QQLP356Q
+cp -R build/dd/Build/Products/Debug/Aeacus.app /Applications
+open /Applications/Aeacus.app
+```
+
+The project carries no team, so a build without `DEVELOPMENT_TEAM` falls back to "Sign to Run
+Locally", which is ad hoc: Safari then loads the extension only with Develop > Allow Unsigned
+Extensions ticked, and that resets every time Safari starts. With the team it is signed with the
+Apple Development certificate, which needs no provisioning profile and no toggle.
+
+Copying the app to `/Applications` keeps it where LaunchServices found it; a build directory in
+`/tmp` goes away and takes Safari's copy of the extension with it. Safari lists the extension after
+the app has run once. Then Safari > Settings > Extensions > Aeacus, and a check on any page, which
+downloads the weights from Hugging Face the first time.
+
+Xcode does the same by hand: open `safari/Aeacus/Aeacus.xcodeproj`, set the team under Signing &
+Capabilities on both targets, and Run.
+
 ## What the App Store wants
 
 - An Apple Distribution certificate. The team here is `63QQLP356Q`, which Xcode is signed into, so
