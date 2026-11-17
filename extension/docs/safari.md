@@ -43,16 +43,88 @@ Capabilities on both targets, and Run.
 
 ## What the App Store wants
 
-- An Apple Distribution certificate. The team here is `63QQLP356Q`, which Xcode is signed into, so
-  `-allowProvisioningUpdates` on the archive creates the certificate and the profiles for
-  `dev.bgenc.aeacus` and `dev.bgenc.aeacus.Extension`.
+- A distribution signature. Archiving signs with Apple Development, and `-exportArchive` below
+  re-signs with a cloud-managed Apple Distribution certificate and a "Mac Team Store Provisioning
+  Profile" for `dev.bgenc.aeacus`, both made on the fly through the team `63QQLP356Q` that Xcode is
+  signed into. Nothing lands in the keychain, so this works on a machine with no distribution
+  certificate.
+
+  ```sh
+  xcodebuild -exportArchive -archivePath build/aeacus.xcarchive -exportPath build/export \
+    -exportOptionsPlist docs/export-options.plist -allowProvisioningUpdates
+  ```
+
+  `build/export/Aeacus.pkg` is the upload, and `DistributionSummary.plist` beside it records which
+  certificate and profile signed what.
 - An app record in App Store Connect: platform macOS, name Aeacus, bundle identifier
   `dev.bgenc.aeacus`, a SKU and a primary language. The API cannot create one.
-- An upload from Xcode's Organizer (Distribute App, App Store Connect) or with an App Store Connect
-  API key at `~/.appstoreconnect/private_keys`, which neither `altool` nor `notarytool` has here.
+- An upload of `Aeacus.pkg` from Xcode's Organizer (Distribute App, App Store Connect) or from the
+  command line, which needs an App Store Connect API key at `~/.appstoreconnect/private_keys` that
+  is not set up here:
+
+  ```sh
+  xcrun altool --upload-app -f build/export/Aeacus.pkg -t macos \
+    --apiKey <key id> --apiIssuer <issuer id>
+  ```
 - A privacy policy URL, screenshots, a category, and the app's privacy answers. The extension
   declares no data collection, and the weights are downloaded from Hugging Face on first use, which
   review asks about.
 
 The app's `MARKETING_VERSION` is 1.0 while the extension reports the version in `package.json`; the
-two are independent, and App Store versions only move forward.
+two are independent, and App Store versions only move forward. `CURRENT_PROJECT_VERSION` is 1 and
+has to go up for every upload that reaches App Store Connect.
+
+## The listing
+
+Name `Aeacus`. Subtitle, 30 characters at most:
+
+> Check text for AI writing
+
+Promotional text, 170 at most, and the one field that changes without waiting for review:
+
+> Marks the paragraphs, reviews and comments on a page that read as AI-written, so you can tell a
+> person's review from a generated one. Everything runs on your Mac.
+
+Keywords, 100 at most, comma separated:
+
+> ai detector,ai writing,ai text,generated text,fake reviews,chatgpt,writing checker
+
+Description:
+
+> Aeacus marks which paragraphs, reviews and comments on a page read as AI-written and which read as
+> written by a person.
+>
+> Ask for a check with the toolbar button or Alt+Shift+A, and the text in view is scored. Each block
+> comes back tinted from likely human to likely AI, with the score on hover.
+>
+> It works where you already read: store reviews, restaurant reviews, forum threads, newsletters,
+> blog comments.
+>
+> Nothing leaves your Mac. The model that does the scoring runs inside the extension, the text of
+> the page is never uploaded, and there is no account to make. The first check downloads the model
+> once and keeps it on your device after that.
+>
+> The same check is at aeacus.bgenc.dev if you would rather paste text, and the model is public at
+> huggingface.co/level20tauren/aeacus-s-1.
+
+Support URL `https://github.com/SeriousBug/aeacus/issues`, marketing URL `https://aeacus.bgenc.dev`,
+privacy policy `https://aeacus.bgenc.dev/privacy.html`, category Productivity, price free, App
+Privacy "Data Not Collected". Screenshots are the seven at 2560×1600 that `pnpm art` writes to
+`store/art/mac`.
+
+Notes for review, which is where the download and the extension both get explained:
+
+> Aeacus is a Safari web extension, and the app is the small window that holds it. To try it: open
+> the app, then Safari > Settings > Extensions > Aeacus, tick it, and press Alt+Shift+A on any page.
+> The page's paragraphs and comments come back tinted.
+>
+> The first check downloads about 90 MB from huggingface.co: the model's weights, a tokenizer and a
+> thresholds file, all data. No executable code is fetched, and WebAssembly that runs the model ships
+> inside the extension bundle. Later checks read the copy kept on the Mac.
+>
+> Nothing is collected. Page text is scored on the device and never sent anywhere, which is why the
+> App Privacy answers are empty and the app asks for no account.
+
+Two answers that are judgement calls rather than lookups: content rights, where the app bundles MIT
+and Apache licensed code and MIT licensed weights, and the age rating, where the questionnaire's
+unrestricted web access question is about apps that are themselves browsers, which this is not.
