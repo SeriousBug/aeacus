@@ -78,11 +78,11 @@ because `commands`, the Alt+Shift+A shortcut, has no iOS counterpart.
   `build/export/Aeacus.pkg` is the upload, and `DistributionSummary.plist` beside it records which
   certificate and profile signed what.
 - An app record in App Store Connect: name Aeacus, bundle identifier `dev.bgenc.aeacus`, a SKU and
-  a primary language. The API cannot create one. Create it with platform **iOS** and the macOS
-  version is added to the same record, which is the direction universal purchase works in: Apple's
-  help on adding platforms lets macOS, tvOS and visionOS join an existing iOS app, sharing its
-  Apple ID, SKU and bundle ID, and says records cannot be merged afterwards. Uploading the macOS
-  build with the same bundle identifier is what attaches it.
+  a primary language. The API cannot create one. Tick both platforms in the New App dialog: Apple
+  asks for "one or more platforms" there, and creating one record for both is what shares the bundle
+  ID and sells them as a single purchase. A record that started on one platform can also gain the
+  other later from the sidebar's Add Platform, but the metadata does not all come with it, and
+  records cannot be merged once they exist separately.
 - An upload of `Aeacus.pkg` from Xcode's Organizer (Distribute App, App Store Connect) or from the
   command line, which needs an App Store Connect API key at `~/.appstoreconnect/private_keys` that
   is not set up here. The iOS build uploads the same way, with `-t ios`:

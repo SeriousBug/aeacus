@@ -112,5 +112,5 @@ AMO, and `fetch` against the Chrome Web Store API for Chrome.
 
 The Safari build is an app around the extension, which `pnpm safari` writes to `safari/` and Xcode
 builds. The same project holds an iOS app and a macOS app under one bundle identifier, so one App
-Store record sells both as a universal purchase, and the record has to be created as iOS for that to
-work. `docs/safari.md` has the certificate, the app record, the upload and the listing.
+Store record created with both platforms sells them as a universal purchase. `docs/safari.md` has
+the certificate, the app record, the upload and the listing.
