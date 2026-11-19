@@ -10,6 +10,8 @@
     "icons": "node tools/icons.mjs",
     "safari": "node tools/safari.mjs",
     "zip": "node tools/pack.mjs",
+    "source": "node tools/source.mjs",
+    "release": "pnpm zip && pnpm source",
     "art": "node tools/store-art.mjs",
     "test": "node --test test/*.test.mjs",
     "types": "tsc -p tsconfig.json && tsc -p tsconfig.tools.json",

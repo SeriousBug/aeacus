@@ -1,8 +1,10 @@
 # Putting the extension in the stores
 
-What each store takes, and what it asks for before it takes it. `pnpm zip` writes
-`artifacts/aeacus-<browser>-<version>.zip` for Chrome and Firefox from a fresh build, with
-`manifest.json` at the archive's root.
+What each store takes, and what it asks for before it takes it. `pnpm release` writes all of it:
+`pnpm zip` builds Chrome and Firefox into `artifacts/aeacus-<browser>-<version>.zip`, with
+`manifest.json` at the archive's root, and `pnpm source` writes the source archive AMO asks for,
+`artifacts/aeacus-<version>-source.zip`. The version in those names comes from `package.json`, which
+is also the version the manifest carries.
 
 `pnpm art` draws the store artwork from the screenshots in `store/sources`, with the words kept
 outside the frame of each shot: `store/art/screenshots` at 1280×800 for Chrome and AMO,
@@ -90,10 +92,12 @@ stores will ask about, and both show readers that the extension reads every site
    `https://addons.mozilla.org/developers/addon/submit/distribution`, listed.
 2. Upload `artifacts/aeacus-firefox-<version>.zip`.
 3. Attach the source code when asked. AMO requires it whenever a bundler touches the code, and
-   `build.mjs` bundles with esbuild. A source archive holds `extension/` without `node_modules` or
-   `dist`, plus `shared/tokenizer.js` and `LICENSE`; the build instructions are `pnpm install
-   --frozen-lockfile && pnpm build`, which writes `dist/firefox`, and reviewers compare it against the
-   upload. Dependencies come from npm, which the add-on policies allow.
+   `build.mjs` bundles with esbuild. `pnpm source` writes `artifacts/aeacus-<version>-source.zip`: the
+   extension's own files without `node_modules` or `dist`, plus `shared/tokenizer.js`, `LICENSE`, and a
+   README that says how to build it, from `docs/amo-source.md` with the version and the tool versions
+   filled in. The build is `pnpm install --frozen-lockfile && pnpm build firefox`, which writes
+   `dist/firefox`, and reviewers compare it against the upload. Dependencies come from npm, which the
+   add-on policies allow.
 4. Fill the listing: name, summary, description, category, screenshots, the MIT license, and a
    privacy policy.
 5. Data collection is already declared `none` in the manifest, which AMO requires of new submissions.
