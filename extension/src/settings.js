@@ -1,7 +1,7 @@
 import api from "./api.js";
 
 /** @type {Settings} */
-export const DEFAULTS = { gpu: true, verbose: false };
+export const DEFAULTS = { gpu: true, verbose: false, theme: "system" };
 
 /** @returns {Promise<Settings>} */
 export async function readSettings() {

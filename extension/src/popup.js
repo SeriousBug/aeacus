@@ -1,6 +1,8 @@
 
 
 import api from "./api.js";
+import { readSettings } from "./settings.js";
+import { applyTheme } from "./theme.js";
 
 /**
  * @template {HTMLElement} T
@@ -180,7 +182,13 @@ elements.settings.addEventListener("click", (event) => {
 });
 
 async function start() {
-  const stored = await api.storage.local.get(["modelReady"]);
+  const [stored, settings] = await Promise.all([
+    api.storage.local.get(["modelReady"]),
+    readSettings(),
+  ]);
+  // theme-boot.js already put the theme on the page from what it remembered; this is for when that
+  // memory is gone, as it is once the reader clears their browsing data.
+  applyTheme(settings.theme);
   modelReady = Boolean(stored.modelReady);
   draw({});
 

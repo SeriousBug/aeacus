@@ -1,4 +1,5 @@
 import { readSettings, writeSettings } from "./settings.js";
+import { applyTheme } from "./theme.js";
 import api from "./api.js";
 
 /**
@@ -12,6 +13,8 @@ const $ = (id) => /** @type {any} */ (document.getElementById(id));
 const gpu = $("gpu");
 /** @type {HTMLInputElement} */
 const verbose = $("verbose");
+/** @type {HTMLSelectElement} */
+const theme = $("theme");
 /** @type {HTMLButtonElement} */
 const download = $("download");
 /** @type {HTMLElement} */
@@ -80,10 +83,20 @@ verbose.addEventListener("change", () => {
   });
 });
 
+theme.addEventListener("change", () => {
+  const picked = /** @type {Theme} */ (theme.value);
+  applyTheme(picked);
+  writeSettings({ theme: picked }).catch((error) => {
+    note(`The setting couldn't be saved: ${error.message ?? error}`, true);
+  });
+});
+
 async function start() {
   const settings = await readSettings();
   gpu.checked = settings.gpu;
   verbose.checked = settings.verbose;
+  theme.value = settings.theme;
+  applyTheme(settings.theme);
   const stored = await api.storage.local.get(["modelReady"]);
   if (stored.modelReady) downloaded();
 }

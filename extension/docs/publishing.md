@@ -50,11 +50,11 @@ stores will ask about, and both show readers that the extension reads every site
 
    `storage`:
 
-   > Keeps three things the extension needs on the next visit: whether checks may use the GPU,
-   > whether the debug log is verbose, and whether the model has finished downloading. That last
-   > one is what makes the toolbar button say "Check this page" instead of "Download Aeacus". They
-   > are a few small values on the reader's computer, sent nowhere, and they go when the extension
-   > is removed.
+   > Keeps four small things the extension needs on the next visit: whether checks may use the GPU,
+   > whether the debug log is verbose, whether the model has finished downloading, and which theme
+   > the reader picked. Whether the model has downloaded is what makes the toolbar button say
+   > "Check this page" instead of "Download Aeacus". They are a few small values on the reader's
+   > computer, sent nowhere, and they go when the extension is removed.
 
    `unlimitedStorage`:
 

@@ -15,7 +15,8 @@ const TARGETS = process.argv.slice(2).length ? process.argv.slice(2) : ["chrome"
 // Where the model comes from, which the tests point at a local folder to stay off the network.
 const MODEL_BASE = process.env.AEACUS_MODEL_BASE ?? "";
 
-const ENTRIES = ["background", "content", "offscreen", "popup", "options", "infer-worker"];
+const ENTRIES = ["background", "content", "offscreen", "popup", "options", "infer-worker",
+  "theme-boot"];
 
 // The web pages, shared by both popup and options.
 const PAGES = ["popup.html", "popup.css", "options.html", "options.css", "theme.css"];

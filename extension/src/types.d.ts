@@ -138,7 +138,10 @@ interface Host {
 
 type Post = (message: ModelReply) => void;
 
+type Theme = "system" | "light" | "dark";
+
 interface Settings {
   gpu: boolean;
   verbose: boolean;
+  theme: Theme;
 }

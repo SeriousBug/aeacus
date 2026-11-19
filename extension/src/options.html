@@ -4,12 +4,24 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Aeacus</title>
+  <script src="theme-boot.js"></script>
   <link rel="stylesheet" href="theme.css">
   <link rel="stylesheet" href="options.css">
 </head>
 <body>
   <main>
     <section class="card">
+      <label class="row">
+        <span>
+          <strong>Theme</strong>
+          <em>Light, dark, or whatever your computer is set to.</em>
+        </span>
+        <select id="theme">
+          <option value="system">Follow the system</option>
+          <option value="light">Light</option>
+          <option value="dark">Dark</option>
+        </select>
+      </label>
       <label class="row">
         <input type="checkbox" id="gpu">
         <span>

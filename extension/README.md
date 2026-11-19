@@ -91,7 +91,8 @@ worker runs the model itself over WebAssembly.
 | `src/host.js` | Runs `infer.js` in a worker, or in place when the browser has none |
 | `src/background.js` | Connects each page to the document that holds the worker |
 | `src/scoring.js` | Thresholds, calibration and the page-level numbers, on the bands the website and the CLI use |
-| `src/settings.js` | The one setting, whether the model may use the GPU, and what it defaults to |
+| `src/settings.js` | The settings, the GPU, the verbose log and the theme, and what each one defaults to |
+| `src/theme.js` | Puts the theme on the page as `data-theme`, and remembers it for `src/theme-boot.js` |
 | `src/api.js` | The browser's API under one name, since Firefox calls it `browser` and Chrome `chrome` |
 | `src/types.d.ts` | The shapes that cross a boundary: the model's messages and the page's state |
 

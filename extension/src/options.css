@@ -36,6 +36,21 @@ main {
   font-weight: 600;
 }
 
+.row select {
+  margin-left: auto;
+  padding: 5px 8px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+}
+
+.row select:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
 .row em {
   display: block;
   margin-top: 2px;
