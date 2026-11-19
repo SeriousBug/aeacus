@@ -167,6 +167,33 @@ lands inside that node.
   handles, `· 6h`, `115`, `1K`, `9` and `Write your reply`; the thread gives 57 and the profile 320,
   nearly all of them `ALT`.
 
+## facebook.com
+
+Checked signed in on 2026-11-18, on a group permalink, the group's feed, the home feed and a Page.
+
+- Keep: `[data-ad-rendering-role=story_message]`, which is a post's own words and nothing else. It is
+  the only stable hook: the classes are hashed (`x1i10hfl`, `x9f619`), and on a group permalink the
+  message is an `h4`, in the feed beside it an `h5`, and on a Page a `div`. The attribute is on the
+  post, not on the words, and it survives all three.
+- Keep: `[role=article]`, which is a comment, and in some views a whole post. The article holds the
+  author, the time, the words and the Like and Reply buttons; only the words survive the general pass,
+  which drops a block that is mostly a link (the author's name) and everything else here.
+- The permalink is what needs the rule. A post opened from a group is shown in a dialog, and dialogs
+  are chrome to the general pass, so it read the sidebar and the ads behind the dialog instead: 97
+  blocks, every one of them `Create a post`, `Join group`, `Remove`, `2.9K members • 10+ posts a day`
+  and a sponsored flu remedy, and not one word of the post or its 17 comments. With the rule it is 19
+  blocks, the post and the comments.
+- Drop: `[role=button]`. The Like and Reply buttons under every comment are `div`s with that role, so
+  they are read as text without it: 18 comments came to 54 blocks, two thirds of them the same two
+  words. The same goes for "See more" and the reaction counts.
+- The group's feed: 3 blocks, the post and the two comments under it. The home feed: 3 blocks. A Page:
+  its post, and none of the follower count, the sign-up banner or the about text, which the rule does
+  not name.
+- Left over: an attachment's label reads as a block of its own ("GIPHY", or `ALT`), because it is text
+  inside a link that is inside the comment rather than around it, where the link-share test cannot see
+  it. A post that the page clamps with "See more" ends its block at the ellipsis, since the rest of
+  the words are not in the page until the reader opens it.
+
 ## Pages no rule covers, measured on a WordPress blog
 
 ma.tt is the test case: a `[role=main]`, an `article` per post, `.entry-content` around the writing,

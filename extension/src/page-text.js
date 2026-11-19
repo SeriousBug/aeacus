@@ -103,8 +103,12 @@ function mainOf(root) {
  */
 export function findBlocks({ root = document.body, maxBlocks = MAX_BLOCKS, rule = ruleFor() } = {}) {
   if (!root) return [];
-  const regions = rule ? regionsFor(rule, root) : [];
-  if (!regions.length) regions.push(mainOf(root));
+  const named = rule ? regionsFor(rule, root) : [];
+  // A page that opens something in a dialog usually keeps a copy of it behind the dialog and hides
+  // that copy from readers. The copy is not writing on the page: reading it too would put every word
+  // of it in the summary twice, which is what Facebook does with the post a permalink opens.
+  const regions = (named.length ? named : [mainOf(root)])
+    .filter((region) => !region.closest("[aria-hidden='true']"));
   const drop = rule?.drop?.length ? rule.drop.join(", ") : "";
 
   /** @type {Map<Element, Element>} */

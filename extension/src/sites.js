@@ -57,6 +57,14 @@ const RULES = [
     keep: ['[data-word-wrap="1"]'],
     drop: ["[aria-label^='Post ']"],
   },
+  {
+    // A post's own words are in its story message, and the comments under it in articles. Both can
+    // sit in the dialog that a permalink opens, which the general pass treats as chrome, so the rule
+    // names them instead of naming the page.
+    host: /(^|\.)(facebook|fb)\.com$/,
+    keep: ["[data-ad-rendering-role='story_message']", "[role='article']"],
+    drop: ["[role='button']"],
+  },
 ];
 
 /**
